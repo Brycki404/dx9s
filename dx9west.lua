@@ -85,8 +85,6 @@ local config = _G.config or {
 	},
 }
 
---dx9.ShowConsole(true)
-
 local lib_ui = loadstring(dx9.Get("https://raw.githubusercontent.com/soupg/DXLibUI/main/main.lua"))()
 local lib_esp = loadstring(dx9.Get("https://pastebin.com/raw/Pwn8GxMB"))()
 
