@@ -40,11 +40,11 @@ local config = _G.config or {
 			},
 			{
 				AnimalType = "Horse",
-				Enabled = true,
+				Enabled = false,
 			},
 			{
 				AnimalType = "Cow",
-				Enabled = true,
+				Enabled = false,
 			},
 		},
     },
