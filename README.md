@@ -1,2 +1,2 @@
-# DX9WAREs
-My wares for dx9ware
+# dx9s
+My wares of dx9s
