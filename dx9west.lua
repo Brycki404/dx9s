@@ -22,14 +22,30 @@ local config = _G.config or {
 		color = { 255, 255, 255 },
 		distance_limit = 5000,
 		entries = {
-			["Deer"] = true,
-			["Bison"] = true,
-			["Gator"] = true,
-			["Bear"] = true,
-			["Cow"] = false,
-			["Horse"] = false,
-			["UndeadBear"] = false,
-			["Wendigo"] = false,
+			{
+				AnimalType = "Deer",
+				Enabled = true,
+			},
+			{
+				AnimalType = "Bison",
+				Enabled = true,
+			},
+			{
+				AnimalType = "Gator",
+				Enabled = true,
+			},
+			{
+				AnimalType = "Bear",
+				Enabled = true,
+			},
+			{
+				AnimalType = "Horse",
+				Enabled = true,
+			},
+			{
+				AnimalType = "Cow",
+				Enabled = true,
+			},
 		},
     },
 	trees = {
@@ -68,6 +84,8 @@ local config = _G.config or {
 		},
 	},
 }
+
+--dx9.ShowConsole(true)
 
 local lib_ui = loadstring(dx9.Get("https://raw.githubusercontent.com/soupg/DXLibUI/main/main.lua"))()
 local lib_esp = loadstring(dx9.Get("https://pastebin.com/raw/Pwn8GxMB"))()
@@ -239,7 +257,9 @@ local animals = {
 }
 
 local hunting = {}
-for animalType, animalEnabled in pairs(config.animals.entries) do
+for i, animalTab in pairs(config.animals.entries) do
+	local animalType = animalTab.AnimalType
+	local animalEnabled = animalTab.Enabled
 	hunting[animalType.."_enabled"] = groupboxes.hunting
 		:AddToggle({
 			Default = animalEnabled,
@@ -408,7 +428,8 @@ if animal_entities then
 			local animalName = dx9.GetName(animal)
 			local animalType = nil
 			local skipThisAnimal = true
-			for at, animalEnabled in pairs(config.animals.entries) do
+			for i, animalTab in pairs(config.animals.entries) do
+				local at = animalTab.AnimalType
 				if string.match(animalName, at) then
 					animalType = at
 					if hunting[animalType.."_enabled"].Value then
