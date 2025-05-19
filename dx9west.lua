@@ -7,7 +7,7 @@ local config = _G.config or {
 		aimbot_part = 1, -- 1 = "Head", 2 = "HumanoidRootPart"
 		aimbot_fov = 300,
 		aimbot_smoothness = 5,
-		aimbot_sensitivity = 5,
+		aimbot_sensitivity = 1,
 
 		esp_enabled = true,
         box_type = 1, -- 1 = "Corners", 2 = "2D Box", 3 = "3D Box"
@@ -755,14 +755,12 @@ local function player_task()
 				end
 
 				if aimbot_target_name and aimbot_target_screen_pos and aimbot_target_screen_pos.x > 0 and aimbot_target_screen_pos.y > 0 and aimbot_target_screen_pos.x < screen_size.width and aimbot_target_screen_pos.y < screen_size.height then
-					print(aimbot_target_name.." x: "..aimbot_target_screen_pos.x.." y: "..aimbot_target_screen_pos.y)
 					local mouse_moved = false
 					if mouse_moved == false then
 						dx9.FirstPersonAim({
 						    aimbot_target_screen_pos.x + (screen_size.width / 2),
 							aimbot_target_screen_pos.y + (screen_size.height / 2)
 						}, (aimbot_settings.smoothness), (aimbot_settings.sensitivity))
-						print("mouse moved")
 						mouse_moved = true
 					end
 				end
