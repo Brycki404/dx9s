@@ -671,9 +671,10 @@ local function player_task()
 				local character = dx9.FindFirstChild(player_entities, playerName)
 				if character ~= 0 then
 					local root = dx9.FindFirstChild(character, "HumanoidRootPart")
+					local head = dx0.FindFirstChild(character, "Head")
 					local humanoid = dx9.FindFirstChild(character, "Humanoid")
 
-					if root ~= 0 and humanoid ~= 0 then
+					if root ~= 0 and humanoid ~= 0 and head ~= 0 then
 						if teamName == "Outlaws" or teamName == "Lawmen" or teamName == "Citizens" then
 							local my_root_pos = dx9.GetPosition(my_root)
 							local root_pos = dx9.GetPosition(root)
@@ -695,13 +696,25 @@ local function player_task()
 														if closest_player_value == nil or mouse_distance < closest_player_value then
 															closest_player_name = playerName
 															closest_player_value = mouse_distance
-															closest_player_screen_pos = root_screen_pos
+															if current_aimbot_part == 1 then
+																local head_pos = dx9.GetPosition(head)
+																local head_screen_pos = dx9.WorldToScreen({head_pos.x, head_pos.y, head_pos.z})
+																closest_player_screen_pos = head_screen_pos
+															else
+																closest_player_screen_pos = root_screen_pos
+															end
 														end
 													elseif current_aimbot_type == 2 then
 														if closest_player_value == nil or root_distance < closest_player_value then
 															closest_player_name = playerName
 															closest_player_value = root_distance
-															closest_player_screen_pos = root_screen_pos
+															if current_aimbot_part == 1 then
+																local head_pos = dx9.GetPosition(head)
+																local head_screen_pos = dx9.WorldToScreen({head_pos.x, head_pos.y, head_pos.z})
+																closest_player_screen_pos = head_screen_pos
+															else
+																closest_player_screen_pos = root_screen_pos
+															end
 														end
 													end
 												end
@@ -749,8 +762,8 @@ local function player_task()
 					local mouse_moved = false
 					if mouse_moved == false then
 						dx9.FirstPersonAim({
-							aimbot_target_screen_pos.x + (screen_size.width / 2), 
-							aimbot_target_screen_pos.y + (screen_size.height / 2)
+							math.floor(aimbot_target_screen_pos.x) + math.floor(screen_size.width / 2), 
+							math.floor(aimbot_target_screen_pos.y) + math/floor(screen_size.height / 2)
 						}, math.floor(aimbot_settings.smoothness), math.floor(aimbot_settings.sensitivity))
 						--print("mouse moved")
 						mouse_moved = true
