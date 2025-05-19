@@ -586,13 +586,26 @@ local services = {
 }
 
 local local_player = nil
-local mouse = dx9.GetMouse()
-local key = dx9.GetKey()
-if key == config.settings.aimbot_toggle_keybind then
-	aimbot_settings.enabled.Value = (aimbot_settings.enabled.Value and false) or (not aimbot_settings.enabled.Value and true)
+local mouse = nil
+local key = nil
+
+local function update_mouse()
+	mouse = dx9.GetMouse()
 end
 
+update_mouse()
+
+local function update_key()
+	key = dx9.GetKey()
+	if key == config.settings.aimbot_toggle_keybind then
+		aimbot_settings.enabled.Value = (aimbot_settings.enabled.Value and false) or (not aimbot_settings.enabled.Value and true)
+	end
+end
+
+update_key()
+
 local function get_distance_from_mouse(pos)
+	update_mouse()
 	local a = (mouse.x - pos.x) * (mouse.x - pos.x)
 	local b = (mouse.y - pos.y) * (mouse.y - pos.y)
 	
@@ -694,6 +707,7 @@ local function player_task()
 							end
 
 							if screen_pos and screen_pos ~= 0 and screen_pos.x ~= 0 and screen_pos.y ~= 0 then
+								update_key()
 								if aimbot_settings.enabled.Value then
 									if aimbot_settings.sticky_aim.Value and playerName == aimbot_target_name then
 										aimbot_target_screen_pos = screen_pos
