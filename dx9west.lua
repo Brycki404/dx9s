@@ -5,9 +5,9 @@ local config = _G.config or {
 		aimbot_fov_shown = true,
 		aimbot_type = 1, -- 1 = "Closest to mouse", 2 = "Distance"
 		aimbot_part = 1, -- 1 = "Head", 2 = "HumanoidRootPart"
-		aimbot_fov = 150,
-		aimbot_smoothness = 150,
-		aimbot_sensitivity = 150,
+		aimbot_fov = 300,
+		aimbot_smoothness = 5,
+		aimbot_sensitivity = 5,
 
 		esp_enabled = true,
         box_type = 1, -- 1 = "Corners", 2 = "2D Box", 3 = "3D Box"
@@ -244,17 +244,17 @@ local aimbot_settings = {
 
 	smoothness = groupboxes.aimbot_settings:AddSlider({
 		Default = config.settings.aimbot_x_smoothness,
-		Text = "X Smoothness",
+		Text = "Smoothness",
 		Min = 1,
-		Max = 2560,
+		Max = 10,
 		Rounding = 0,
 	}).Value,
 
 	sensitivity = groupboxes.aimbot_settings:AddSlider({
 		Default = config.settings.aimbot_y_smoothness,
-		Text = "Y Smoothness",
+		Text = "Sensitivity",
 		Min = 1,
-		Max = 2560,
+		Max = 10,
 		Rounding = 0,
 	}).Value,
 }
@@ -671,7 +671,7 @@ local function player_task()
 				local character = dx9.FindFirstChild(player_entities, playerName)
 				if character ~= 0 then
 					local root = dx9.FindFirstChild(character, "HumanoidRootPart")
-					local head = dx0.FindFirstChild(character, "Head")
+					local head = dx9.FindFirstChild(character, "Head")
 					local humanoid = dx9.FindFirstChild(character, "Humanoid")
 
 					if root ~= 0 and humanoid ~= 0 and head ~= 0 then
@@ -680,41 +680,38 @@ local function player_task()
 							local root_pos = dx9.GetPosition(root)
 							local root_distance = get_distance(my_root_pos, root_pos)
 							local root_screen_pos = dx9.WorldToScreen({root_pos.x, root_pos.y, root_pos.z})
+							local head_pos = dx9.GetPosition(head)
+							local head_screen_pos = dx9.WorldToScreen({head_pos.x, head_pos.y, head_pos.z})
 
-							if root_screen_pos and root_screen_pos ~= 0 and root_screen_pos.x ~= 0 and root_screen_pos.y ~= 0 then
+							local screen_pos = nil
+							if current_aimbot_part == 1 then
+								screen_pos = head_screen_pos
+							elseif current_aimbot_part == 2 then
+								screen_pos = root_screen_pos
+							end
+
+							if screen_pos and screen_pos ~= 0 and screen_pos.x ~= 0 and screen_pos.y ~= 0 then
 								if aimbot_settings.enabled.Value then
 									if aimbot_settings.sticky_aim.Value and playerName == aimbot_target_name then
-										aimbot_target_screen_pos = root_screen_pos
+										aimbot_target_screen_pos = screen_pos
 									end
 
 									if not aimbot_settings.sticky_aim.Value or aimbot_settings.sticky_aim.Value and not aimbot_target_name then
-										if root_screen_pos and root_screen_pos ~= 0 then
+										if screen_pos and screen_pos ~= 0 then
 											if aimbot_settings.enabled.Value then
-												local mouse_distance = get_distance_from_mouse(root_screen_pos)
+												local mouse_distance = get_distance_from_mouse(screen_pos)
 												if mouse_distance and mouse_distance <= aimbot_settings.fov then
 													if current_aimbot_type == 1 then
 														if closest_player_value == nil or mouse_distance < closest_player_value then
 															closest_player_name = playerName
 															closest_player_value = mouse_distance
-															if current_aimbot_part == 1 then
-																local head_pos = dx9.GetPosition(head)
-																local head_screen_pos = dx9.WorldToScreen({head_pos.x, head_pos.y, head_pos.z})
-																closest_player_screen_pos = head_screen_pos
-															else
-																closest_player_screen_pos = root_screen_pos
-															end
+															closest_player_screen_pos = screen_pos
 														end
 													elseif current_aimbot_type == 2 then
 														if closest_player_value == nil or root_distance < closest_player_value then
 															closest_player_name = playerName
 															closest_player_value = root_distance
-															if current_aimbot_part == 1 then
-																local head_pos = dx9.GetPosition(head)
-																local head_screen_pos = dx9.WorldToScreen({head_pos.x, head_pos.y, head_pos.z})
-																closest_player_screen_pos = head_screen_pos
-															else
-																closest_player_screen_pos = root_screen_pos
-															end
+															closest_player_screen_pos = screen_pos
 														end
 													end
 												end
@@ -758,14 +755,14 @@ local function player_task()
 				end
 
 				if aimbot_target_name and aimbot_target_screen_pos and aimbot_target_screen_pos.x > 0 and aimbot_target_screen_pos.y > 0 and aimbot_target_screen_pos.x < screen_size.width and aimbot_target_screen_pos.y < screen_size.height then
-					--print(aimbot_target_name.." x: "..aimbot_target_screen_pos.x.." y: "..aimbot_target_screen_pos.y)
+					print(aimbot_target_name.." x: "..aimbot_target_screen_pos.x.." y: "..aimbot_target_screen_pos.y)
 					local mouse_moved = false
 					if mouse_moved == false then
 						dx9.FirstPersonAim({
-							math.floor(aimbot_target_screen_pos.x) + math.floor(screen_size.width / 2), 
-							math.floor(aimbot_target_screen_pos.y) + math/floor(screen_size.height / 2)
-						}, math.floor(aimbot_settings.smoothness), math.floor(aimbot_settings.sensitivity))
-						--print("mouse moved")
+						    aimbot_target_screen_pos.x + (screen_size.width / 2),
+							aimbot_target_screen_pos.y + (screen_size.height / 2)
+						}, (aimbot_settings.smoothness), (aimbot_settings.sensitivity))
+						print("mouse moved")
 						mouse_moved = true
 					end
 				end
