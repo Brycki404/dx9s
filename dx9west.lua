@@ -1,6 +1,15 @@
 local config = _G.config or {
     settings = {
-        enabled = true,
+		aimbot_enabled = true,
+		sticky_aim = false,
+		aimbot_fov_shown = true,
+		aimbot_type = 1, -- 1 = "Closest to mouse", 2 = "Distance"
+		aimbot_part = 1, -- 1 = "Head", 2 = "HumanoidRootPart"
+		aimbot_fov = 150,
+		aimbot_smoothness = 150,
+		aimbot_sensitivity = 150,
+
+		esp_enabled = true,
         box_type = 1, -- 1 = "Corners", 2 = "2D Box", 3 = "3D Box"
         tracer_type = 1, -- 1= "Near-Bottom", 2 = "Bottom", 3 = "Top", 4 = "Mouse"
     },
@@ -106,12 +115,11 @@ local config = _G.config or {
 }
 
 local lib_ui = loadstring(dx9.Get("https://raw.githubusercontent.com/soupg/DXLibUI/main/main.lua"))()
-local lib_esp = loadstring(dx9.Get("https://pastebin.com/raw/Pwn8GxMB"))()
 
 local interface = lib_ui:CreateWindow({
-	Title = "The Wild West | dx9ware",
+	Title = "The Wild West | dx9ware | By @Brycki",
 	Size = { 500, 500 },
-	Resizable = false,
+	Resizable = true,
 
 	ToggleKey = "[F2]",
 
@@ -133,7 +141,8 @@ local tabs = {
 }
 
 local groupboxes = {
-	settings = tabs.settings:AddMiddleGroupbox("< Settings >"),
+	esp_settings = tabs.settings:AddLeftGroupbox("ESP"),
+	aimbot_settings = tabs.settings:AddRightGroupbox("Aimbot"),
 	players = tabs.players:AddMiddleGroupbox("Players ESP"),
 	animals = tabs.animals:AddLeftGroupbox("Hunting ESP"),
 	hunting = tabs.animals:AddRightGroupbox("Hunting Config"),
@@ -142,17 +151,17 @@ local groupboxes = {
 	oreconfig = tabs.ores:AddRightGroupbox("Mining Config"),
 }
 
-local settings = {
-	enabled = groupboxes.settings
+local esp_settings = {
+	enabled = groupboxes.esp_settings
 		:AddToggle({
-			Default = config.settings.enabled,
+			Default = config.settings.esp_enabled,
 			Text = "ESP Enabled",
 		})
 		:OnChanged(function(value)
 			lib_ui:Notify(value and "[settings] Enabled Global ESP" or "[settings] Disabled Global ESP", 1)
 		end),
 
-	box_type = groupboxes.settings
+	box_type = groupboxes.esp_settings
 		:AddDropdown({
 			Text = "Box Type",
 			Default = config.settings.box_type,
@@ -162,7 +171,7 @@ local settings = {
 			lib_ui:Notify("[settings] Box Type: " .. value, 1)
 		end),
 
-	tracer_type = groupboxes.settings
+	tracer_type = groupboxes.esp_settings
 		:AddDropdown({
 			Text = "Tracer Type",
 			Default = config.settings.tracer_type,
@@ -172,6 +181,86 @@ local settings = {
 			lib_ui:Notify("[settings] Tracer Type: " .. value, 1)
 		end),
 }
+
+local aimbot_settings = {
+	enabled = groupboxes.aimbot_settings
+		:AddToggle({
+			Default = config.settings.aimbot_enabled,
+			Text = "Aimbot Enabled",
+		})
+		:OnChanged(function(value)
+			lib_ui:Notify(value and "[settings] Enabled Aimbot" or "[settings] Disabled Aimbot", 1)
+			if not value then
+				_G.aimbot_target_name = nil
+				_G.aimbot_target_screen_pos = nil
+			end
+		end),
+
+	sticky_aim = groupboxes.aimbot_settings
+		:AddToggle({
+			Default = config.settings.sticky_aim,
+			Text = "Stick Aim Enabled",
+		})
+		:OnChanged(function(value)
+			lib_ui:Notify(value and "[settings] Enabled Sticky Aim" or "[settings] Disabled Sticky Aim", 1)
+		end),
+
+	fov_shown = groupboxes.aimbot_settings
+		:AddToggle({
+			Default = config.settings.aimbot_fov_shown,
+			Text = "Fov Circle Shown",
+		})
+		:OnChanged(function(value)
+			lib_ui:Notify(value and "[settings] Showed Fov Circle" or "[settings] Hid Fov Circle", 1)
+		end),
+	
+	type = groupboxes.aimbot_settings
+		:AddDropdown({
+			Text = "Aimbot Type",
+			Default = config.settings.aimbot_type,
+			Values = { "Closest to mouse", "Distance" },
+		})
+		:OnChanged(function(value)
+			lib_ui:Notify("[settings] Aimbot Type: " .. value, 1)
+		end),
+
+	part = groupboxes.aimbot_settings
+		:AddDropdown({
+			Text = "Aimbot Part",
+			Default = config.settings.aimbot_part,
+			Values = { "Head", "HumanoidRootPart" },
+		})
+		:OnChanged(function(value)
+			lib_ui:Notify("[settings] Aimbot Part: " .. value, 1)
+		end),
+
+	fov = groupboxes.aimbot_settings:AddSlider({
+		Default = config.settings.aimbot_fov,
+		Text = "Fov",
+		Min = 1,
+		Max = 2560,
+		Rounding = 0,
+	}).Value,
+
+	smoothness = groupboxes.aimbot_settings:AddSlider({
+		Default = config.settings.aimbot_x_smoothness,
+		Text = "X Smoothness",
+		Min = 1,
+		Max = 2560,
+		Rounding = 0,
+	}).Value,
+
+	sensitivity = groupboxes.aimbot_settings:AddSlider({
+		Default = config.settings.aimbot_y_smoothness,
+		Text = "Y Smoothness",
+		Min = 1,
+		Max = 2560,
+		Rounding = 0,
+	}).Value,
+}
+
+local aimbot_target_name = _G.aimbot_target_name or nil
+local aimbot_target_screen_pos = _G.aimbot_target_screen_pos or nil
 
 local players = {
 	enabled = groupboxes.players
@@ -453,14 +542,8 @@ for _, oreTab in pairs(config.ores.entries) do
 		}).Value
 end
 
-local datamodel = dx9.GetDatamodel()
-local workspace = dx9.FindFirstChild(datamodel, "Workspace")
-local services = {
-	players = dx9.FindFirstChild(datamodel, "Players"),
-}
-
 local function get_distance(myRoot, part)
-    local v1 = myRoot
+	local v1 = myRoot
 	local v2 = part
 
 	local a = (v1.x - v2.x) * (v1.x - v2.x)
@@ -471,21 +554,52 @@ local function get_distance(myRoot, part)
 end
 
 local function get_index(type, value)
-	local table = type == "tracer" and { "Near-Bottom", "Bottom", "Top", "Mouse" } or { "Corners", "2D Box", "3D Box" }
+	local table = nil
+	if type == "tracer" then
+		table = { "Near-Bottom", "Bottom", "Top", "Mouse" }
+	elseif type == "box" then
+		table = { "Corners", "2D Box", "3D Box" }
+	elseif type == "aimbot_type" then
+		table = { "Closest to mouse", "Distance" }
+	elseif type == "aimbot_part" then
+		table = { "Head", "HumanoidRootPart" }
+	end
 
-	for index, item in pairs(table) do
-		if item == value then
-			return index
+	if table then
+		for index, item in pairs(table) do
+			if item == value then
+				return index
+			end
 		end
 	end
 
 	return nil
 end
 
+local lib_esp = loadstring(dx9.Get("https://pastebin.com/raw/Pwn8GxMB"))()
+
+local datamodel = dx9.GetDatamodel()
+local workspace = dx9.FindFirstChild(datamodel, "Workspace")
+local services = {
+	players = dx9.FindFirstChild(datamodel, "Players"),
+}
+
 local local_player = nil
 local mouse = dx9.GetMouse()
-local current_tracer_type = get_index("tracer", settings.tracer_type.Value)
-local current_box_type = get_index("box", settings.box_type.Value)
+
+local function get_distance_from_mouse(pos)
+	local a = (mouse.x - pos.x) * (mouse.x - pos.x)
+	local b = (mouse.y - pos.y) * (mouse.y - pos.y)
+	
+	return math.floor(math.sqrt(a + b) + 0.5)
+end
+
+dx9.ShowConsole(true)
+
+local current_aimbot_type = get_index("aimbot_type", aimbot_settings.type.Value)
+local current_aimbot_part = get_index("aimbot_part", aimbot_settings.part.Value)
+local current_tracer_type = get_index("tracer", esp_settings.tracer_type.Value)
+local current_box_type = get_index("box", esp_settings.box_type.Value)
 
 if local_player == nil then
 	for _, player in pairs(dx9.GetChildren(services.players)) do
@@ -504,185 +618,267 @@ local function get_local_player_name()
 	end
 end
 
-local workspace_geometry = dx9.FindFirstChild(workspace, "WORKSPACE_Geometry")
-local health_value_name = "Health"
-local trees_folder_name = "Trees"
-local vegetation_folder_name = "Vegetation"
-local tree_info_folder_name = "TreeInfo"
-local deposit_info_folder_name = "DepositInfo"
-local ore_remaining_value_name = "OreRemaining"
-
-local workspace_interactables = dx9.FindFirstChild(workspace, "WORKSPACE_Interactables")
-local mining_interactables = nil
-local ore_deposits_interactables = nil
-if workspace_interactables ~= 0 then
-	mining_interactables = dx9.FindFirstChild(workspace_interactables, "Mining")
-	if mining_interactables ~= 0 then
-		ore_deposits_interactables = dx9.FindFirstChild(mining_interactables, "OreDeposits")
-	end
-end
-
-local workspace_ignore = dx9.FindFirstChild(workspace, "Ignore")
-local foliageModel = nil
-if workspace_ignore ~= 0 then
-	foliageModel = dx9.FindFirstChild(workspace_ignore, "FoliageModel")
-end
-
 local workspace_entities = dx9.FindFirstChild(workspace, "WORKSPACE_Entities")
-local animal_entities = dx9.FindFirstChild(workspace_entities, "Animals")
-local npc_entitiees = dx9.FindFirstChild(workspace_entities, "NPCs")
 local player_entities = dx9.FindFirstChild(workspace_entities, "Players")
-
 if workspace_entities == 0 or player_entities == 0 then
 	return false
-end
-
-if not settings.enabled.Value then
-	return
 end
 
 local my_player = dx9.FindFirstChild(services.players, get_local_player_name())
 local my_character = nil
 local my_root = nil
 local my_humanoid = nil
-if my_player then
+if my_player and my_player ~= 0 then
     my_character = dx9.FindFirstChild(player_entities, get_local_player_name())
-    if my_character then
+    if my_character and my_character ~= 0 then
         my_root = dx9.FindFirstChild(my_character, "HumanoidRootPart")
         my_humanoid = dx9.FindFirstChild(my_character, "Humanoid")
     end
 end
 
-if not my_root then
+if not my_root or my_root == 0 then
     return
 end
 
-if players.enabled.Value then
-    for _, player in pairs(dx9.GetChildren(services.players)) do
-        local playerName = dx9.GetName(player)
-        if playerName ~= get_local_player_name() then
-			
-			local teamName = dx9.GetTeam(player)
-			local playerColor = players.color
-			if teamName == "Outlaws" then
-				playerColor = {255, 0, 0}
-			elseif teamName == "Lawmen" then
-				playerColor = {0, 0, 255}
-			elseif teamName == "Citizens" then
-				playerColor = {255, 255, 0}
+local health_value_name = "Health"
+
+local screen_size = dx9.size()
+
+if aimbot_settings.enabled.Value then
+	if aimbot_settings.fov_shown.Value then
+		dx9.DrawCircle({mouse.x, mouse.y}, {255,255,255}, aimbot_settings.fov)
+	end
+end
+
+local function player_task()
+	if players.enabled.Value or aimbot_settings.enabled.Value then
+		local closest_player_name = nil
+		local closest_player_value = nil
+		local closest_player_screen_pos = nil
+		for _, player in pairs(dx9.GetChildren(services.players)) do
+			local playerName = dx9.GetName(player)
+			if playerName ~= get_local_player_name() then
+				local teamName = dx9.GetTeam(player)
+				local playerColor = players.color
+				if teamName == "Outlaws" then
+					playerColor = {255, 0, 0}
+				elseif teamName == "Lawmen" then
+					playerColor = {0, 0, 255}
+				elseif teamName == "Citizens" then
+					playerColor = {255, 255, 0}
+				end
+				
+				local character = dx9.FindFirstChild(player_entities, playerName)
+				if character ~= 0 then
+					local root = dx9.FindFirstChild(character, "HumanoidRootPart")
+					local humanoid = dx9.FindFirstChild(character, "Humanoid")
+
+					if root ~= 0 and humanoid ~= 0 then
+						if teamName == "Outlaws" or teamName == "Lawmen" or teamName == "Citizens" then
+							local my_root_pos = dx9.GetPosition(my_root)
+							local root_pos = dx9.GetPosition(root)
+							local root_distance = get_distance(my_root_pos, root_pos)
+							local root_screen_pos = dx9.WorldToScreen({root_pos.x, root_pos.y, root_pos.z})
+
+							if root_screen_pos and root_screen_pos ~= 0 and root_screen_pos.x ~= 0 and root_screen_pos.y ~= 0 then
+								if aimbot_settings.enabled.Value then
+									if aimbot_settings.sticky_aim.Value and playerName == aimbot_target_name then
+										aimbot_target_screen_pos = root_screen_pos
+									end
+
+									if not aimbot_settings.sticky_aim.Value or aimbot_settings.sticky_aim.Value and not aimbot_target_name then
+										if root_screen_pos and root_screen_pos ~= 0 then
+											if aimbot_settings.enabled.Value then
+												local mouse_distance = get_distance_from_mouse(root_screen_pos)
+												if mouse_distance and mouse_distance <= aimbot_settings.fov then
+													if current_aimbot_type == 1 then
+														if closest_player_value == nil or mouse_distance < closest_player_value then
+															closest_player_name = playerName
+															closest_player_value = mouse_distance
+															closest_player_screen_pos = root_screen_pos
+														end
+													elseif current_aimbot_type == 2 then
+														if closest_player_value == nil or root_distance < closest_player_value then
+															closest_player_name = playerName
+															closest_player_value = root_distance
+															closest_player_screen_pos = root_screen_pos
+														end
+													end
+												end
+											end
+										end
+									end
+								end
+								
+								if esp_settings.enabled.Value and players.enabled.Value then
+									if root_distance < players.distance_limit then
+										lib_esp.draw({
+											target = character,
+											color = playerColor,
+											healthbar = config.players.healthbar,
+											nametag = players.nametag.Value,
+											distance = players.distance.Value,
+											custom_distance = "" .. root_distance,
+											tracer = players.tracer.Value,
+											tracer_type = current_tracer_type,
+											box_type = current_box_type,
+										})
+									end
+								end
+							end
+						end
+					end
+				end
+			end
+		end
+
+		if aimbot_settings.enabled.Value then
+			if dx9.isRightClickHeld() then
+				if aimbot_settings.sticky_aim.Value then
+					if not aimbot_target_name then
+						aimbot_target_name = closest_player_name
+						aimbot_target_screen_pos = closest_player_screen_pos
+					end
+				else
+					aimbot_target_name = closest_player_name
+					aimbot_target_screen_pos = closest_player_screen_pos
+				end
+
+				if aimbot_target_name and aimbot_target_screen_pos and aimbot_target_screen_pos.x > 0 and aimbot_target_screen_pos.y > 0 and aimbot_target_screen_pos.x < screen_size.width and aimbot_target_screen_pos.y < screen_size.height then
+					--print(aimbot_target_name.." x: "..aimbot_target_screen_pos.x.." y: "..aimbot_target_screen_pos.y)
+					local mouse_moved = false
+					if mouse_moved == false then
+						dx9.FirstPersonAim({
+							aimbot_target_screen_pos.x + (screen_size.width / 2), 
+							aimbot_target_screen_pos.y + (screen_size.height / 2)
+						}, math.floor(aimbot_settings.smoothness), math.floor(aimbot_settings.sensitivity))
+						--print("mouse moved")
+						mouse_moved = true
+					end
+				end
+			else
+				aimbot_target_name = nil
+				aimbot_target_screen_pos = nil
 			end
 			
-            local character = dx9.FindFirstChild(player_entities, playerName)
-            if character ~= 0 then
-                local root = dx9.FindFirstChild(character, "HumanoidRootPart")
-                local humanoid = dx9.FindFirstChild(character, "Humanoid")
+			_G.aimbot_target_name = aimbot_target_name
+			_G.aimbot_target_screen_pos = aimbot_target_screen_pos
+		end
+	end
+end
+local player_co = coroutine.create(player_task)
+coroutine.resume(player_co)
 
-                if root ~= 0 and humanoid ~= 0 then
-					if teamName == "Outlaws" or teamName == "Lawmen" or teamName == "Citizens" then
+if not esp_settings.enabled.Value then
+	return
+end
+
+local function animal_esp_task()
+	local animal_entities = dx9.FindFirstChild(workspace_entities, "Animals")
+	if animal_entities then
+		if animals.enabled.Value then
+			for _, animal in pairs(dx9.GetChildren(animal_entities)) do
+				local animalName = dx9.GetName(animal)
+				local animalType = nil
+				local skipThisAnimal = true
+				for _, animalTab in pairs(config.animals.entries) do
+					local at = animalTab.AnimalType
+					if string.match(animalName, at) then
+						animalType = at
+						if hunting[animalType.."_enabled"].Value then
+							skipThisAnimal = false
+						end
+						break
+					end
+				end
+				if not skipThisAnimal then
+					local root = dx9.FindFirstChild(animal, "HumanoidRootPart")
+					local healthNumber = dx9.FindFirstChild(animal, health_value_name)
+					if root ~= 0 and healthNumber ~= 0 then
+						local health = dx9.GetNumValue(healthNumber)
 						local got_distance = get_distance(dx9.GetPosition(my_root), dx9.GetPosition(root))
-						if got_distance < players.distance_limit then
+						if got_distance < (animalType and hunting[animalType.."_distance_limit"] or animals.distance_limit) then
 							lib_esp.draw({
-								target = character,
-								color = playerColor,
-								healthbar = config.players.healthbar,
-								nametag = players.nametag.Value,
-								distance = players.distance.Value,
+								target = animal,
+								color = animalType and hunting[animalType.."_color"] or animals.color,
+								healthbar = config.animals.healthbar,
+								nametag = animals.nametag.Value,
+								custom_nametag = animalName .. " | " .. health .. " hp",
+								distance = animals.distance.Value,
 								custom_distance = "" .. got_distance,
-								tracer = players.tracer.Value,
+								tracer = animals.tracer.Value,
 								tracer_type = current_tracer_type,
 								box_type = current_box_type,
 							})
 						end
-					end
-                end
-            end
-        end
-    end
-end
-
-if animal_entities then
-	if animals.enabled.Value then
-		for _, animal in pairs(dx9.GetChildren(animal_entities)) do
-			local animalName = dx9.GetName(animal)
-			local animalType = nil
-			local skipThisAnimal = true
-			for _, animalTab in pairs(config.animals.entries) do
-				local at = animalTab.AnimalType
-				if string.match(animalName, at) then
-					animalType = at
-					if hunting[animalType.."_enabled"].Value then
-						skipThisAnimal = false
-					end
-					break
-				end
-			end
-			if not skipThisAnimal then
-				local root = dx9.FindFirstChild(animal, "HumanoidRootPart")
-				local healthNumber = dx9.FindFirstChild(animal, health_value_name)
-				if root ~= 0 and healthNumber ~= 0 then
-					local health = dx9.GetNumValue(healthNumber)
-					local got_distance = get_distance(dx9.GetPosition(my_root), dx9.GetPosition(root))
-					if got_distance < (animalType and hunting[animalType.."_distance_limit"] or animals.distance_limit) then
-						lib_esp.draw({
-							target = animal,
-							color = animalType and hunting[animalType.."_color"] or animals.color,
-							healthbar = config.animals.healthbar,
-							nametag = animals.nametag.Value,
-							custom_nametag = animalName .. " | " .. health .. " hp",
-							distance = animals.distance.Value,
-							custom_distance = "" .. got_distance,
-							tracer = animals.tracer.Value,
-							tracer_type = current_tracer_type,
-							box_type = current_box_type,
-						})
 					end
 				end
 			end
 		end
 	end
 end
+local animal_esp_co = coroutine.create(animal_esp_task)
+coroutine.resume(animal_esp_co)
 
-if ore_deposits_interactables then
-	if ores.enabled.Value then
-		for _, typeFolder in pairs(dx9.GetChildren(ore_deposits_interactables)) do
-			local typeName = dx9.GetName(typeFolder)
-			local oreName = nil
-			local oreEnabled = true
-			for _, oreTab in pairs(config.ores.entries) do
-				local oreTabName = oreTab.OreName
-				if string.match(typeName, oreTabName) then
-					oreName = oreTabName
-					if not oreconfig[oreName.."_enabled"].Value then
-						oreEnabled = false
+--local npc_entities = dx9.FindFirstChild(workspace_entities, "NPCs")
+
+local function ore_esp_task()
+	local deposit_info_folder_name = "DepositInfo"
+	local ore_remaining_value_name = "OreRemaining"
+
+	local workspace_interactables = dx9.FindFirstChild(workspace, "WORKSPACE_Interactables")
+	local mining_interactables = nil
+	local ore_deposits_interactables = nil
+	if workspace_interactables ~= 0 then
+		mining_interactables = dx9.FindFirstChild(workspace_interactables, "Mining")
+		if mining_interactables ~= 0 then
+			ore_deposits_interactables = dx9.FindFirstChild(mining_interactables, "OreDeposits")
+		end
+	end
+	if ore_deposits_interactables and ore_deposits_interactables ~= 0 then
+		if ores.enabled.Value then
+			for _, typeFolder in pairs(dx9.GetChildren(ore_deposits_interactables)) do
+				local typeName = dx9.GetName(typeFolder)
+				local oreName = nil
+				local oreEnabled = true
+				for _, oreTab in pairs(config.ores.entries) do
+					local oreTabName = oreTab.OreName
+					if string.match(typeName, oreTabName) then
+						oreName = oreTabName
+						if not oreconfig[oreName.."_enabled"].Value then
+							oreEnabled = false
+						end
+						break
 					end
-					break
 				end
-			end
-			if oreEnabled then
-				for _, model in pairs(dx9.GetChildren(typeFolder)) do
-					local modelName = dx9.GetName(model)
-					local meshpart = dx9.FindFirstChildOfClass(model, "MeshPart")
-					local depositInfo = dx9.FindFirstChild(model, deposit_info_folder_name)
-					if meshpart ~= 0 and depositInfo ~= 0 then
-						local remainingNumber = dx9.FindFirstChild(depositInfo, ore_remaining_value_name)
-						if remainingNumber ~= 0 then
-							local remainingNumber = dx9.GetNumValue(remainingNumber)
-							local meshpartName = dx9.GetName(meshpart)
-							local got_distance = get_distance(dx9.GetPosition(my_root), dx9.GetPosition(meshpart))
-							if got_distance < (oreconfig[oreName.."_distance_limit"] or ores.distance_limit) then
-								lib_esp.draw({
-									target = model,
-									custom_root = meshpartName,
-									color = oreconfig[oreName.."_color"] or ores.color,
-									healthbar = config.ores.healthbar,
-									nametag = ores.nametag.Value,
-									custom_nametag = typeName .. " | " .. remainingNumber .. " left",
-									distance = ores.distance.Value,
-									custom_distance = "" .. got_distance,
-									tracer = ores.tracer.Value,
-									tracer_type = current_tracer_type,
-									box_type = current_box_type,
-								})
+				if oreEnabled then
+					for _, model in pairs(dx9.GetChildren(typeFolder)) do
+						local modelName = dx9.GetName(model)
+						local meshpart = dx9.FindFirstChildOfClass(model, "MeshPart")
+						local depositInfo = dx9.FindFirstChild(model, deposit_info_folder_name)
+						if meshpart ~= 0 and depositInfo ~= 0 then
+							local remainingNumber = dx9.FindFirstChild(depositInfo, ore_remaining_value_name)
+							if remainingNumber ~= 0 then
+								local remainingNumber = dx9.GetNumValue(remainingNumber)
+								if ores.hide_empty.Value and remainingNumber > 0 or not ores.hide_empty.Value then
+									local meshpartName = dx9.GetName(meshpart)
+									local got_distance = get_distance(dx9.GetPosition(my_root), dx9.GetPosition(meshpart))
+									if got_distance < (oreconfig[oreName.."_distance_limit"] or ores.distance_limit) then
+										lib_esp.draw({
+											target = model,
+											custom_root = meshpartName,
+											color = oreconfig[oreName.."_color"] or ores.color,
+											healthbar = config.ores.healthbar,
+											nametag = ores.nametag.Value,
+											custom_nametag = typeName .. " | " .. remainingNumber .. " left",
+											distance = ores.distance.Value,
+											custom_distance = "" .. got_distance,
+											tracer = ores.tracer.Value,
+											tracer_type = current_tracer_type,
+											box_type = current_box_type,
+										})
+									end
+								end
 							end
 						end
 					end
@@ -691,80 +887,95 @@ if ore_deposits_interactables then
 		end
 	end
 end
+local ore_esp_co = coroutine.create(ore_esp_task)
+coroutine.resume(ore_esp_co)
 
-dx9.ShowConsole(true)
+local function tree_esp_task()
+	local trees_folder_name = "Trees"
+	local vegetation_folder_name = "Vegetation"
+	local tree_info_folder_name = "TreeInfo"
+	
+	local workspace_geometry = dx9.FindFirstChild(workspace, "WORKSPACE_Geometry")
+	local workspace_ignore = dx9.FindFirstChild(workspace, "Ignore")
+	local foliageModel = nil
+	if workspace_ignore ~= 0 then
+		foliageModel = dx9.FindFirstChild(workspace_ignore, "FoliageModel")
+	end
 
-if trees.enabled.Value then
-	local function addTree(model)
-		local modelName = dx9.GetName(model)
-		local meshpart = dx9.FindFirstChildOfClass(model, "MeshPart")
-		local treeinfo = dx9.FindFirstChild(model, tree_info_folder_name)
+	if trees.enabled.Value then
+		local function addTree(model)
+			local modelName = dx9.GetName(model)
+			local meshpart = dx9.FindFirstChildOfClass(model, "MeshPart")
+			local treeinfo = dx9.FindFirstChild(model, tree_info_folder_name)
 
-		if meshpart ~= 0 and treeinfo ~= 0 then
-			local healthNumber = dx9.FindFirstChild(treeinfo, health_value_name)
-			if healthNumber ~= 0 then
-				local health = dx9.GetNumValue(healthNumber)
-				local meshpartName = dx9.GetName(meshpart)
-				local got_distance = get_distance(dx9.GetPosition(my_root), dx9.GetPosition(meshpart))
-				if got_distance < trees.distance_limit then
-					lib_esp.draw({
-						target = model,
-						custom_root = meshpartName,
-						color = trees.color,
-						healthbar = config.trees.healthbar,
-						nametag = trees.nametag.Value,
-						custom_nametag = modelName .. " | " .. health .. " hp",
-						distance = trees.distance.Value,
-						custom_distance = "" .. got_distance,
-						tracer = trees.tracer.Value,
-						tracer_type = current_tracer_type,
-						box_type = current_box_type,
-					})
+			if meshpart ~= 0 and treeinfo ~= 0 then
+				local healthNumber = dx9.FindFirstChild(treeinfo, health_value_name)
+				if healthNumber ~= 0 then
+					local health = dx9.GetNumValue(healthNumber)
+					local meshpartName = dx9.GetName(meshpart)
+					local got_distance = get_distance(dx9.GetPosition(my_root), dx9.GetPosition(meshpart))
+					if got_distance < trees.distance_limit then
+						lib_esp.draw({
+							target = model,
+							custom_root = meshpartName,
+							color = trees.color,
+							healthbar = config.trees.healthbar,
+							nametag = trees.nametag.Value,
+							custom_nametag = modelName .. " | " .. health .. " hp",
+							distance = trees.distance.Value,
+							custom_distance = "" .. got_distance,
+							tracer = trees.tracer.Value,
+							tracer_type = current_tracer_type,
+							box_type = current_box_type,
+						})
+					end
 				end
 			end
 		end
-	end
 
-	local function hasStrike2(model)
-		local found = false
-		for _, part in pairs(dx9.GetChildren(model)) do
-			local strike2 = dx9.FindFirstChild(part, "Strike2")
-			if strike2 ~= 0 then
-				found = true
-				break
+		local function hasStrike2(model)
+			local found = false
+			for _, part in pairs(dx9.GetChildren(model)) do
+				local strike2 = dx9.FindFirstChild(part, "Strike2")
+				if strike2 ~= 0 then
+					found = true
+					break
+				end
 			end
+			return found
 		end
-		return found
-	end
 
-	local function treesLoop(folder)
-		for _, model in pairs(dx9.GetChildren(folder)) do
-			if trees.thunderstruck_only.Value then
-				local strike2 = hasStrike2(model)
-				if strike2 then
+		local function treesLoop(folder)
+			for _, model in pairs(dx9.GetChildren(folder)) do
+				if trees.thunderstruck_only.Value then
+					local strike2 = hasStrike2(model)
+					if strike2 then
+						addTree(model)
+					end
+				else
 					addTree(model)
 				end
-			else
-				addTree(model)
 			end
 		end
-	end
 
-	if workspace_geometry ~= 0 then
-		for _, region in pairs(dx9.GetChildren(workspace_geometry)) do
-			local trees_folder = dx9.FindFirstChild(region, trees_folder_name)
-			local vegitation_folder = dx9.FindFirstChild(region, vegetation_folder_name)
+		if workspace_geometry ~= 0 then
+			for _, region in pairs(dx9.GetChildren(workspace_geometry)) do
+				local trees_folder = dx9.FindFirstChild(region, trees_folder_name)
+				local vegitation_folder = dx9.FindFirstChild(region, vegetation_folder_name)
 
-			if trees_folder ~= 0 then
-				treesLoop(trees_folder)
-			end
-			if vegitation_folder ~= 0 then
-				treesLoop(vegitation_folder)
+				if trees_folder ~= 0 then
+					treesLoop(trees_folder)
+				end
+				if vegitation_folder ~= 0 then
+					treesLoop(vegitation_folder)
+				end
 			end
 		end
-	end
 
-	if foliageModel ~= 0 then
-		treesLoop(foliageModel)
+		if foliageModel and foliageModel ~= 0 then
+			treesLoop(foliageModel)
+		end
 	end
 end
+local tree_esp_co = coroutine.create(tree_esp_task)
+coroutine.resume(tree_esp_co)
