@@ -243,7 +243,7 @@ local aimbot_settings = {
 	}).Value,
 
 	smoothness = groupboxes.aimbot_settings:AddSlider({
-		Default = config.settings.aimbot_x_smoothness,
+		Default = config.settings.aimbot_smoothness,
 		Text = "Smoothness",
 		Min = 1,
 		Max = 10,
@@ -251,7 +251,7 @@ local aimbot_settings = {
 	}).Value,
 
 	sensitivity = groupboxes.aimbot_settings:AddSlider({
-		Default = config.settings.aimbot_y_smoothness,
+		Default = config.settings.aimbot_sensitivity,
 		Text = "Sensitivity",
 		Min = 1,
 		Max = 10,
