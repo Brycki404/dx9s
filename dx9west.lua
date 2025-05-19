@@ -8,6 +8,7 @@ local config = _G.config or {
 		aimbot_fov = 300,
 		aimbot_smoothness = 5,
 		aimbot_sensitivity = 1,
+		aimbot_toggle_keybind = "[XBUTTON2]";
 
 		esp_enabled = true,
         box_type = 1, -- 1 = "Corners", 2 = "2D Box", 3 = "3D Box"
@@ -586,6 +587,10 @@ local services = {
 
 local local_player = nil
 local mouse = dx9.GetMouse()
+local key = dx9.GetKey()
+if key == config.settings.aimbot_toggle_keybind then
+	aimbot_settings.enabled.Value = (aimbot_settings.enabled.Value and false) or (not aimbot_settings.enabled.Value and true)
+end
 
 local function get_distance_from_mouse(pos)
 	local a = (mouse.x - pos.x) * (mouse.x - pos.x)
@@ -593,8 +598,6 @@ local function get_distance_from_mouse(pos)
 	
 	return math.floor(math.sqrt(a + b) + 0.5)
 end
-
-dx9.ShowConsole(true)
 
 local current_aimbot_type = get_index("aimbot_type", aimbot_settings.type.Value)
 local current_aimbot_part = get_index("aimbot_part", aimbot_settings.part.Value)
