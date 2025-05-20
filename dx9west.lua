@@ -121,7 +121,7 @@ local interface = lib_ui:CreateWindow({
 	Size = { 500, 500 },
 	Resizable = true,
 
-	ToggleKey = config.menu_toggle_keybind,
+	ToggleKey = config.settings.menu_toggle_keybind,
 
 	FooterToggle = false,
 	FooterRGB = true,
@@ -551,24 +551,12 @@ local services = {
 
 local local_player = nil
 local mouse = nil
---local key = nil
 
 local function update_mouse()
 	mouse = dx9.GetMouse()
 end
 
 update_mouse()
-
---local function update_key()
-	--key = dx9.GetKey()
-	--if key == config.settings.aimbot_toggle_keybind then
-		--aimbot_settings.enabled.Value = (aimbot_settings.enabled.Value and false) or (not aimbot_settings.enabled.Value and true)
-	--elseif key == config.menu_toggle_keybind then
-		--interface.Active = not interface.Active
-	--end
---end
-
---update_key()
 
 local function get_distance_from_mouse(pos)
 	update_mouse()
