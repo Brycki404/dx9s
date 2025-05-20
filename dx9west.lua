@@ -1,3 +1,5 @@
+dx9.ShowConsole(true)
+
 local config = _G.config or {
     settings = {
 		aimbot_enabled = true,
@@ -660,13 +662,13 @@ local function player_task()
 
 							if isOnScreen(screen_pos) then
 								if aimbot_settings.enabled.Value then
-									if aimbot_settings.sticky_aim.Value and playerName == aimbot_target_name then
+									if playerName == aimbot_target_name then
 										aimbot_target_screen_pos = screen_pos
 									end
 
 									if not aimbot_settings.sticky_aim.Value or aimbot_settings.sticky_aim.Value and not aimbot_target_name then
 										local mouse_distance = get_distance_from_mouse(screen_pos)
-										local aimbot_range = dx9.GetAimbotValue("range")
+										local aimbot_range = 9999 --dx9.GetAimbotValue("range")
 										local aimbot_fov = dx9.GetAimbotValue("fov")
 										if mouse_distance and mouse_distance <= aimbot_fov and root_distance <= aimbot_range then
 											local current_aimbot_type = dx9.GetAimbotValue("type")
@@ -723,14 +725,15 @@ local function player_task()
 			end
 
 			if aimbot_target_name and isOnScreen(aimbot_target_screen_pos) then
+				print(aimbot_target_name.." | x: "..aimbot_target_screen_pos.x.." | y: "..aimbot_target_screen_pos.y)
 				local mouse_moved = false
 				if mouse_moved == false then
 					dx9.SetAimbotValue("x", 0)
 					dx9.SetAimbotValue("y", 0)
 					dx9.SetAimbotValue("z", 0)
 					dx9.FirstPersonAim({
-						math.floor(aimbot_target_screen_pos.x) + math.floor(screen_size.width/2),
-						math.floor(aimbot_target_screen_pos.y) + math.floor(screen_size.height/2)
+						aimbot_target_screen_pos.x + screen_size.width/2,
+						aimbot_target_screen_pos.y + screen_size.height/2
 					}, aimbot_settings.smoothness, 1)
 					mouse_moved = true
 				end
