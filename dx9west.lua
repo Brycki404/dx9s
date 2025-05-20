@@ -1,4 +1,4 @@
-dx9.ShowConsole(true)
+--dx9.ShowConsole(true)
 
 local config = _G.config or {
     settings = {
@@ -725,7 +725,7 @@ local function player_task()
 			end
 
 			if aimbot_target_name and isOnScreen(aimbot_target_screen_pos) then
-				print(aimbot_target_name.." | x: "..aimbot_target_screen_pos.x.." | y: "..aimbot_target_screen_pos.y)
+				--print(aimbot_target_name.." | x: "..aimbot_target_screen_pos.x.." | y: "..aimbot_target_screen_pos.y)
 				local mouse_moved = false
 				if mouse_moved == false then
 					dx9.SetAimbotValue("x", 0)
