@@ -1,5 +1,3 @@
-dx9.ShowConsole(true)
-
 local config = _G.config or {
     settings = {
 		aimbot_enabled = true,
