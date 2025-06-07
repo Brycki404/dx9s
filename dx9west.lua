@@ -63,6 +63,7 @@ local config = _G.config or {
         distance = true,
         healthbar = false,
         nametag = true,
+		healthtag = false,
         tracer = false,
 		color = { 255, 255, 255 },
 		distance_limit = 5000,
@@ -75,6 +76,7 @@ local config = _G.config or {
         distance = true,
         healthbar = false,
         nametag = true,
+		healthtag = false,
         tracer = false,
 		color = { 255, 255, 255 },
 		distance_limit = 5000,
@@ -121,9 +123,9 @@ end
 
 local lib_ui = loadstring(dx9.Get("https://raw.githubusercontent.com/soupg/DXLibUI/main/main.lua"))()
 
-if _G.lib_esp == nil then
+--if _G.lib_esp == nil then
 	_G.lib_esp = loadstring(dx9.Get("https://pastebin.com/raw/Pwn8GxMB"))()
-end
+--end
 
 local interface = lib_ui:CreateWindow({
 	Title = "The Wild West | dx9ware | By @Brycki",
@@ -230,7 +232,7 @@ local aimbot_settings = {
 		Min = 1,
 		Max = 50,
 		Rounding = 0,
-	}).Value,
+	}),
 }
 
 local aimbot_target_name = _G.aimbot_target_name or nil
@@ -273,18 +275,13 @@ local players = {
 			lib_ui:Notify(value and "[players] Enabled Tracer" or "[players] Disabled Tracer", 1)
 		end),
 
-    color = groupboxes.players:AddColorPicker({
-		Default = config.players.color,
-		Text = "Color",
-	}).Value,
-
     distance_limit = groupboxes.players:AddSlider({
 		Default = config.players.distance_limit,
 		Text = "ESP Distance Limit",
 		Min = 0,
 		Max = 5000,
 		Rounding = 0,
-	}).Value,
+	}),
 }
 
 local animals = {
@@ -336,7 +333,7 @@ local animals = {
     color = groupboxes.animals:AddColorPicker({
 		Default = config.animals.color,
 		Text = "Color",
-	}).Value,
+	}),
 
 	distance_limit = groupboxes.animals:AddSlider({
 		Default = config.animals.distance_limit,
@@ -344,7 +341,7 @@ local animals = {
 		Min = 0,
 		Max = 5000,
 		Rounding = 0,
-	}).Value,
+	}),
 }
 
 local hunting = {}
@@ -364,7 +361,7 @@ for _, animalTab in pairs(config.animals.entries) do
 		:AddColorPicker({
 			Default = config.animals.color,
 			Text = animalType.." Color",
-		}).Value
+		})
 
 	hunting[animalType.."_distance_limit"] = groupboxes.hunting
 		:AddSlider({
@@ -373,7 +370,7 @@ for _, animalTab in pairs(config.animals.entries) do
 			Min = 0,
 			Max = 5000,
 			Rounding = 0,
-		}).Value
+		})
 end
 
 local trees = {
@@ -413,6 +410,15 @@ local trees = {
 			lib_ui:Notify(value and "[logging] Enabled Nametag" or "[logging] Disabled Nametag", 1)
 		end),
 
+	healthtag = groupboxes.trees
+		:AddToggle({
+			Default = config.trees.healthtag,
+			Text = "HealthTag",
+		})
+		:OnChanged(function(value)
+			lib_ui:Notify(value and "[logging] Enabled HealthTag" or "[logging] Disabled HealthTag", 1)
+		end),
+
 	tracer = groupboxes.trees
 		:AddToggle({
 			Default = config.trees.tracer,
@@ -425,7 +431,7 @@ local trees = {
     color = groupboxes.trees:AddColorPicker({
 		Default = config.trees.color,
 		Text = "Color",
-	}).Value,
+	}),
 
 	distance_limit = groupboxes.trees:AddSlider({
 		Default = config.trees.distance_limit,
@@ -433,7 +439,7 @@ local trees = {
 		Min = 0,
 		Max = 5000,
 		Rounding = 0,
-	}).Value,
+	}),
 }
 
 local ores = {
@@ -473,6 +479,15 @@ local ores = {
 			lib_ui:Notify(value and "[mining] Enabled Nametag" or "[mining] Disabled Nametag", 1)
 		end),
 
+	healthtag = groupboxes.ores
+		:AddToggle({
+			Default = config.ores.healthtag,
+			Text = "HealthTag",
+		})
+		:OnChanged(function(value)
+			lib_ui:Notify(value and "[mining] Enabled HealthTag" or "[mining] Disabled HealthTag", 1)
+		end),
+
 	tracer = groupboxes.ores
 		:AddToggle({
 			Default = config.ores.tracer,
@@ -485,7 +500,7 @@ local ores = {
     color = groupboxes.ores:AddColorPicker({
 		Default = config.ores.color,
 		Text = "Color",
-	}).Value,
+	}),
 
 	distance_limit = groupboxes.ores:AddSlider({
 		Default = config.ores.distance_limit,
@@ -493,7 +508,7 @@ local ores = {
 		Min = 0,
 		Max = 5000,
 		Rounding = 0,
-	}).Value,
+	}),
 }
 
 local oreconfig = {}
@@ -513,7 +528,7 @@ for _, oreTab in pairs(config.ores.entries) do
 		:AddColorPicker({
 			Default = config.ores.color,
 			Text = oreName.." Color",
-		}).Value
+		})
 
 	oreconfig[oreName.."_distance_limit"] = groupboxes.oreconfig
 		:AddSlider({
@@ -522,10 +537,10 @@ for _, oreTab in pairs(config.ores.entries) do
 			Min = 0,
 			Max = 5000,
 			Rounding = 0,
-		}).Value
+		})
 end
 
---if _G.Get_Distance == nil then
+if _G.Get_Distance == nil then
 	_G.Get_Distance = function(v1, v2)
 		local a = (v1.x - v2.x) * (v1.x - v2.x)
 		local b = (v1.y - v2.y) * (v1.y - v2.y)
@@ -533,9 +548,9 @@ end
 
 		return math.floor(math.sqrt(a + b + c) + 0.5)
 	end
---end
+end
 
---if _G.Get_Index == nil then
+if _G.Get_Index == nil then
 	_G.Get_Index = function(type, value)
 		local table = nil
 		if type == "tracer" then
@@ -558,7 +573,7 @@ end
 
 		return nil
 	end
---end
+end
 
 local datamodel = dx9.GetDatamodel()
 local workspace = dx9.FindFirstChild(datamodel, "Workspace")
@@ -569,15 +584,15 @@ local services = {
 local local_player = nil
 local mouse = nil
 
---if _G.Update_Mouse == nil then
+if _G.Update_Mouse == nil then
 	_G.Update_Mouse = function()
 		mouse = dx9.GetMouse()
 	end
---end
+end
 
 _G.Update_Mouse()
 
---if _G.Get_Distance_From_Mouse == nil then
+if _G.Get_Distance_From_Mouse == nil then
 	_G.Get_Distance_From_Mouse = function(pos)
 		_G.Update_Mouse()
 		local a = (mouse.x - pos.x) * (mouse.x - pos.x)
@@ -585,7 +600,7 @@ _G.Update_Mouse()
 		
 		return math.floor(math.sqrt(a + b) + 0.5)
 	end
---end
+end
 
 local current_aimbot_part = _G.Get_Index("aimbot_part", aimbot_settings.part.Value)
 local current_tracer_type = _G.Get_Index("tracer", esp_settings.tracer_type.Value)
@@ -623,32 +638,35 @@ end
 
 local my_player = dx9.FindFirstChild(services.players, local_player_name)
 local my_character = nil
+local my_head = nil
 local my_root = nil
 local my_humanoid = nil
 
 if my_player == nil or my_player == 0 then
-	print("my_player = nil")
+	--print("my_player = nil")
 	return
 elseif my_player ~= nil and my_player ~= 0 then
     my_character = dx9.FindFirstChild(player_entities, local_player_name)
 end
 
 if my_character == nil or my_character == 0 then
-	print("my_character == nil")
+	--print("my_character == nil")
 	return
 elseif my_character ~= nil and my_character ~= 0 then
-	print("my_character ["..my_character.."]")
+	my_head = dx9.FindFirstChild(my_character, "Head")
 	my_root = dx9.FindFirstChild(my_character, "HumanoidRootPart")
 	my_humanoid = dx9.FindFirstChild(my_character, "Humanoid")
 end
 
 if my_root == nil or my_root == 0 then
-	print("my_root == nil")
+	--print("my_root == nil")
     return
 end
 
-local my_root_pos = dx9.GetPosition(my_root)
-print(my_root_pos.x .. " | " .. my_root_pos.y .. " | " .. my_root_pos.z)
+if my_head == nil or my_head == 0 then
+	--print("my_head == nil")
+    return
+end
 
 local health_value_name = "Health"
 
@@ -691,10 +709,11 @@ if _G.PlayerTask == nil then
 
 						if root and root ~= 0 and humanoid and humanoid ~= 0 and head and head ~= 0 then
 							if teamName and (teamName == "Outlaws" or teamName == "Lawmen" or teamName == "Citizens") then
+								local my_root_pos = dx9.GetPosition(my_root)
 								local root_pos = dx9.GetPosition(root)
+								local head_pos = dx9.GetPosition(head)
 								local root_distance = _G.Get_Distance(my_root_pos, root_pos)
 								local root_screen_pos = dx9.WorldToScreen({root_pos.x, root_pos.y, root_pos.z})
-								local head_pos = dx9.GetPosition(head)
 								local head_screen_pos = dx9.WorldToScreen({head_pos.x, head_pos.y, head_pos.z})
 
 								local screen_pos = nil
@@ -734,14 +753,14 @@ if _G.PlayerTask == nil then
 									end
 									
 									if esp_settings.enabled.Value and players.enabled.Value then
-										if root_distance < players.distance_limit then
+										if root_distance < players.distance_limit.Value then
 											_G.lib_esp.draw({
 												target = character,
 												color = playerColor,
 												healthbar = config.players.healthbar,
 												nametag = players.nametag.Value,
 												distance = players.distance.Value,
-												custom_distance = "" .. root_distance,
+												custom_distance = ""..root_distance,
 												tracer = players.tracer.Value,
 												tracer_type = current_tracer_type,
 												box_type = current_box_type,
@@ -778,7 +797,7 @@ if _G.PlayerTask == nil then
 						dx9.FirstPersonAim({
 							aimbot_target_screen_pos.x + screen_size.width/2,
 							aimbot_target_screen_pos.y + screen_size.height/2
-						}, aimbot_settings.smoothness, 1)
+						}, aimbot_settings.smoothness.Value, 1)
 						mouse_moved = true
 					end
 				end
@@ -822,20 +841,21 @@ if _G.AnimalEspTask == nil then
 						local root = dx9.FindFirstChild(animal, "HumanoidRootPart")
 						local healthNumber = dx9.FindFirstChild(animal, health_value_name)
 						if root and root ~= 0 and healthNumber and healthNumber ~= 0 then
+							local my_root_pos = dx9.GetPosition(my_root)
 							local root_pos = dx9.GetPosition(root)
 							local health = dx9.GetNumValue(healthNumber)
 							local root_distance = _G.Get_Distance(my_root_pos, root_pos)
-							if root_distance < (animalType and hunting[animalType.."_distance_limit"] or animals.distance_limit) then
+							if root_distance < (animalType and hunting[animalType.."_distance_limit"].Value or animals.distance_limit.Value) then
 								local root_screen_pos = dx9.WorldToScreen({root_pos.x, root_pos.y, root_pos.z})
 								if _G.IsOnScreen(root_screen_pos) then
 									_G.lib_esp.draw({
 										target = animal,
-										color = animalType and hunting[animalType.."_color"] or animals.color,
+										color = animalType and hunting[animalType.."_color"].Value or animals.color.Value,
 										healthbar = config.animals.healthbar,
 										nametag = animals.nametag.Value,
 										custom_nametag = animals.healthtag.Value and animalName .. " | " .. health .. " hp" or animalName,
 										distance = animals.distance.Value,
-										custom_distance = "" .. root_distance,
+										custom_distance = ""..root_distance,
 										tracer = animals.tracer.Value,
 										tracer_type = current_tracer_type,
 										box_type = current_box_type,
@@ -897,19 +917,20 @@ if _G.OreEspTask == nil then
 									if ores.hide_empty.Value and remainingNumber > 0 or not ores.hide_empty.Value then
 										local meshpart_pos = dx9.GetPosition(meshpart)
 										local meshpartName = dx9.GetName(meshpart)
+										local my_root_pos = dx9.GetPosition(my_root)
 										local got_distance = _G.Get_Distance(my_root_pos, meshpart_pos)
-										if got_distance < (oreconfig[oreName.."_distance_limit"] or ores.distance_limit) then
+										if got_distance < (oreconfig[oreName.."_distance_limit"].Value or ores.distance_limit.Value) then
 											local screen_pos = dx9.WorldToScreen({meshpart_pos.x, meshpart_pos.y, meshpart_pos.z})
 											if _G._G.IsOnScreen(screen_pos) then
 												_G.lib_esp.draw({
 													target = model,
 													custom_root = meshpartName,
-													color = oreconfig[oreName.."_color"] or ores.color,
+													color = oreconfig[oreName.."_color"].Value or ores.color.Value,
 													healthbar = config.ores.healthbar,
 													nametag = ores.nametag.Value,
-													custom_nametag = typeName .. " | " .. remainingNumber .. " left",
+													custom_nametag = ores.healthtag.Value and typeName .. " | " .. remainingNumber .. " left" or typeName,
 													distance = ores.distance.Value,
-													custom_distance = "" .. got_distance,
+													custom_distance = ""..got_distance,
 													tracer = ores.tracer.Value,
 													tracer_type = current_tracer_type,
 													box_type = current_box_type,
@@ -955,19 +976,20 @@ if _G.TreeEspTask == nil then
 						local meshpart_pos = dx9.GetPosition(meshpart)
 						local health = dx9.GetNumValue(healthNumber)
 						local meshpartName = dx9.GetName(meshpart)
+						local my_root_pos = dx9.GetPosition(my_root)
 						local got_distance = _G.Get_Distance(my_root_pos, meshpart_pos)
-						if got_distance < trees.distance_limit then
+						if got_distance < trees.distance_limit.Value then
 							local screen_pos = dx9.WorldToScreen({meshpart_pos.x, meshpart_pos.y, meshpart_pos.z})
 							if _G.IsOnScreen(screen_pos) then
 								_G.lib_esp.draw({
 									target = model,
 									custom_root = meshpartName,
-									color = trees.color,
+									color = trees.color.Value,
 									healthbar = config.trees.healthbar,
 									nametag = trees.nametag.Value,
-									custom_nametag = modelName .. " | " .. health .. " hp",
+									custom_nametag = trees.healthtag.Value and modelName .. " | " .. health .. " hp" or modelName,
 									distance = trees.distance.Value,
-									custom_distance = "" .. got_distance,
+									custom_distance = ""..got_distance,
 									tracer = trees.tracer.Value,
 									tracer_type = current_tracer_type,
 									box_type = current_box_type,
