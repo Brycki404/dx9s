@@ -26,6 +26,7 @@ local config = _G.config or {
         enabled = false,
         distance = true,
         healthbar = false,
+		healthtag = false,
         nametag = true,
         tracer = false,
 		color = { 255, 255, 255 },
@@ -314,6 +315,15 @@ local animals = {
 			lib_ui:Notify(value and "[hunting] Enabled Nametag" or "[hunting] Disabled Nametag", 1)
 		end),
 
+	healthtag = groupboxes.animals
+		:AddToggle({
+			Default = config.animals.healthtag,
+			Text = "HealthTag",
+		})
+		:OnChanged(function(value)
+			lib_ui:Notify(value and "[hunting] Enabled HealthTag" or "[hunting] Disabled HealthTag", 1)
+		end),
+
 	tracer = groupboxes.animals
 		:AddToggle({
 			Default = config.animals.tracer,
@@ -515,20 +525,17 @@ for _, oreTab in pairs(config.ores.entries) do
 		}).Value
 end
 
-if _G.Get_Distance == nil then
-	_G.Get_Distance = function(myRoot, part)
-		local v1 = myRoot
-		local v2 = part
-
+--if _G.Get_Distance == nil then
+	_G.Get_Distance = function(v1, v2)
 		local a = (v1.x - v2.x) * (v1.x - v2.x)
 		local b = (v1.y - v2.y) * (v1.y - v2.y)
 		local c = (v1.z - v2.z) * (v1.z - v2.z)
 
 		return math.floor(math.sqrt(a + b + c) + 0.5)
 	end
-end
+--end
 
-if _G.Get_Index == nil then
+--if _G.Get_Index == nil then
 	_G.Get_Index = function(type, value)
 		local table = nil
 		if type == "tracer" then
@@ -551,7 +558,7 @@ if _G.Get_Index == nil then
 
 		return nil
 	end
-end
+--end
 
 local datamodel = dx9.GetDatamodel()
 local workspace = dx9.FindFirstChild(datamodel, "Workspace")
@@ -562,15 +569,15 @@ local services = {
 local local_player = nil
 local mouse = nil
 
-if _G.Update_Mouse == nil then
+--if _G.Update_Mouse == nil then
 	_G.Update_Mouse = function()
 		mouse = dx9.GetMouse()
 	end
-end
+--end
 
 _G.Update_Mouse()
 
-if _G.Get_Distance_From_Mouse == nil then
+--if _G.Get_Distance_From_Mouse == nil then
 	_G.Get_Distance_From_Mouse = function(pos)
 		_G.Update_Mouse()
 		local a = (mouse.x - pos.x) * (mouse.x - pos.x)
@@ -578,7 +585,7 @@ if _G.Get_Distance_From_Mouse == nil then
 		
 		return math.floor(math.sqrt(a + b) + 0.5)
 	end
-end
+--end
 
 local current_aimbot_part = _G.Get_Index("aimbot_part", aimbot_settings.part.Value)
 local current_tracer_type = _G.Get_Index("tracer", esp_settings.tracer_type.Value)
@@ -586,11 +593,16 @@ local current_box_type = _G.Get_Index("box", esp_settings.box_type.Value)
 
 if local_player == nil then
 	for _, player in pairs(dx9.GetChildren(services.players)) do
-		if dx9.FindFirstChild(player, "PlayerGui") then
+		local pgui = dx9.FindFirstChild(player, "PlayerGui")
+		if pgui ~= nil and pgui ~= 0 then
 			local_player = player
 			break
 		end
 	end
+end
+
+if local_player == nil or local_player == 0 then
+	local_player = dx9.get_localplayer()
 end
 
 local function get_local_player_name()
@@ -601,27 +613,42 @@ local function get_local_player_name()
 	end
 end
 
+local local_player_name = get_local_player_name()
+
 local workspace_entities = dx9.FindFirstChild(workspace, "WORKSPACE_Entities")
 local player_entities = dx9.FindFirstChild(workspace_entities, "Players")
-if workspace_entities == 0 or player_entities == 0 then
+if workspace_entities == nil or workspace_entities == 0 or player_entities == nil or player_entities == 0 then
 	return false
 end
 
-local my_player = dx9.FindFirstChild(services.players, get_local_player_name())
+local my_player = dx9.FindFirstChild(services.players, local_player_name)
 local my_character = nil
 local my_root = nil
 local my_humanoid = nil
-if my_player and my_player ~= 0 then
-    my_character = dx9.FindFirstChild(player_entities, get_local_player_name())
-    if my_character and my_character ~= 0 then
-        my_root = dx9.FindFirstChild(my_character, "HumanoidRootPart")
-        my_humanoid = dx9.FindFirstChild(my_character, "Humanoid")
-    end
+
+if my_player == nil or my_player == 0 then
+	print("my_player = nil")
+	return
+elseif my_player ~= nil and my_player ~= 0 then
+    my_character = dx9.FindFirstChild(player_entities, local_player_name)
 end
 
-if not my_root or my_root == 0 then
+if my_character == nil or my_character == 0 then
+	print("my_character == nil")
+	return
+elseif my_character ~= nil and my_character ~= 0 then
+	print("my_character ["..my_character.."]")
+	my_root = dx9.FindFirstChild(my_character, "HumanoidRootPart")
+	my_humanoid = dx9.FindFirstChild(my_character, "Humanoid")
+end
+
+if my_root == nil or my_root == 0 then
+	print("my_root == nil")
     return
 end
+
+local my_root_pos = dx9.GetPosition(my_root)
+print(my_root_pos.x .. " | " .. my_root_pos.y .. " | " .. my_root_pos.z)
 
 local health_value_name = "Health"
 
@@ -645,7 +672,7 @@ if _G.PlayerTask == nil then
 			local closest_player_screen_pos = nil
 			for _, player in pairs(dx9.GetChildren(services.players)) do
 				local playerName = dx9.GetName(player)
-				if playerName and playerName ~= get_local_player_name() then
+				if playerName and playerName ~= local_player_name then
 					local teamName = dx9.GetTeam(player)
 					local playerColor = players.color
 					if teamName == "Outlaws" then
@@ -664,7 +691,6 @@ if _G.PlayerTask == nil then
 
 						if root and root ~= 0 and humanoid and humanoid ~= 0 and head and head ~= 0 then
 							if teamName and (teamName == "Outlaws" or teamName == "Lawmen" or teamName == "Citizens") then
-								local my_root_pos = dx9.GetPosition(my_root)
 								local root_pos = dx9.GetPosition(root)
 								local root_distance = _G.Get_Distance(my_root_pos, root_pos)
 								local root_screen_pos = dx9.WorldToScreen({root_pos.x, root_pos.y, root_pos.z})
@@ -796,7 +822,6 @@ if _G.AnimalEspTask == nil then
 						local root = dx9.FindFirstChild(animal, "HumanoidRootPart")
 						local healthNumber = dx9.FindFirstChild(animal, health_value_name)
 						if root and root ~= 0 and healthNumber and healthNumber ~= 0 then
-							local my_root_pos = dx9.GetPosition(my_root)
 							local root_pos = dx9.GetPosition(root)
 							local health = dx9.GetNumValue(healthNumber)
 							local root_distance = _G.Get_Distance(my_root_pos, root_pos)
@@ -808,7 +833,7 @@ if _G.AnimalEspTask == nil then
 										color = animalType and hunting[animalType.."_color"] or animals.color,
 										healthbar = config.animals.healthbar,
 										nametag = animals.nametag.Value,
-										custom_nametag = animalName .. " | " .. health .. " hp",
+										custom_nametag = animals.healthtag.Value and animalName .. " | " .. health .. " hp" or animalName,
 										distance = animals.distance.Value,
 										custom_distance = "" .. root_distance,
 										tracer = animals.tracer.Value,
@@ -870,7 +895,6 @@ if _G.OreEspTask == nil then
 								if remainingNumber and remainingNumber ~= 0 then
 									local remainingNumber = dx9.GetNumValue(remainingNumber)
 									if ores.hide_empty.Value and remainingNumber > 0 or not ores.hide_empty.Value then
-										local my_root_pos = dx9.GetPosition(my_root)
 										local meshpart_pos = dx9.GetPosition(meshpart)
 										local meshpartName = dx9.GetName(meshpart)
 										local got_distance = _G.Get_Distance(my_root_pos, meshpart_pos)
@@ -928,7 +952,6 @@ if _G.TreeEspTask == nil then
 				if meshpart ~= 0 and treeinfo ~= 0 then
 					local healthNumber = dx9.FindFirstChild(treeinfo, health_value_name)
 					if healthNumber ~= 0 then
-						local my_root_pos = dx9.GetPosition(my_root)
 						local meshpart_pos = dx9.GetPosition(meshpart)
 						local health = dx9.GetNumValue(healthNumber)
 						local meshpartName = dx9.GetName(meshpart)
