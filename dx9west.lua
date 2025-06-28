@@ -757,7 +757,7 @@ if _G.PlayerTask == nil then
 											_G.lib_esp.draw({
 												target = character,
 												color = playerColor,
-												healthbar = config.players.healthbar,
+												healthbar = true,
 												nametag = players.nametag.Value,
 												distance = players.distance.Value,
 												custom_distance = ""..root_distance,
