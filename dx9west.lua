@@ -1,4 +1,4 @@
-dx9.ShowConsole(true)
+--dx9.ShowConsole(true)
 
 local config = _G.config or {
     settings = {
