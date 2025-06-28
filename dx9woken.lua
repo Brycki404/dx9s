@@ -12,7 +12,6 @@ local config = _G.config or {
         enabled = true,
         distance = true,
         healthbar = true,
-        healthtag = false,
         nametag = true,
         tracer = false,
         color = { 255, 255, 255 },
@@ -22,7 +21,6 @@ local config = _G.config or {
         enabled = true,
         distance = true,
         healthbar = true,
-		healthtag = false,
         nametag = true,
         tracer = false,
 		color = { 255, 255, 255 },
@@ -137,15 +135,6 @@ local players = {
 			lib_ui:Notify(value and "[players] Enabled Nametag" or "[players] Disabled Nametag", 1)
 		end),
 
-    healthtag = groupboxes.players
-		:AddToggle({
-			Default = config.players.healthtag,
-			Text = "HealthTag",
-		})
-		:OnChanged(function(value)
-			lib_ui:Notify(value and "[players] Enabled HealthTag" or "[players] Disabled HealthTag", 1)
-		end),
-
 	tracer = groupboxes.players
 		:AddToggle({
 			Default = config.players.tracer,
@@ -195,15 +184,6 @@ local enemies = {
 		})
 		:OnChanged(function(value)
 			lib_ui:Notify(value and "[hunting] Enabled Nametag" or "[hunting] Disabled Nametag", 1)
-		end),
-
-	healthtag = groupboxes.enemies
-		:AddToggle({
-			Default = config.enemies.healthtag,
-			Text = "HealthTag",
-		})
-		:OnChanged(function(value)
-			lib_ui:Notify(value and "[Enemies] Enabled HealthTag" or "[Enemies] Disabled HealthTag", 1)
 		end),
 
 	tracer = groupboxes.enemies
@@ -430,7 +410,7 @@ if _G.LiveTask == nil then
                                 color = entityTab.color.Value,
                                 healthbar = entityConfig.healthbar,
                                 nametag = entityTab.nametag.Value,
-                                custom_nametag = entityTab.healthtag.Value and entityName .. " | " .. "0" .. " hp" or entityName,
+                                custom_nametag = entityName,
                                 distance = entityTab.distance.Value,
                                 custom_distance = ""..root_distance,
                                 tracer = entityTab.tracer.Value,
