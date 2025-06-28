@@ -2,36 +2,36 @@ dx9.ShowConsole(true)
 
 local config = _G.config or {
     settings = {
-		aimbot_enabled = true,
-		sticky_aim = false,
-		aimbot_part = 1, -- 1 = "Head", 2 = "HumanoidRootPart"
-		aimbot_smoothness = 5,
+	aimbot_enabled = true,
+	sticky_aim = false,
+	aimbot_part = 1, -- 1 = "Head", 2 = "HumanoidRootPart"
+	aimbot_smoothness = 5,
 
-		menu_toggle_keybind = "[F2]",
+	menu_toggle_keybind = "[F2]",
 
-		esp_enabled = true,
+	esp_enabled = true,
         box_type = 1, -- 1 = "Corners", 2 = "2D Box", 3 = "3D Box"
         tracer_type = 1, -- 1= "Near-Bottom", 2 = "Bottom", 3 = "Top", 4 = "Mouse"
     },
     players = {
         enabled = true,
         distance = true,
-        healthbar = true,
+        healthbar = false,
         nametag = true,
         tracer = false,
         color = { 255, 255, 255 },
 	distance_limit = 5000,
     },
-	animals = {
+    animals = {
         enabled = false,
         distance = true,
-        healthbar = true,
+        healthbar = false,
 	healthtag = false,
         nametag = true,
         tracer = false,
-		color = { 255, 255, 255 },
-		distance_limit = 5000,
-		entries = {
+	color = { 255, 255, 255 },
+	distance_limit = 5000,
+	entries = {
 			{
 				AnimalType = "Deer",
 				Enabled = true,
@@ -757,7 +757,7 @@ if _G.PlayerTask == nil then
 											_G.lib_esp.draw({
 												target = character,
 												color = playerColor,
-												healthbar = true,
+												healthbar = config.players.healthbar,
 												nametag = players.nametag.Value,
 												distance = players.distance.Value,
 												custom_distance = ""..root_distance,
