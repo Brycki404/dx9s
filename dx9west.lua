@@ -210,7 +210,7 @@ local aimbot_settings = {
 	sticky_aim = groupboxes.aimbot_settings
 		:AddToggle({
 			Default = config.settings.sticky_aim,
-			Text = "Stick Aim Enabled",
+			Text = "Sticky Aim Enabled",
 		})
 		:OnChanged(function(value)
 			lib_ui:Notify(value and "[settings] Enabled Sticky Aim" or "[settings] Disabled Sticky Aim", 1)
