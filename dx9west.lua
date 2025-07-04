@@ -602,9 +602,9 @@ if _G.Get_Distance_From_Mouse == nil then
 	end
 end
 
-local current_aimbot_part = _G.Get_Index("aimbot_part", aimbot_settings.part.Value)
-local current_tracer_type = _G.Get_Index("tracer", esp_settings.tracer_type.Value)
-local current_box_type = _G.Get_Index("box", esp_settings.box_type.Value)
+current_aimbot_part = _G.Get_Index("aimbot_part", aimbot_settings.part.Value)
+current_tracer_type = _G.Get_Index("tracer", esp_settings.tracer_type.Value)
+current_box_type = _G.Get_Index("box", esp_settings.box_type.Value)
 
 if local_player == nil then
 	for _, player in pairs(dx9.GetChildren(services.players)) do
