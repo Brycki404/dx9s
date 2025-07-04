@@ -1,37 +1,37 @@
 --dx9.ShowConsole(true)
 
 local config = _G.config or {
-    settings = {
-	aimbot_enabled = true,
-	sticky_aim = false,
-	aimbot_part = 1, -- 1 = "Head", 2 = "HumanoidRootPart"
-	aimbot_smoothness = 5,
-
-	menu_toggle_keybind = "[F2]",
-
-	esp_enabled = true,
-        box_type = 1, -- 1 = "Corners", 2 = "2D Box", 3 = "3D Box"
-        tracer_type = 1, -- 1= "Near-Bottom", 2 = "Bottom", 3 = "Top", 4 = "Mouse"
-    },
-    players = {
-        enabled = true,
-        distance = true,
-        healthbar = false,
-        nametag = true,
-        tracer = false,
-        color = { 255, 255, 255 },
-	distance_limit = 5000,
-    },
-    animals = {
-        enabled = false,
-        distance = true,
-        healthbar = false,
-	healthtag = false,
-        nametag = true,
-        tracer = false,
-	color = { 255, 255, 255 },
-	distance_limit = 5000,
-	entries = {
+	settings = {
+		aimbot_enabled = true,
+		sticky_aim = false,
+		aimbot_part = 1, -- 1 = "Head", 2 = "HumanoidRootPart"
+		aimbot_smoothness = 5,
+	
+		menu_toggle_keybind = "[F2]",
+	
+		esp_enabled = true,
+	        box_type = 1, -- 1 = "Corners", 2 = "2D Box", 3 = "3D Box"
+	        tracer_type = 1, -- 1= "Near-Bottom", 2 = "Bottom", 3 = "Top", 4 = "Mouse"
+	},
+	players = {
+		enabled = true,
+		distance = true,
+		healthbar = false,
+		nametag = true,
+		tracer = false,
+		color = { 255, 255, 255 },
+		distance_limit = 5000,
+	},
+	animals = {
+	        enabled = false,
+	        distance = true,
+	        healthbar = false,
+		healthtag = false,
+	        nametag = true,
+	        tracer = false,
+		color = { 255, 255, 255 },
+		distance_limit = 5000,
+		entries = {
 			{
 				AnimalType = "Deer",
 				Enabled = true,
@@ -57,14 +57,14 @@ local config = _G.config or {
 				Enabled = false,
 			},
 		},
-    },
+	},
 	trees = {
 		enabled = false,
-        distance = true,
-        healthbar = false,
-        nametag = true,
+	        distance = true,
+	        healthbar = false,
+	        nametag = true,
 		healthtag = false,
-        tracer = false,
+        	tracer = false,
 		color = { 255, 255, 255 },
 		distance_limit = 5000,
 		thunderstruck_only = true,
@@ -73,11 +73,11 @@ local config = _G.config or {
 	ores = {
 		enabled = false,
 		hide_empty = false,
-        distance = true,
-        healthbar = false,
-        nametag = true,
+	        distance = true,
+	        healthbar = false,
+	        nametag = true,
 		healthtag = false,
-        tracer = false,
+        	tracer = false,
 		color = { 255, 255, 255 },
 		distance_limit = 5000,
 		entries = {
@@ -330,7 +330,7 @@ local animals = {
 			lib_ui:Notify(value and "[hunting] Enabled Tracer" or "[hunting] Disabled Tracer", 1)
 		end),
 
-    color = groupboxes.animals:AddColorPicker({
+	color = groupboxes.animals:AddColorPicker({
 		Default = config.animals.color,
 		Text = "Color",
 	}),
@@ -428,7 +428,7 @@ local trees = {
 			lib_ui:Notify(value and "[logging] Enabled Tracer" or "[logging] Disabled Tracer", 1)
 		end),
 
-    color = groupboxes.trees:AddColorPicker({
+	color = groupboxes.trees:AddColorPicker({
 		Default = config.trees.color,
 		Text = "Color",
 	}),
@@ -497,7 +497,7 @@ local ores = {
 			lib_ui:Notify(value and "[mining] Enabled Tracer" or "[mining] Disabled Tracer", 1)
 		end),
 
-    color = groupboxes.ores:AddColorPicker({
+	color = groupboxes.ores:AddColorPicker({
 		Default = config.ores.color,
 		Text = "Color",
 	}),
