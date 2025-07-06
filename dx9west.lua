@@ -1,37 +1,39 @@
+--indent size 4
+
 --dx9.ShowConsole(true)
 
-local config = _G.config or {
-	settings = {
+config = _G.config or {
+    settings = {
 		aimbot_enabled = true,
 		sticky_aim = false,
 		aimbot_part = 1, -- 1 = "Head", 2 = "HumanoidRootPart"
 		aimbot_smoothness = 5,
-	
+		
 		menu_toggle_keybind = "[F2]",
-	
+		
 		esp_enabled = true,
-	        box_type = 1, -- 1 = "Corners", 2 = "2D Box", 3 = "3D Box"
-	        tracer_type = 1, -- 1= "Near-Bottom", 2 = "Bottom", 3 = "Top", 4 = "Mouse"
-	},
-	players = {
-		enabled = true,
-		distance = true,
-		healthbar = false,
-		nametag = true,
-		tracer = false,
-		color = { 255, 255, 255 },
+    	box_type = 1, -- 1 = "Corners", 2 = "2D Box", 3 = "3D Box"
+    	tracer_type = 1, -- 1= "Near-Bottom", 2 = "Bottom", 3 = "Top", 4 = "Mouse"
+    },
+    players = {
+        enabled = true,
+        distance = true,
+        healthbar = false,
+        nametag = true,
+        tracer = false,
+        color = { 255, 255, 255 },
 		distance_limit = 5000,
-	},
-	animals = {
-	        enabled = false,
-	        distance = true,
-	        healthbar = false,
+    },
+    animals = {
+        enabled = false,
+        distance = true,
+        healthbar = false,
 		healthtag = false,
-	        nametag = true,
-	        tracer = false,
+        nametag = true,
+        tracer = false,
 		color = { 255, 255, 255 },
 		distance_limit = 5000,
-		entries = {
+	entries = {
 			{
 				AnimalType = "Deer",
 				Enabled = true,
@@ -57,14 +59,14 @@ local config = _G.config or {
 				Enabled = false,
 			},
 		},
-	},
+    },
 	trees = {
 		enabled = false,
-	        distance = true,
-	        healthbar = false,
-	        nametag = true,
+        distance = true,
+        healthbar = false,
+        nametag = true,
 		healthtag = false,
-        	tracer = false,
+        tracer = false,
 		color = { 255, 255, 255 },
 		distance_limit = 5000,
 		thunderstruck_only = true,
@@ -73,11 +75,11 @@ local config = _G.config or {
 	ores = {
 		enabled = false,
 		hide_empty = false,
-	        distance = true,
-	        healthbar = false,
-	        nametag = true,
+        distance = true,
+        healthbar = false,
+        nametag = true,
 		healthtag = false,
-        	tracer = false,
+        tracer = false,
 		color = { 255, 255, 255 },
 		distance_limit = 5000,
 		entries = {
@@ -121,13 +123,11 @@ if _G.config == nil then
 	config = _G.config
 end
 
-local lib_ui = loadstring(dx9.Get("https://raw.githubusercontent.com/soupg/DXLibUI/main/main.lua"))()
+lib_ui = loadstring(dx9.Get("https://raw.githubusercontent.com/soupg/DXLibUI/main/main.lua"))()
 
-if _G.lib_esp == nil then
-	_G.lib_esp = loadstring(dx9.Get("https://pastebin.com/raw/Pwn8GxMB"))()
-end
+lib_esp = loadstring(dx9.Get("https://pastebin.com/raw/Pwn8GxMB"))()
 
-local interface = lib_ui:CreateWindow({
+interface = lib_ui:CreateWindow({
 	Title = "The Wild West | dx9ware | By @Brycki",
 	Size = { 500, 500 },
 	Resizable = true,
@@ -143,7 +143,7 @@ local interface = lib_ui:CreateWindow({
 	OutlineColor = { 54, 47, 90 },
 })
 
-local tabs = {
+tabs = {
 	settings = interface:AddTab("Settings"),
 	players = interface:AddTab("Players"),
 	animals = interface:AddTab("Hunting"),
@@ -151,7 +151,7 @@ local tabs = {
 	ores = interface:AddTab("Mining"),
 }
 
-local groupboxes = {
+groupboxes = {
 	esp_settings = tabs.settings:AddLeftGroupbox("ESP"),
 	aimbot_settings = tabs.settings:AddRightGroupbox("Aimbot"),
 	players = tabs.players:AddMiddleGroupbox("Players ESP"),
@@ -162,7 +162,7 @@ local groupboxes = {
 	oreconfig = tabs.ores:AddRightGroupbox("Mining Config"),
 }
 
-local esp_settings = {
+esp_settings = {
 	enabled = groupboxes.esp_settings
 		:AddToggle({
 			Default = config.settings.esp_enabled,
@@ -193,7 +193,7 @@ local esp_settings = {
 		end),
 }
 
-local aimbot_settings = {
+aimbot_settings = {
 	enabled = groupboxes.aimbot_settings
 		:AddToggle({
 			Default = config.settings.aimbot_enabled,
@@ -238,7 +238,7 @@ local aimbot_settings = {
 local aimbot_target_name = _G.aimbot_target_name or nil
 local aimbot_target_screen_pos = _G.aimbot_target_screen_pos or nil
 
-local players = {
+players = {
 	enabled = groupboxes.players
 		:AddToggle({
 			Default = config.players.enabled,
@@ -284,7 +284,7 @@ local players = {
 	}),
 }
 
-local animals = {
+animals = {
 	enabled = groupboxes.animals
 		:AddToggle({
 			Default = config.animals.enabled,
@@ -330,7 +330,7 @@ local animals = {
 			lib_ui:Notify(value and "[hunting] Enabled Tracer" or "[hunting] Disabled Tracer", 1)
 		end),
 
-	color = groupboxes.animals:AddColorPicker({
+    color = groupboxes.animals:AddColorPicker({
 		Default = config.animals.color,
 		Text = "Color",
 	}),
@@ -344,7 +344,7 @@ local animals = {
 	}),
 }
 
-local hunting = {}
+hunting = {}
 for _, animalTab in pairs(config.animals.entries) do
 	local animalType = animalTab.AnimalType
 	local animalEnabled = animalTab.Enabled
@@ -373,7 +373,7 @@ for _, animalTab in pairs(config.animals.entries) do
 		})
 end
 
-local trees = {
+trees = {
 	enabled = groupboxes.trees
 		:AddToggle({
 			Default = config.trees.enabled,
@@ -428,7 +428,7 @@ local trees = {
 			lib_ui:Notify(value and "[logging] Enabled Tracer" or "[logging] Disabled Tracer", 1)
 		end),
 
-	color = groupboxes.trees:AddColorPicker({
+    color = groupboxes.trees:AddColorPicker({
 		Default = config.trees.color,
 		Text = "Color",
 	}),
@@ -442,7 +442,7 @@ local trees = {
 	}),
 }
 
-local ores = {
+ores = {
 	enabled = groupboxes.ores
 		:AddToggle({
 			Default = config.ores.enabled,
@@ -497,7 +497,7 @@ local ores = {
 			lib_ui:Notify(value and "[mining] Enabled Tracer" or "[mining] Disabled Tracer", 1)
 		end),
 
-	color = groupboxes.ores:AddColorPicker({
+    color = groupboxes.ores:AddColorPicker({
 		Default = config.ores.color,
 		Text = "Color",
 	}),
@@ -511,7 +511,7 @@ local ores = {
 	}),
 }
 
-local oreconfig = {}
+oreconfig = {}
 for _, oreTab in pairs(config.ores.entries) do
 	local oreName = oreTab.OreName
 	local oreEnabled = oreTab.Enabled
@@ -575,14 +575,17 @@ if _G.Get_Index == nil then
 	end
 end
 
-local datamodel = dx9.GetDatamodel()
-local workspace = dx9.FindFirstChild(datamodel, "Workspace")
-local services = {
+datamodel = dx9.GetDatamodel()
+
+workspace = dx9.FindFirstChild(datamodel, "Workspace")
+local workspace = _G.workspace
+
+services = {
 	players = dx9.FindFirstChild(datamodel, "Players"),
 }
 
-local local_player = nil
-local mouse = nil
+local_player = nil
+mouse = nil
 
 if _G.Update_Mouse == nil then
 	_G.Update_Mouse = function()
@@ -628,29 +631,27 @@ local function get_local_player_name()
 	end
 end
 
-local local_player_name = get_local_player_name()
+local_player_name = get_local_player_name()
 
-local workspace_entities = dx9.FindFirstChild(workspace, "WORKSPACE_Entities")
-local player_entities = dx9.FindFirstChild(workspace_entities, "Players")
+workspace_entities = dx9.FindFirstChild(workspace, "WORKSPACE_Entities")
+player_entities = dx9.FindFirstChild(workspace_entities, "Players")
 if workspace_entities == nil or workspace_entities == 0 or player_entities == nil or player_entities == 0 then
 	return false
 end
 
-local my_player = dx9.FindFirstChild(services.players, local_player_name)
-local my_character = nil
-local my_head = nil
-local my_root = nil
-local my_humanoid = nil
+my_player = dx9.FindFirstChild(services.players, local_player_name)
+my_character = nil
+my_head = nil
+my_root = nil
+my_humanoid = nil
 
 if my_player == nil or my_player == 0 then
-	--print("my_player = nil")
 	return
 elseif my_player ~= nil and my_player ~= 0 then
     my_character = dx9.FindFirstChild(player_entities, local_player_name)
 end
 
 if my_character == nil or my_character == 0 then
-	--print("my_character == nil")
 	return
 elseif my_character ~= nil and my_character ~= 0 then
 	my_head = dx9.FindFirstChild(my_character, "Head")
@@ -659,18 +660,16 @@ elseif my_character ~= nil and my_character ~= 0 then
 end
 
 if my_root == nil or my_root == 0 then
-	--print("my_root == nil")
     return
 end
 
 if my_head == nil or my_head == 0 then
-	--print("my_head == nil")
     return
 end
 
-local health_value_name = "Health"
+health_value_name = "Health"
 
-local screen_size = nil
+screen_size = nil
 
 if _G.IsOnScreen == nil then
 	_G.IsOnScreen = function(screen_pos)
@@ -754,7 +753,7 @@ if _G.PlayerTask == nil then
 									
 									if esp_settings.enabled.Value and players.enabled.Value then
 										if root_distance < players.distance_limit.Value then
-											_G.lib_esp.draw({
+											lib_esp.draw({
 												target = character,
 												color = playerColor,
 												healthbar = config.players.healthbar,
@@ -848,7 +847,7 @@ if _G.AnimalEspTask == nil then
 							if root_distance < (animalType and hunting[animalType.."_distance_limit"].Value or animals.distance_limit.Value) then
 								local root_screen_pos = dx9.WorldToScreen({root_pos.x, root_pos.y, root_pos.z})
 								if _G.IsOnScreen(root_screen_pos) then
-									_G.lib_esp.draw({
+									lib_esp.draw({
 										target = animal,
 										color = animalType and hunting[animalType.."_color"].Value or animals.color.Value,
 										healthbar = config.animals.healthbar,
@@ -922,7 +921,7 @@ if _G.OreEspTask == nil then
 										if got_distance < (oreconfig[oreName.."_distance_limit"].Value or ores.distance_limit.Value) then
 											local screen_pos = dx9.WorldToScreen({meshpart_pos.x, meshpart_pos.y, meshpart_pos.z})
 											if _G._G.IsOnScreen(screen_pos) then
-												_G.lib_esp.draw({
+												lib_esp.draw({
 													target = model,
 													custom_root = meshpartName,
 													color = oreconfig[oreName.."_color"].Value or ores.color.Value,
@@ -981,7 +980,7 @@ if _G.TreeEspTask == nil then
 						if got_distance < trees.distance_limit.Value then
 							local screen_pos = dx9.WorldToScreen({meshpart_pos.x, meshpart_pos.y, meshpart_pos.z})
 							if _G.IsOnScreen(screen_pos) then
-								_G.lib_esp.draw({
+								lib_esp.draw({
 									target = model,
 									custom_root = meshpartName,
 									color = trees.color.Value,
