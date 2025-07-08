@@ -1,6 +1,6 @@
 --dx9.ShowConsole(true)
 
-local config = _G.config or {
+config = _G.config or {
     settings = {
 		menu_toggle_keybind = "[F2]",
 
@@ -12,22 +12,24 @@ local config = _G.config or {
         enabled = true,
         distance = true,
         healthbar = true,
+        healthtag = false,
         nametag = true,
         tracer = false,
-        color = { 255, 255, 255 },
+        color = { 0, 0, 255 },
 		distance_limit = 5000,
     },
 	enemies = {
         enabled = true,
         distance = true,
         healthbar = true,
+		healthtag = false,
         nametag = true,
         tracer = false,
-		color = { 255, 255, 255 },
+		color = { 255, 0, 0 },
 		distance_limit = 5000,
     },
 	npcs = {
-		enabled = true,
+		enabled = false,
         distance = true,
         nametag = true,
         tracer = false,
@@ -40,13 +42,11 @@ if _G.config == nil then
 	config = _G.config
 end
 
-local lib_ui = loadstring(dx9.Get("https://raw.githubusercontent.com/soupg/DXLibUI/main/main.lua"))()
+lib_ui = loadstring(dx9.Get("https://raw.githubusercontent.com/soupg/DXLibUI/main/main.lua"))()
 
-if _G.lib_esp == nil then
-	_G.lib_esp = loadstring(dx9.Get("https://pastebin.com/raw/Pwn8GxMB"))()
-end
+lib_esp = loadstring(dx9.Get("https://pastebin.com/raw/Pwn8GxMB"))()
 
-local interface = lib_ui:CreateWindow({
+interface = lib_ui:CreateWindow({
 	Title = "Deepwoken | dx9ware | By @Brycki",
 	Size = { 500, 500 },
 	Resizable = true,
@@ -62,21 +62,21 @@ local interface = lib_ui:CreateWindow({
 	OutlineColor = { 54, 47, 90 },
 })
 
-local tabs = {
+tabs = {
 	settings = interface:AddTab("Settings"),
 	players = interface:AddTab("Players"),
 	enemies = interface:AddTab("Enemies"),
 	npcs = interface:AddTab("NPCs"),
 }
 
-local groupboxes = {
+groupboxes = {
 	esp_settings = tabs.settings:AddLeftGroupbox("ESP"),
 	players = tabs.players:AddLeftGroupbox("Players ESP"),
 	enemies = tabs.enemies:AddLeftGroupbox("Enemies ESP"),
 	npcs = tabs.npcs:AddLeftGroupbox("NPCs ESP"),
 }
 
-local esp_settings = {
+esp_settings = {
 	enabled = groupboxes.esp_settings
 		:AddToggle({
 			Default = config.settings.esp_enabled,
@@ -107,7 +107,7 @@ local esp_settings = {
 		end),
 }
 
-local players = {
+players = {
 	enabled = groupboxes.players
 		:AddToggle({
 			Default = config.players.enabled,
@@ -135,6 +135,15 @@ local players = {
 			lib_ui:Notify(value and "[players] Enabled Nametag" or "[players] Disabled Nametag", 1)
 		end),
 
+    healthtag = groupboxes.players
+		:AddToggle({
+			Default = config.players.healthtag,
+			Text = "HealthTag",
+		})
+		:OnChanged(function(value)
+			lib_ui:Notify(value and "[players] Enabled HealthTag" or "[players] Disabled HealthTag", 1)
+		end),
+
 	tracer = groupboxes.players
 		:AddToggle({
 			Default = config.players.tracer,
@@ -158,7 +167,7 @@ local players = {
 	}),
 }
 
-local enemies = {
+enemies = {
 	enabled = groupboxes.enemies
 		:AddToggle({
 			Default = config.enemies.enabled,
@@ -186,6 +195,15 @@ local enemies = {
 			lib_ui:Notify(value and "[hunting] Enabled Nametag" or "[hunting] Disabled Nametag", 1)
 		end),
 
+	healthtag = groupboxes.enemies
+		:AddToggle({
+			Default = config.enemies.healthtag,
+			Text = "HealthTag",
+		})
+		:OnChanged(function(value)
+			lib_ui:Notify(value and "[Enemies] Enabled HealthTag" or "[Enemies] Disabled HealthTag", 1)
+		end),
+
 	tracer = groupboxes.enemies
 		:AddToggle({
 			Default = config.enemies.tracer,
@@ -209,7 +227,7 @@ local enemies = {
 	}),
 }
 
-local npcs = {
+npcs = {
 	enabled = groupboxes.npcs
 		:AddToggle({
 			Default = config.npcs.enabled,
@@ -295,16 +313,16 @@ if _G.Get_Index == nil then
 	end
 end
 
-local datamodel = dx9.GetDatamodel()
-local workspace = dx9.FindFirstChild(datamodel, "Workspace")
-local services = {
+datamodel = dx9.GetDatamodel()
+workspace = dx9.FindFirstChild(datamodel, "Workspace")
+services = {
 	players = dx9.FindFirstChild(datamodel, "Players"),
 }
 
-local local_player = nil
+local_player = nil
 
-local current_tracer_type = _G.Get_Index("tracer", esp_settings.tracer_type.Value)
-local current_box_type = _G.Get_Index("box", esp_settings.box_type.Value)
+current_tracer_type = _G.Get_Index("tracer", esp_settings.tracer_type.Value)
+current_box_type = _G.Get_Index("box", esp_settings.box_type.Value)
 
 if local_player == nil then
 	for _, player in pairs(dx9.GetChildren(services.players)) do
@@ -320,7 +338,7 @@ if local_player == nil or local_player == 0 then
 	local_player = dx9.get_localplayer()
 end
 
-local function get_local_player_name()
+function get_local_player_name()
 	if dx9.GetType(local_player) == "Player" then
 		return dx9.GetName(local_player)
 	else
@@ -328,30 +346,28 @@ local function get_local_player_name()
 	end
 end
 
-local local_player_name = get_local_player_name()
+local_player_name = get_local_player_name()
 
-local workspace_Live = dx9.FindFirstChild(workspace, "Live")
-local workspace_NPCs = dx9.FindFirstChild(workspace, "NPCs")
+workspace_Live = dx9.FindFirstChild(workspace, "Live")
+workspace_NPCs = dx9.FindFirstChild(workspace, "NPCs")
 
 if workspace_Live == nil or workspace_Live == 0 or workspace_NPCs == nil or workspace_NPCs == 0 then
 	return false
 end
 
-local my_player = dx9.FindFirstChild(services.players, local_player_name)
-local my_character = nil
-local my_head = nil
-local my_root = nil
-local my_humanoid = nil
+my_player = dx9.FindFirstChild(services.players, local_player_name)
+my_character = nil
+my_head = nil
+my_root = nil
+my_humanoid = nil
 
 if my_player == nil or my_player == 0 then
-	print("my_player = nil")
 	return
 elseif my_player ~= nil and my_player ~= 0 then
     my_character = dx9.FindFirstChild(workspace_Live, local_player_name)
 end
 
 if my_character == nil or my_character == 0 then
-	print("my_character == nil")
 	return
 elseif my_character ~= nil and my_character ~= 0 then
 	my_head = dx9.FindFirstChild(my_character, "Head")
@@ -360,16 +376,14 @@ elseif my_character ~= nil and my_character ~= 0 then
 end
 
 if my_root == nil or my_root == 0 then
-	print("my_root == nil")
     return
 end
 
 if my_head == nil or my_head == 0 then
-	print("my_head == nil")
     return
 end
 
-local screen_size = nil
+screen_size = nil
 
 if _G.IsOnScreen == nil then
 	_G.IsOnScreen = function(screen_pos)
@@ -405,12 +419,12 @@ if _G.LiveTask == nil then
                     if root_distance < entityTab.distance_limit.Value then
                         local root_screen_pos = dx9.WorldToScreen({root_pos.x, root_pos.y, root_pos.z})
                         if _G.IsOnScreen(root_screen_pos) then
-                            _G.lib_esp.draw({
+                        	lib_esp.draw({
                                 target = entity,
                                 color = entityTab.color.Value,
                                 healthbar = entityConfig.healthbar,
                                 nametag = entityTab.nametag.Value,
-                                custom_nametag = entityName,
+                                custom_nametag = entityTab.healthtag.Value and entityName .. " | " .. "0" .. " hp" or entityName,
                                 distance = entityTab.distance.Value,
                                 custom_distance = ""..root_distance,
                                 tracer = entityTab.tracer.Value,
@@ -441,7 +455,7 @@ if _G.NPCTask == nil then
                     if root_distance < npcs.distance_limit.Value then
                         local root_screen_pos = dx9.WorldToScreen({root_pos.x, root_pos.y, root_pos.z})
                         if _G._G.IsOnScreen(root_screen_pos) then
-                            _G.lib_esp.draw({
+                            lib_esp.draw({
                                 target = npc,
                                 custom_root = npcName,
                                 color = npcs.color.Value,
