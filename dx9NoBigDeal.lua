@@ -18,7 +18,7 @@ config = _G.config or {
     players = {
         enabled = true,
         distance = true,
-        healthbar = true,
+        healthbar = false,
         nametag = true,
         tracer = false,
         color = { 0, 255, 0 },
@@ -83,20 +83,20 @@ config = _G.config or {
 			},
 			{
 				name = "Cash",
-				part = "Cash",
-				isPartParent = true,
+				part = "Root",
+				parent = "Cash",
 				Enabled = true,
 			},
 			{
 				name = "Fake Cash",
-				part = "FakeCash",
-				isPartParent = true,
+				part = "Root",
+				parent = "FakeCash",
 				Enabled = true,
 			},
 			{
 				name = "Disguise Suit",
-				part = "DisguiseSuit",
-				isPartParent = true,
+				part = "Root",
+				parent = "DisguiseSuit",
 				Enabled = true,
 			},
 		},
@@ -130,80 +130,80 @@ config = _G.config or {
 			},
 			{
 				name = "Strikeout Ammo",
-				part = "StrikeoutMag",
-				isPartParent = true,
+				part = "Root",
+				parent = "StrikeoutMag",
 				Enabled = true,
 			},
 			{
 				name = "Pistol Ammo",
-				part = "PistolMag",
-				isPartParent = true,
+				part = "Root",
+				parent = "PistolMag",
 				Enabled = true,
 			},
 			{
 				name = "MP5 Ammo",
-				part = "MP5Mag",
-				isPartParent = true,
+				part = "Root",
+				parent = "MP5Mag",
 				Enabled = true,
 			},
 			{
 				name = "AK47 Ammo",
-				part = "AKMag",
-				isPartParent = true,
+				part = "Root",
+				parent = "AKMag",
 				Enabled = true,
 			},
 			{
 				name = "MAC10 Ammo",
-				part = "MAC10MAG",
-				isPartParent = true,
+				part = "Root",
+				parent = "MAC10MAG",
 				Enabled = true,
 			},
 			{
 				name = "Magnum Ammo",
-				part = "MagnumRound",
-				isPartParent = true,
+				part = "Root",
+				parent = "MagnumRound",
 				Enabled = true,
 			},
 			{
 				name = "Ace Ammo",
-				part = "AceMag",
-				isPartParent = true,
+				part = "Root",
+				parent = "AceMag",
 				Enabled = true,
 			},
 			{
 				name = "Sniper Ammo",
-				part = "SniperBullet",
-				isPartParent = true,
+				part = "Root",
+				parent = "SniperBullet",
 				Enabled = true,
 			},
 			{
 				name = "Pitch Ammo",
-				part = "PitchMag",
-				isPartParent = true,
+				part = "Root",
+				parent = "PitchMag",
 				Enabled = true,
 			},
 			{
 				name = "Forte Ammo",
-				part = "ForteMag",
-				isPartParent = true,
+				part = "Root",
+				parent = "ForteMag",
 				Enabled = true,
 			},
 			{
 				name = "Fix Ammo",
-				part = "FixMag",
-				isPartParent = true,
+				part = "Root",
+				parent = "FixMag",
 				Enabled = true,
 			},
 			{
 				name = "Ruby Ammo",
-				part = "RubyMag",
-				isPartParent = true,
+				part = "Root",
+				parent = "RubyMag",
 				Enabled = true,
 			},
 			{
 				name = "Jericho Ammo",
-				part = "JerichoMag",
-				isPartParent = true,
+				part = "Root",
+				parent = "JerichoMag",
 				Enabled = true,
 			},
 		},
@@ -566,9 +566,6 @@ items = {
 items_config = {}
 for _, tab in pairs(config.items.entries) do
 	local name = tab.name
-	local part = tab.part
-	local parent = tab.parent
-	local IsPartParent = tab.isPartParent
 	local Enabled = tab.Enabled
 
 	items_config[name.."_enabled"] = groupboxes.items_config
@@ -635,9 +632,6 @@ ammo = {
 ammo_config = {}
 for _, tab in pairs(config.ammo.entries) do
 	local name = tab.name
-	local part = tab.part
-	local parent = tab.parent
-	local IsPartParent = tab.isPartParent
 	local Enabled = tab.Enabled
 
 	ammo_config[name.."_enabled"] = groupboxes.ammo_config
@@ -704,9 +698,6 @@ weapons = {
 weapons_config = {}
 for _, tab in pairs(config.weapons.entries) do
 	local name = tab.name
-	local part = tab.part
-	local parent = tab.parent
-	local IsPartParent = tab.isPartParent
 	local Enabled = tab.Enabled
 
 	weapons_config[name.."_enabled"] = groupboxes.weapons_config
@@ -975,14 +966,13 @@ if not esp_settings.enabled.Value then
 	return
 end
 
-if _G.WorkspaceESPTask == nil then
+--if _G.WorkspaceESPTask == nil then
 	_G.WorkspaceESPTask = function()
 		if items.enabled.Value or ammo.enabled.Value or weapons.enabled.Value then
 			for _, parent in pairs(dx9.GetChildren(workspace)) do
 				local name = nil
 				local partName = nil
 				local parentName = dx9.GetName(parent)
-				local isPartParent = nil
 
 				local skipThis = true
 				local isType = 0
@@ -991,12 +981,10 @@ if _G.WorkspaceESPTask == nil then
 						local Name = tab.name
 						local PartName = tab.part
 						local ParentName = tab.parent
-						local IsPartParent = tab.isPartParent
 
-						if string.match(parentName, ParentName or PartName) then
+						if parentName == ParentName or parentName == PartName then
 							name = Name
 							partName = PartName
-							isPartParent = IsPartParent
 							if items_config[Name.."_enabled"].Value then
 								isType = 1
 								skipThis = false
@@ -1009,13 +997,11 @@ if _G.WorkspaceESPTask == nil then
 					for _, tab in pairs(config.ammo.entries) do
 						local Name = tab.name
 						local PartName = tab.part
-						local ParentName = tab.parent
-						local IsPartParent = tab.isPartParent
+						local ParentName = tab.IsPartParent
 
-						if string.match(parentName, ParentName or PartName) then
+						if parentName == ParentName or parentName == PartName then
 							name = Name
 							partName = PartName
-							isPartParent = IsPartParent
 							if ammo_config[Name.."_enabled"].Value then
 								isType = 2
 								skipThis = false
@@ -1029,12 +1015,10 @@ if _G.WorkspaceESPTask == nil then
 						local Name = tab.name
 						local PartName = tab.part
 						local ParentName = tab.parent
-						local IsPartParent = tab.isPartParent
 
-						if string.match(parentName, ParentName or PartName) then
+						if parentName == ParentName or parentName == PartName then
 							name = Name
 							partName = PartName
-							isPartParent = IsPartParent
 							if weapons_config[Name.."_enabled"].Value then
 								isType = 3
 								skipThis = false
@@ -1062,14 +1046,39 @@ if _G.WorkspaceESPTask == nil then
 				end
 
 				if not skipThis and typeTab and typeConfigSettings and typeConfig then
-					local part = ((isPartParent == true) and parent) or partName and dx9.FindFirstChild(parent, partName) or nil
+					--print(name)
+					local part = partName and dx9.FindFirstChild(parent, partName) or nil
+					--print(part)
 					if part and part ~= 0 then
+						--print("real")
+						local pivot = dx9.FindFirstChild(part, "Pivot")
+						local offset = {
+							x = 0,
+							y = 0,
+							z = 0,
+						}
+						if pivot and pivot ~= 0 then
+							--print("pivot")
+							local pivot_pos = dx9.GetPosition(pivot)
+							offset.x = pivot_pos.x
+							offset.y = pivot_pos.y
+							offset.z = pivot_pos.z
+						end
+						--print("offset: "..offset.x..", "..offset.y..", "..offset.z)
 						local my_root_pos = dx9.GetPosition(my_root)
 						local root_pos = dx9.GetPosition(part)
-						local root_distance = _G.Get_Distance(my_root_pos, root_pos)
+						local final_pos = {
+							x = root_pos.x + offset.x,
+							y = root_pos.y + offset.y,
+							z = root_pos.z + offset.z,
+						}
+						local root_distance = _G.Get_Distance(my_root_pos, final_pos)
+						--print(""..root_distance.." studs")
 						if root_distance < typeTab.distance_limit.Value then
-							local root_screen_pos = dx9.WorldToScreen({root_pos.x, root_pos.y, root_pos.z})
+							local root_screen_pos = dx9.WorldToScreen({final_pos.x, final_pos.y, final_pos.z})
+							--print("pos: "..final_pos.x..", "..final_pos.y..", "..final_pos.z)
 							if _G.IsOnScreen(root_screen_pos) then
+								--print("draw")
 								lib_esp.draw({
 									esp_type = "misc",
 									target = part,
@@ -1090,7 +1099,7 @@ if _G.WorkspaceESPTask == nil then
 			end
 		end
 	end
-end
+--end
 if _G.WorkspaceESPTask then
 	_G.WorkspaceESPTask()
 end
