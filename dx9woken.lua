@@ -1,3 +1,5 @@
+--indent size 4
+
 --dx9.ShowConsole(true)
 
 config = _G.config or {
