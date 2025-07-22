@@ -1,7 +1,7 @@
 --indent size 4
 
 config = _G.config or {
-	settings = {
+    settings = {
 		menu_toggle_keybind = "[F2]",
 		
 		esp_enabled = true,
@@ -303,8 +303,8 @@ if Debris_Folder and Debris_Folder ~= 0 then
                                 local Name = tab.name
 
                                 if name == Name then
+                                    isType = 1
                                     if trinkets_config[Name.."_enabled"].Value then
-                                        isType = 1
                                         skipThis = false
                                     end
                                     break
