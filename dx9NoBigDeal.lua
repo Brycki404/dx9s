@@ -966,7 +966,7 @@ if not esp_settings.enabled.Value then
 	return
 end
 
---if _G.WorkspaceESPTask == nil then
+if _G.WorkspaceESPTask == nil then
 	_G.WorkspaceESPTask = function()
 		if items.enabled.Value or ammo.enabled.Value or weapons.enabled.Value then
 			for _, parent in pairs(dx9.GetChildren(workspace)) do
@@ -1099,7 +1099,7 @@ end
 			end
 		end
 	end
---end
+end
 if _G.WorkspaceESPTask then
 	_G.WorkspaceESPTask()
 end
