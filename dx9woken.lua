@@ -297,10 +297,6 @@ if _G.Get_Index == nil then
 			table = { "Near-Bottom", "Bottom", "Top", "Mouse" }
 		elseif type == "box" then
 			table = { "Corners", "2D Box", "3D Box" }
-		elseif type == "aimbot_type" then
-			table = { "Closest to mouse", "Distance" }
-		elseif type == "aimbot_part" then
-			table = { "Head", "HumanoidRootPart" }
 		end
 
 		if table then
