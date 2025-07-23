@@ -728,7 +728,7 @@ if _G.PlayerTask == nil then
 											aimbot_target_screen_pos = screen_pos
 										end
 
-										if not aimbot_settings.sticky_aim.Value or aimbot_settings.sticky_aim.Value and not aimbot_target_name then
+										--if not aimbot_settings.sticky_aim.Value or aimbot_settings.sticky_aim.Value and not aimbot_target_name then
 											local mouse_distance = _G.Get_Distance_From_Mouse(screen_pos)
 											local aimbot_range = 9999 --dx9.GetAimbotValue("range")
 											local aimbot_fov = dx9.GetAimbotValue("fov")
@@ -748,7 +748,7 @@ if _G.PlayerTask == nil then
 													end
 												end
 											end
-										end
+										--end
 									end
 									
 									if esp_settings.enabled.Value and players.enabled.Value then
@@ -773,17 +773,20 @@ if _G.PlayerTask == nil then
 				end
 			end
 
-			if aimbot_settings.enabled.Value then
-				if dx9.isRightClickHeld() then --swapping targets
-					if aimbot_settings.sticky_aim.Value then
-						if not aimbot_target_name or aimbot_target_name and aimbot_target_name == 0 then
-							aimbot_target_name = closest_player_name
-							aimbot_target_screen_pos = closest_player_screen_pos
-						end
-					else
+			iif aimbot_settings.enabled.Value then
+				--swapping targets
+				if aimbot_settings.sticky_aim.Value then
+					if dx9.isRightClickHeld() then
+						aimbot_target_name = nil
+						aimbot_target_screen_pos = nil
+					end
+					if not aimbot_target_name or aimbot_target_name and aimbot_target_name == 0 then
 						aimbot_target_name = closest_player_name
 						aimbot_target_screen_pos = closest_player_screen_pos
 					end
+				else
+					aimbot_target_name = closest_player_name
+					aimbot_target_screen_pos = closest_player_screen_pos
 				end
 
 				if aimbot_target_name and _G.IsOnScreen(aimbot_target_screen_pos) then
