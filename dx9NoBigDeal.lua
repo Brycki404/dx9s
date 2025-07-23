@@ -997,7 +997,7 @@ if _G.WorkspaceESPTask == nil then
 					for _, tab in pairs(config.ammo.entries) do
 						local Name = tab.name
 						local PartName = tab.part
-						local ParentName = tab.IsPartParent
+						local ParentName = tab.parent
 
 						if parentName == ParentName or parentName == PartName then
 							name = Name
