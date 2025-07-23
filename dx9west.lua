@@ -773,7 +773,7 @@ if _G.PlayerTask == nil then
 				end
 			end
 
-			iif aimbot_settings.enabled.Value then
+			if aimbot_settings.enabled.Value then
 				--swapping targets
 				if aimbot_settings.sticky_aim.Value then
 					if dx9.isRightClickHeld() then
