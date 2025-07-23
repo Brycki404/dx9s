@@ -18,7 +18,7 @@ config = _G.config or {
     players = {
         enabled = true,
         distance = true,
-        healthbar = false,
+        healthbar = true,
         nametag = true,
         tracer = false,
         color = { 0, 255, 0 },
@@ -459,6 +459,15 @@ players = {
 			lib_ui:Notify(value and "[players] Enabled Nametag" or "[players] Disabled Nametag", 1)
 		end),
 
+	healthbar = groupboxes.players
+		:AddToggle({
+			Default = config.players.healthbar,
+			Text = "Healthbar",
+		})
+		:OnChanged(function(value)
+			lib_ui:Notify(value and "[hunting] Enabled Healthbar" or "[hunting] Disabled Healthbar", 1)
+		end),
+
 	tracer = groupboxes.players
 		:AddToggle({
 			Default = config.players.tracer,
@@ -876,7 +885,7 @@ if _G.PlayerTask == nil then
 										lib_esp.draw({
 											target = character,
 											color = playerColor,
-											healthbar = config.players.healthbar,
+											healthbar = players.healthbar.Value,
 											nametag = players.nametag.Value,
 											distance = players.distance.Value,
 											custom_distance = ""..root_distance,
