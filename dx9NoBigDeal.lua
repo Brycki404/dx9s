@@ -969,136 +969,153 @@ if not esp_settings.enabled.Value then
 	return
 end
 
+if _G.ParentESPCheck == nil then
+	_G.ParentESPCheck = function(parent)
+		local name = nil
+		local partName = nil
+		local parentName = dx9.GetName(parent)
+
+		if parentName == "Briefcase" then
+			if _G.ParentESPCheck ~= nil then
+				for _, child in pairs(dx9.GetChildren(parent)) do
+					local childName = dx9.GetName(child)
+					if childName ~= "Briefcase" then
+						_G.ParentESPCheck(child)
+					end
+				end
+			end
+		end
+
+		local skipThis = true
+		local isType = 0
+		if skipThis == true then
+			for _, tab in pairs(config.items.entries) do
+				local Name = tab.name
+				local PartName = tab.part
+				local ParentName = tab.parent
+
+				if parentName == ParentName or parentName == PartName then
+					name = Name
+					partName = PartName
+					if items.enabled.Value and items_config[Name.."_enabled"].Value then
+						isType = 1
+						skipThis = false
+					end
+					break
+				end
+			end
+		end
+		if skipThis == true then
+			for _, tab in pairs(config.ammo.entries) do
+				local Name = tab.name
+				local PartName = tab.part
+				local ParentName = tab.parent
+
+				if parentName == ParentName or parentName == PartName then
+					name = Name
+					partName = PartName
+					if ammo.enabled.Value and ammo_config[Name.."_enabled"].Value then
+						isType = 2
+						skipThis = false
+					end
+					break
+				end
+			end
+		end
+		if skipThis == true then
+			for _, tab in pairs(config.weapons.entries) do
+				local Name = tab.name
+				local PartName = tab.part
+				local ParentName = tab.parent
+
+				if parentName == ParentName or parentName == PartName then
+					name = Name
+					partName = PartName
+					if weapons.enabled.Value and weapons_config[Name.."_enabled"].Value then
+						isType = 3
+						skipThis = false
+					end
+					break
+				end
+			end
+		end
+
+		local typeTab = nil
+		local typeConfigSettings = nil
+		local typeConfig = nil
+		if isType == 1 then
+			typeTab = items
+			typeConfigSettings = config.items
+			typeConfig = items_config
+		elseif isType == 2 then
+			typeTab = ammo
+			typeConfigSettings = config.ammo
+			typeConfig = ammo_config
+		elseif isType == 3 then
+			typeTab = weapons
+			typeConfigSettings = config.weapons
+			typeConfig = weapons_config
+		end
+
+		if not skipThis and typeTab and typeConfigSettings and typeConfig then
+			--print(name)
+			local part = partName and dx9.FindFirstChild(parent, partName) or nil
+			--print(part)
+			if part and part ~= 0 then
+				--print("real")
+				local pivot = dx9.FindFirstChild(part, "Pivot")
+				local offset = {
+					x = 0,
+					y = 0,
+					z = 0,
+				}
+				if pivot and pivot ~= 0 then
+					--print("pivot")
+					local pivot_pos = dx9.GetPosition(pivot)
+					offset.x = pivot_pos.x
+					offset.y = pivot_pos.y
+					offset.z = pivot_pos.z
+				end
+				--print("offset: "..offset.x..", "..offset.y..", "..offset.z)
+				local my_root_pos = dx9.GetPosition(my_root)
+				local root_pos = dx9.GetPosition(part)
+				local final_pos = {
+					x = root_pos.x + offset.x,
+					y = root_pos.y + offset.y,
+					z = root_pos.z + offset.z,
+				}
+				local root_distance = _G.Get_Distance(my_root_pos, final_pos)
+				--print(""..root_distance.." studs")
+				if root_distance < typeTab.distance_limit.Value then
+					local root_screen_pos = dx9.WorldToScreen({final_pos.x, final_pos.y, final_pos.z})
+					--print("pos: "..final_pos.x..", "..final_pos.y..", "..final_pos.z)
+					if _G.IsOnScreen(root_screen_pos) then
+						--print("draw")
+						lib_esp.draw({
+							esp_type = "misc",
+							target = part,
+							color = typeTab.color.Value,
+							healthbar = typeConfigSettings.healthbar,
+							nametag = typeTab.nametag.Value,
+							custom_nametag = name,
+							distance = typeTab.distance.Value,
+							custom_distance = ""..root_distance,
+							tracer = typeTab.tracer.Value,
+							tracer_type = current_tracer_type,
+							box_type = current_box_type,
+						})
+					end
+				end
+			end
+		end
+	end
+end
+
 if _G.WorkspaceESPTask == nil then
 	_G.WorkspaceESPTask = function()
 		if items.enabled.Value or ammo.enabled.Value or weapons.enabled.Value then
 			for _, parent in pairs(dx9.GetChildren(workspace)) do
-				local name = nil
-				local partName = nil
-				local parentName = dx9.GetName(parent)
-
-				local skipThis = true
-				local isType = 0
-				if skipThis == true then
-					for _, tab in pairs(config.items.entries) do
-						local Name = tab.name
-						local PartName = tab.part
-						local ParentName = tab.parent
-
-						if parentName == ParentName or parentName == PartName then
-							name = Name
-							partName = PartName
-							if items_config[Name.."_enabled"].Value then
-								isType = 1
-								skipThis = false
-							end
-							break
-						end
-					end
-				end
-				if skipThis == true then
-					for _, tab in pairs(config.ammo.entries) do
-						local Name = tab.name
-						local PartName = tab.part
-						local ParentName = tab.parent
-
-						if parentName == ParentName or parentName == PartName then
-							name = Name
-							partName = PartName
-							if ammo_config[Name.."_enabled"].Value then
-								isType = 2
-								skipThis = false
-							end
-							break
-						end
-					end
-				end
-				if skipThis == true then
-					for _, tab in pairs(config.weapons.entries) do
-						local Name = tab.name
-						local PartName = tab.part
-						local ParentName = tab.parent
-
-						if parentName == ParentName or parentName == PartName then
-							name = Name
-							partName = PartName
-							if weapons_config[Name.."_enabled"].Value then
-								isType = 3
-								skipThis = false
-							end
-							break
-						end
-					end
-				end
-
-				local typeTab = nil
-				local typeConfigSettings = nil
-				local typeConfig = nil
-				if isType == 1 then
-					typeTab = items
-					typeConfigSettings = config.items
-					typeConfig = items_config
-				elseif isType == 2 then
-					typeTab = ammo
-					typeConfigSettings = config.ammo
-					typeConfig = ammo_config
-				elseif isType == 3 then
-					typeTab = weapons
-					typeConfigSettings = config.weapons
-					typeConfig = weapons_config
-				end
-
-				if not skipThis and typeTab and typeConfigSettings and typeConfig then
-					--print(name)
-					local part = partName and dx9.FindFirstChild(parent, partName) or nil
-					--print(part)
-					if part and part ~= 0 then
-						--print("real")
-						local pivot = dx9.FindFirstChild(part, "Pivot")
-						local offset = {
-							x = 0,
-							y = 0,
-							z = 0,
-						}
-						if pivot and pivot ~= 0 then
-							--print("pivot")
-							local pivot_pos = dx9.GetPosition(pivot)
-							offset.x = pivot_pos.x
-							offset.y = pivot_pos.y
-							offset.z = pivot_pos.z
-						end
-						--print("offset: "..offset.x..", "..offset.y..", "..offset.z)
-						local my_root_pos = dx9.GetPosition(my_root)
-						local root_pos = dx9.GetPosition(part)
-						local final_pos = {
-							x = root_pos.x + offset.x,
-							y = root_pos.y + offset.y,
-							z = root_pos.z + offset.z,
-						}
-						local root_distance = _G.Get_Distance(my_root_pos, final_pos)
-						--print(""..root_distance.." studs")
-						if root_distance < typeTab.distance_limit.Value then
-							local root_screen_pos = dx9.WorldToScreen({final_pos.x, final_pos.y, final_pos.z})
-							--print("pos: "..final_pos.x..", "..final_pos.y..", "..final_pos.z)
-							if _G.IsOnScreen(root_screen_pos) then
-								--print("draw")
-								lib_esp.draw({
-									esp_type = "misc",
-									target = part,
-									color = typeTab.color.Value,
-									healthbar = typeConfigSettings.healthbar,
-									nametag = typeTab.nametag.Value,
-									custom_nametag = name,
-									distance = typeTab.distance.Value,
-									custom_distance = ""..root_distance,
-									tracer = typeTab.tracer.Value,
-									tracer_type = current_tracer_type,
-									box_type = current_box_type,
-								})
-							end
-						end
-					end
-				end
+				_G.ParentESPCheck(parent)
 			end
 		end
 	end
