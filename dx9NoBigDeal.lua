@@ -34,18 +34,6 @@ config = _G.config or {
 		distance_limit = 10000,
 		entries = {
 			{
-				name = "Taxidermy",
-				part = "Raven",
-				parent = "Taxidermy",
-				Enabled = true,
-			},
-			{
-				name = "Yoro Kotana",
-				part = "Cube",
-				parent = "YoroKatana",
-				Enabled = true,
-			},
-			{
 				name = "Phone",
 				part = "Root",
 				parent = "Phone",
@@ -70,18 +58,6 @@ config = _G.config or {
 				Enabled = true,
 			},
 			{
-				name = "Tonic",
-				part = "TonicBottle",
-				parent = "Tonic",
-				Enabled = true,
-			},
-			{
-				name = "Bottle",
-				part = "Root",
-				parent = "Bottle",
-				Enabled = true,
-			},
-			{
 				name = "Cash",
 				part = "Root",
 				parent = "Cash",
@@ -91,12 +67,6 @@ config = _G.config or {
 				name = "Fake Cash",
 				part = "Root",
 				parent = "FakeCash",
-				Enabled = true,
-			},
-			{
-				name = "Disguise Suit",
-				part = "Root",
-				parent = "DisguiseSuit",
 				Enabled = true,
 			},
 		},
