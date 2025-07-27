@@ -174,7 +174,7 @@ if _G.AutoParry_BladeBall_Task == nil then
 			local speed = math.sqrt(vel.x^2+vel.y^2+vel.z^2)
 			local velocity = vel.x + vel.y + vel.z
 
-   local lpos = local_player_table.Position
+			local lpos = local_player_table.Position
 			local x = (lpos.x-ballpos.x)*(lpos.x-ballpos.x)
 			local y = (lpos.y-ballpos.y)*(lpos.y-ballpos.y)
 			local z = (lpos.z-ballpos.z)*(lpos.z-ballpos.z)
