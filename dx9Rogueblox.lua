@@ -56,7 +56,7 @@ interface = lib_ui:CreateWindow({
 
 	ToggleKey = config.settings.menu_toggle_keybind;
 
-	FooterToggle = false;
+	FooterToggle = true;
 	FooterRGB = true;
 	FontColor = { 255, 255, 255 };
 	MainColor = { 32, 26, 68 };
