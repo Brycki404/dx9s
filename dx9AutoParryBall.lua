@@ -181,7 +181,7 @@ if _G.AutoParry_BladeBall_Task == nil then
 			local distance = math.floor(math.sqrt(x+y+z))
 
 			local highlight = dx9.FindFirstChild(my_character, "Highlight")
-			if highlight and highlight ~= 0 and distance <= 60 and distance / velocity <= 0.55 then
+			if highlight and highlight ~= 0 and distance <= 60 and distance / speed < 0.55 then
 				dx9.Mouse1Click()
 			end
 		end
