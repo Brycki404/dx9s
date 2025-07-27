@@ -4,12 +4,12 @@ config = _G.config or {
 	urls = {
 		DXLibUI = "https://raw.githubusercontent.com/B0NBunny/DXLibUI/refs/heads/main/main.lua";
 	};
-    settings = {
+	settings = {
 		menu_toggle_keybind = "[F3]";
-        autoparry_enabled = true;
-        autoparry_keybind = "[F4]";
+		autoparry_enabled = true;
+		autoparry_keybind = "[F4]";
 		game = 1; -- 1 = "Blade Ball", 2 = "Death Ball"
-    };
+	};
 };
 if _G.config == nil then
 	_G.config = config
@@ -139,13 +139,13 @@ if current_game == 1 then
 end
 
 if PlayerCharacterFolder == nil or PlayerCharacterFolder == 0 then
-    return
+	return
 end
 
 if my_player == nil or my_player == 0 then
 	return
 elseif my_player ~= nil and my_player ~= 0 then
-    my_character = dx9.FindFirstChild(PlayerCharacterFolder, local_player_name)
+	my_character = dx9.FindFirstChild(PlayerCharacterFolder, local_player_name)
 end
 
 if my_character == nil or my_character == 0 then
@@ -157,36 +157,35 @@ elseif my_character ~= nil and my_character ~= 0 then
 end
 
 if my_root == nil or my_root == 0 then
-    return
+	return
 end
 
 if my_head == nil or my_head == 0 then
-    return
+	return
 end
 
 if _G.AutoParry_BladeBall_Task == nil then
-    _G.AutoParry_BladeBall_Task = function()
+	_G.AutoParry_BladeBall_Task = function()
 		local Balls = dx9.FindFirstChild(workspace, "Balls")
 
 		for i,v in pairs(dx9.GetChildren(Balls)) do
 			local ballpos = dx9.GetPosition(v)
 			local vel = dx9.GetVelocity(v)
+			local speed = math.sqrt(vel.x^2+vel.y^2+vel.z^2)
 			local velocity = vel.x + vel.y + vel.z
 
-			function Distance()
-				local lpos = local_player_table.Position
-				local x = (lpos.x-ballpos.x)*(lpos.x-ballpos.x)
-				local y = (lpos.y-ballpos.y)*(lpos.y-ballpos.y)
-				local z = (lpos.z-ballpos.z)*(lpos.z-ballpos.z)
-				return math.floor(math.sqrt(x+y+z))
-			end
+   local lpos = local_player_table.Position
+			local x = (lpos.x-ballpos.x)*(lpos.x-ballpos.x)
+			local y = (lpos.y-ballpos.y)*(lpos.y-ballpos.y)
+			local z = (lpos.z-ballpos.z)*(lpos.z-ballpos.z)
+			local distance = math.floor(math.sqrt(x+y+z))
 
 			local highlight = dx9.FindFirstChild(my_character, "Highlight")
-			if highlight and highlight ~= 0 and Distance() <= 60 and Distance() / velocity <= 0.55 then
+			if highlight and highlight ~= 0 and distance <= 60 and distance / velocity <= 0.55 then
 				dx9.Mouse1Click()
 			end
 		end
-    end
+	end
 end
 
 if autoparry_settings.enabled.Value then
