@@ -1,396 +1,398 @@
 --indent size 4
 
---dx9.ShowConsole(true)
-
 config = _G.config or {
+	urls = {
+		DXLibUI = "https://raw.githubusercontent.com/B0NBunny/DXLibUI/refs/heads/main/main.lua";
+		LibESP = "https://pastebin.com/raw/Pwn8GxMB";
+	};
     settings = {
-		aimbot_enabled = true,
-		sticky_aim = false,
-		aimbot_part = 1, -- 1 = "Head", 2 = "HumanoidRootPart"
-		aimbot_smoothness = 5,
+		aimbot_enabled = true;
+		sticky_aim = false;
+		aimbot_part = 1; -- 1 = "Head", 2 = "HumanoidRootPart"
+		aimbot_smoothness = 5;
 		
-		menu_toggle_keybind = "[F3]",
+		menu_toggle_keybind = "[F3]";
 		
-		esp_enabled = true,
-    	box_type = 1, -- 1 = "Corners", 2 = "2D Box", 3 = "3D Box"
-    	tracer_type = 1, -- 1= "Near-Bottom", 2 = "Bottom", 3 = "Top", 4 = "Mouse"
-    },
+		esp_enabled = true;
+    	box_type = 1; -- 1 = "Corners", 2 = "2D Box", 3 = "3D Box"
+    	tracer_type = 1; -- 1= "Near-Bottom", 2 = "Bottom", 3 = "Top", 4 = "Mouse"
+    };
     players = {
-        enabled = true,
-        distance = true,
-        healthbar = true,
-        nametag = true,
-        tracer = false,
-        color = { 0, 255, 0 },
-		distance_limit = 10000,
-    },
+        enabled = true;
+        distance = true;
+        healthbar = true;
+        nametag = true;
+        tracer = false;
+        color = { 0, 255, 0 };
+		distance_limit = 10000;
+    };
     items = {
-        enabled = true,
-        distance = true,
-        healthbar = false,
-        nametag = true,
-        tracer = false,
-		color = { 255, 255, 255 },
-		distance_limit = 10000,
+        enabled = true;
+        distance = true;
+        healthbar = false;
+        nametag = true;
+        tracer = false;
+		color = { 255, 255, 255 };
+		distance_limit = 10000;
 		entries = {
 			{
-				name = "Phone",
-				part = "Root",
-				parent = "Phone",
-				Enabled = true,
-			},
+				name = "Phone";
+				part = "Root";
+				parent = "Phone";
+				Enabled = true;
+			};
 			{
-				name = "Car",
-				part = "DriveSeat",
-				parent = "Car",
-				Enabled = true,
-			},
+				name = "Car";
+				part = "DriveSeat";
+				parent = "Car";
+				Enabled = true;
+			};
 			{
-				name = "Disk",
-				part = "Root",
-				parent = "Disk",
-				Enabled = true,
-			},
+				name = "Disk";
+				part = "Root";
+				parent = "Disk";
+				Enabled = true;
+			};
 			{
-				name = "Briefcase",
-				part = "Root",
-				parent = "Briefcase",
-				Enabled = true,
-			},
+				name = "Briefcase";
+				part = "Root";
+				parent = "Briefcase";
+				Enabled = true;
+			};
 			{
-				name = "Cash",
-				part = "Root",
-				parent = "Cash",
-				Enabled = true,
-			},
+				name = "Cash";
+				part = "Root";
+				parent = "Cash";
+				Enabled = true;
+			};
 			{
-				name = "Fake Cash",
-				part = "Root",
-				parent = "FakeCash",
-				Enabled = true,
-			},
-		},
-	},
+				name = "Fake Cash";
+				part = "Root";
+				parent = "FakeCash";
+				Enabled = true;
+			};
+		};
+	};
 	ammo = {
-		enabled = true,
-        distance = true,
-        healthbar = true,
-        nametag = true,
-        tracer = false,
-		color = { 255, 255, 0 },
-		distance_limit = 10000,
+		enabled = true;
+        distance = true;
+        healthbar = true;
+        nametag = true;
+        tracer = false;
+		color = { 255, 255, 0 };
+		distance_limit = 10000;
 		entries = {
 			{
-				name = "Kick10 Ammo",
-				part = "Metal",
-				parent = "Kick10Mag",
-				Enabled = true,
-			},
+				name = "Kick10 Ammo";
+				part = "Metal";
+				parent = "Kick10Mag";
+				Enabled = true;
+			};
 			{
-				name = "TheFix Ammo",
-				part = "Meshes/thefix_fixMag",
-				parent = "TheFixMag",
-				Enabled = true,
-			},
+				name = "TheFix Ammo";
+				part = "Meshes/thefix_fixMag";
+				parent = "TheFixMag";
+				Enabled = true;
+			};
 			{
-				name = "Snub Ammo",
-				part = "Root",
-				parent = "SnubCylinder",
-				Enabled = true,
-			},
+				name = "Snub Ammo";
+				part = "Root";
+				parent = "SnubCylinder";
+				Enabled = true;
+			};
 			{
-				name = "Strikeout Ammo",
-				part = "Root",
-				parent = "StrikeoutMag",
-				Enabled = true,
-			},
+				name = "Strikeout Ammo";
+				part = "Root";
+				parent = "StrikeoutMag";
+				Enabled = true;
+			};
 			{
-				name = "Pistol Ammo",
-				part = "Root",
-				parent = "PistolMag",
-				Enabled = true,
-			},
+				name = "Pistol Ammo";
+				part = "Root";
+				parent = "PistolMag";
+				Enabled = true;
+			};
 			{
-				name = "MP5 Ammo",
-				part = "Root",
-				parent = "MP5Mag",
-				Enabled = true,
-			},
+				name = "MP5 Ammo";
+				part = "Root";
+				parent = "MP5Mag";
+				Enabled = true;
+			};
 			{
-				name = "AK47 Ammo",
-				part = "Root",
-				parent = "AKMag",
-				Enabled = true,
-			},
+				name = "AK47 Ammo";
+				part = "Root";
+				parent = "AKMag";
+				Enabled = true;
+			};
 			{
-				name = "MAC10 Ammo",
-				part = "Root",
-				parent = "MAC10MAG",
-				Enabled = true,
-			},
+				name = "MAC10 Ammo";
+				part = "Root";
+				parent = "MAC10MAG";
+				Enabled = true;
+			};
 			{
-				name = "Magnum Ammo",
-				part = "Root",
-				parent = "MagnumRound",
-				Enabled = true,
-			},
+				name = "Magnum Ammo";
+				part = "Root";
+				parent = "MagnumRound";
+				Enabled = true;
+			};
 			{
-				name = "Ace Ammo",
-				part = "Root",
-				parent = "AceMag",
-				Enabled = true,
-			},
+				name = "Ace Ammo";
+				part = "Root";
+				parent = "AceMag";
+				Enabled = true;
+			};
 			{
-				name = "Sniper Ammo",
-				part = "Root",
-				parent = "SniperBullet",
-				Enabled = true,
-			},
+				name = "Sniper Ammo";
+				part = "Root";
+				parent = "SniperBullet";
+				Enabled = true;
+			};
 			{
-				name = "Pitch Ammo",
-				part = "Root",
-				parent = "PitchMag",
-				Enabled = true,
-			},
+				name = "Pitch Ammo";
+				part = "Root";
+				parent = "PitchMag";
+				Enabled = true;
+			};
 			{
-				name = "Forte Ammo",
-				part = "Root",
-				parent = "ForteMag",
-				Enabled = true,
-			},
+				name = "Forte Ammo";
+				part = "Root";
+				parent = "ForteMag";
+				Enabled = true;
+			};
 			{
-				name = "Fix Ammo",
-				part = "Root",
-				parent = "FixMag",
-				Enabled = true,
-			},
+				name = "Fix Ammo";
+				part = "Root";
+				parent = "FixMag";
+				Enabled = true;
+			};
 			{
-				name = "Ruby Ammo",
-				part = "Root",
-				parent = "RubyMag",
-				Enabled = true,
-			},
+				name = "Ruby Ammo";
+				part = "Root";
+				parent = "RubyMag";
+				Enabled = true;
+			};
 			{
-				name = "Jericho Ammo",
-				part = "Root",
-				parent = "JerichoMag",
-				Enabled = true,
-			},
-		},
-	},
+				name = "Jericho Ammo";
+				part = "Root";
+				parent = "JerichoMag";
+				Enabled = true;
+			};
+		};
+	};
 	weapons = {
-		enabled = true,
-        distance = true,
-        healthbar = false,
-        nametag = true,
-        tracer = false,
-		color = { 255, 0, 0 },
-		distance_limit = 10000,
+		enabled = true;
+        distance = true;
+        healthbar = false;
+        nametag = true;
+        tracer = false;
+		color = { 255, 0, 0 };
+		distance_limit = 10000;
 		entries = {
 			{
-				name = "Raygun",
-				part = "Root",
-				parent = "Raygun",
-				Enabled = true,
-			},
+				name = "Raygun";
+				part = "Root";
+				parent = "Raygun";
+				Enabled = true;
+			};
 			{
-				name = "Snub",
-				part = "Root",
-				parent = "Snub",
-				Enabled = true,
-			},
+				name = "Snub";
+				part = "Root";
+				parent = "Snub";
+				Enabled = true;
+			};
 			{
-				name = "Pistol",
-				part = "Root",
-				parent = "Pistol",
-				Enabled = true,
-			},
+				name = "Pistol";
+				part = "Root";
+				parent = "Pistol";
+				Enabled = true;
+			};
 			{
-				name = "Magnum",
-				part = "Root",
-				parent = "MAGNUM",
-				Enabled = true,
-			},
+				name = "Magnum";
+				part = "Root";
+				parent = "MAGNUM";
+				Enabled = true;
+			};
 			{
-				name = "Jericho",
-				part = "Root",
-				parent = "Jericho",
-				Enabled = true,
-			},
+				name = "Jericho";
+				part = "Root";
+				parent = "Jericho";
+				Enabled = true;
+			};
 			{
-				name = "Smoke Grenade",
-				part = "grenadebody",
-				parent = "SmokeGrenade",
-				Enabled = true,
-			},
+				name = "Smoke Grenade";
+				part = "grenadebody";
+				parent = "SmokeGrenade";
+				Enabled = true;
+			};
 			{
-				name = "AK47",
-				part = "Root",
-				parent = "AK47",
-				Enabled = true,
-			},
+				name = "AK47";
+				part = "Root";
+				parent = "AK47";
+				Enabled = true;
+			};
 			{
-				name = "Forte",
-				part = "Root",
-				parent = "Forte",
-				Enabled = true,
-			},
+				name = "Forte";
+				part = "Root";
+				parent = "Forte";
+				Enabled = true;
+			};
 			{
-				name = "PitchGun",
-				part = "Root",
-				parent = "PitchGun",
-				Enabled = true,
-			},
+				name = "PitchGun";
+				part = "Root";
+				parent = "PitchGun";
+				Enabled = true;
+			};
 			{
-				name = "Sniper",
-				part = "Root",
-				parent = "Sniper",
-				Enabled = true,
-			},
+				name = "Sniper";
+				part = "Root";
+				parent = "Sniper";
+				Enabled = true;
+			};
 			{
-				name = "MAC10",
-				part = "Root",
-				parent = "ToolboxMAC10",
-				Enabled = true,
-			},
+				name = "MAC10";
+				part = "Root";
+				parent = "ToolboxMAC10";
+				Enabled = true;
+			};
 			{
-				name = "Ruby",
-				part = "Root",
-				parent = "Ruby",
-				Enabled = true,
-			},
+				name = "Ruby";
+				part = "Root";
+				parent = "Ruby";
+				Enabled = true;
+			};
 			{
-				name = "DB",
-				part = "Root",
-				parent = "DB",
-				Enabled = true,
-			},
+				name = "DB";
+				part = "Root";
+				parent = "DB";
+				Enabled = true;
+			};
 			{
-				name = "Grenade",
-				part = "Meshes/grenade_striker",
-				parent = "Grenade",
-				Enabled = true,
-			},
+				name = "Grenade";
+				part = "Meshes/grenade_striker";
+				parent = "Grenade";
+				Enabled = true;
+			};
 			{
-				name = "Strikeout",
-				part = "Root",
-				parent = "Strikeout",
-				Enabled = true,
-			},
+				name = "Strikeout";
+				part = "Root";
+				parent = "Strikeout";
+				Enabled = true;
+			};
 			{
-				name = "Kick10",
-				part = "Root",
-				parent = "Kick10",
-				Enabled = true,
-			},
+				name = "Kick10";
+				part = "Root";
+				parent = "Kick10";
+				Enabled = true;
+			};
 			{
-				name = "Pop22",
-				part = "Root",
-				parent = "Pop22",
-				Enabled = true,
-			},
+				name = "Pop22";
+				part = "Root";
+				parent = "Pop22";
+				Enabled = true;
+			};
 			{
-				name = "The Fix",
-				part = "Root",
-				parent = "TheFix",
-				Enabled = true,
-			},
+				name = "The Fix";
+				part = "Root";
+				parent = "TheFix";
+				Enabled = true;
+			};
 			{
-				name = "Ace Carbine",
-				part = "Root",
-				parent = "AceCarbine",
-				Enabled = true,
-			},
+				name = "Ace Carbine";
+				part = "Root";
+				parent = "AceCarbine";
+				Enabled = true;
+			};
 			{
-				name = "MP5",
-				part = "Root",
-				parent = "MP5",
-				Enabled = true,
-			},
-		},
-	},
-}
+				name = "MP5";
+				part = "Root";
+				parent = "MP5";
+				Enabled = true;
+			};
+		};
+	};
+};
 if _G.config == nil then
 	_G.config = config
 	config = _G.config
 end
 
-lib_ui = loadstring(dx9.Get("https://raw.githubusercontent.com/soupg/DXLibUI/main/main.lua"))()
+lib_ui = loadstring(dx9.Get(config.urls.DXLibUI))()
 
-lib_esp = loadstring(dx9.Get("https://pastebin.com/raw/Pwn8GxMB"))()
+lib_esp = loadstring(dx9.Get(config.urls.LibESP))()
 
 interface = lib_ui:CreateWindow({
-	Title = "No Big Deal | dx9ware | By @Brycki",
-	Size = { 500, 500 },
-	Resizable = true,
+	Title = "No Big Deal | dx9ware | By @Brycki";
+	Size = { 500, 500 };
+	Resizable = true;
 
-	ToggleKey = config.settings.menu_toggle_keybind,
+	ToggleKey = config.settings.menu_toggle_keybind;
 
-	FooterToggle = false,
-	FooterRGB = true,
-	FontColor = { 255, 255, 255 },
-	MainColor = { 32, 26, 68 },
-	BackgroundColor = { 26, 21, 55 },
-	AccentColor = { 81, 37, 112 },
-	OutlineColor = { 54, 47, 90 },
+	FooterToggle = false;
+	FooterRGB = true;
+	FontColor = { 255, 255, 255 };
+	MainColor = { 32, 26, 68 };
+	BackgroundColor = { 26, 21, 55 };
+	AccentColor = { 81, 37, 112 };
+	OutlineColor = { 54, 47, 90 };
 })
 
 tabs = {
-	settings = interface:AddTab("Settings"),
-	players = interface:AddTab("Players"),
-	items = interface:AddTab("Items"),
-	ammo = interface:AddTab("Ammo"),
-	weapons = interface:AddTab("Weapons"),
+	settings = interface:AddTab("Settings");
+	players = interface:AddTab("Players");
+	items = interface:AddTab("Items");
+	ammo = interface:AddTab("Ammo");
+	weapons = interface:AddTab("Weapons");
 }
 
 groupboxes = {
-	esp_settings = tabs.settings:AddLeftGroupbox("ESP"),
-	aimbot_settings = tabs.settings:AddRightGroupbox("Aimbot"),
-	players = tabs.players:AddMiddleGroupbox("Player ESP"),
-	items = tabs.items:AddLeftGroupbox("Item ESP"),
-	items_config = tabs.items:AddRightGroupbox("Item Config"),
-	ammo = tabs.ammo:AddLeftGroupbox("Ammo ESP"),
-	ammo_config = tabs.ammo:AddRightGroupbox("Ammo Config"),
-	weapons = tabs.weapons:AddLeftGroupbox("Weapon ESP"),
-	weapons_config = tabs.weapons:AddRightGroupbox("Weapon Config"),
+	esp_settings = tabs.settings:AddLeftGroupbox("ESP");
+	aimbot_settings = tabs.settings:AddRightGroupbox("Aimbot");
+	players = tabs.players:AddMiddleGroupbox("Player ESP");
+	items = tabs.items:AddLeftGroupbox("Item ESP");
+	items_config = tabs.items:AddRightGroupbox("Item Config");
+	ammo = tabs.ammo:AddLeftGroupbox("Ammo ESP");
+	ammo_config = tabs.ammo:AddRightGroupbox("Ammo Config");
+	weapons = tabs.weapons:AddLeftGroupbox("Weapon ESP");
+	weapons_config = tabs.weapons:AddRightGroupbox("Weapon Config");
 }
 
 esp_settings = {
 	enabled = groupboxes.esp_settings
 		:AddToggle({
-			Default = config.settings.esp_enabled,
-			Text = "ESP Enabled",
+			Default = config.settings.esp_enabled;
+			Text = "ESP Enabled";
 		})
 		:OnChanged(function(value)
 			lib_ui:Notify(value and "[settings] Enabled Global ESP" or "[settings] Disabled Global ESP", 1)
-		end),
+		end);
 
 	box_type = groupboxes.esp_settings
 		:AddDropdown({
-			Text = "Box Type",
-			Default = config.settings.box_type,
-			Values = { "Corners", "2D Box", "3D Box" },
+			Text = "Box Type";
+			Default = config.settings.box_type;
+			Values = { "Corners", "2D Box", "3D Box" };
 		})
 		:OnChanged(function(value)
 			lib_ui:Notify("[settings] Box Type: " .. value, 1)
-		end),
+		end);
 
 	tracer_type = groupboxes.esp_settings
 		:AddDropdown({
-			Text = "Tracer Type",
-			Default = config.settings.tracer_type,
-			Values = { "Near-Bottom", "Bottom", "Top", "Mouse" },
+			Text = "Tracer Type";
+			Default = config.settings.tracer_type;
+			Values = { "Near-Bottom", "Bottom", "Top", "Mouse" };
 		})
 		:OnChanged(function(value)
 			lib_ui:Notify("[settings] Tracer Type: " .. value, 1)
-		end),
+		end);
 }
 
 aimbot_settings = {
 	enabled = groupboxes.aimbot_settings
 		:AddToggle({
-			Default = config.settings.aimbot_enabled,
-			Text = "Aimbot Enabled",
+			Default = config.settings.aimbot_enabled;
+			Text = "Aimbot Enabled";
 		})
 		:OnChanged(function(value)
 			lib_ui:Notify(value and "[settings] Enabled Aimbot" or "[settings] Disabled Aimbot", 1)
@@ -398,34 +400,34 @@ aimbot_settings = {
 				_G.aimbot_target_name = nil
 				_G.aimbot_target_screen_pos = nil
 			end
-		end),
+		end);
 
 	sticky_aim = groupboxes.aimbot_settings
 		:AddToggle({
-			Default = config.settings.sticky_aim,
-			Text = "Sticky Aim Enabled",
+			Default = config.settings.sticky_aim;
+			Text = "Sticky Aim Enabled";
 		})
 		:OnChanged(function(value)
 			lib_ui:Notify(value and "[settings] Enabled Sticky Aim" or "[settings] Disabled Sticky Aim", 1)
-		end),
+		end);
 
 	part = groupboxes.aimbot_settings
 		:AddDropdown({
-			Text = "Aimbot Part",
-			Default = config.settings.aimbot_part,
-			Values = { "Head", "HumanoidRootPart" },
+			Text = "Aimbot Part";
+			Default = config.settings.aimbot_part;
+			Values = { "Head", "HumanoidRootPart" };
 		})
 		:OnChanged(function(value)
 			lib_ui:Notify("[settings] Aimbot Part: " .. value, 1)
-		end),
+		end);
 
 	smoothness = groupboxes.aimbot_settings:AddSlider({
-		Default = config.settings.aimbot_smoothness,
-		Text = "Aimbot Smoothness",
-		Min = 1,
-		Max = 50,
-		Rounding = 0,
-	}),
+		Default = config.settings.aimbot_smoothness;
+		Text = "Aimbot Smoothness";
+		Min = 1;
+		Max = 50;
+		Rounding = 0;
+	});
 }
 
 local aimbot_target_name = _G.aimbot_target_name or nil
@@ -434,112 +436,112 @@ local aimbot_target_screen_pos = _G.aimbot_target_screen_pos or nil
 players = {
 	enabled = groupboxes.players
 		:AddToggle({
-			Default = config.players.enabled,
-			Text = "Enabled",
+			Default = config.players.enabled;
+			Text = "Enabled";
 		})
 		:OnChanged(function(value)
 			lib_ui:Notify(value and "[players] Enabled ESP" or "[players] Disabled ESP", 1)
-		end),
+		end);
 
 	distance = groupboxes.players
 		:AddToggle({
-			Default = config.players.distance,
-			Text = "Distance",
+			Default = config.players.distance;
+			Text = "Distance";
 		})
 		:OnChanged(function(value)
 			lib_ui:Notify(value and "[players] Enabled Distance" or "[players] Disabled Distance", 1)
-		end),
+		end);
     
 	nametag = groupboxes.players
 		:AddToggle({
-			Default = config.players.nametag,
-			Text = "Nametag",
+			Default = config.players.nametag;
+			Text = "Nametag";
 		})
 		:OnChanged(function(value)
 			lib_ui:Notify(value and "[players] Enabled Nametag" or "[players] Disabled Nametag", 1)
-		end),
+		end);
 
 	healthbar = groupboxes.players
 		:AddToggle({
-			Default = config.players.healthbar,
-			Text = "Healthbar",
+			Default = config.players.healthbar;
+			Text = "Healthbar";
 		})
 		:OnChanged(function(value)
 			lib_ui:Notify(value and "[hunting] Enabled Healthbar" or "[hunting] Disabled Healthbar", 1)
-		end),
+		end);
 
 	tracer = groupboxes.players
 		:AddToggle({
-			Default = config.players.tracer,
-			Text = "Tracer",
+			Default = config.players.tracer;
+			Text = "Tracer";
 		})
 		:OnChanged(function(value)
 			lib_ui:Notify(value and "[players] Enabled Tracer" or "[players] Disabled Tracer", 1)
-		end),
+		end);
 
 	color = groupboxes.players:AddColorPicker({
-		Default = config.players.color,
-		Text = "Color",
-	}),
+		Default = config.players.color;
+		Text = "Color";
+	});
 
     distance_limit = groupboxes.players:AddSlider({
-		Default = config.players.distance_limit,
-		Text = "ESP Distance Limit",
-		Min = 0,
-		Max = 10000,
-		Rounding = 0,
-	}),
+		Default = config.players.distance_limit;
+		Text = "ESP Distance Limit";
+		Min = 0;
+		Max = 10000;
+		Rounding = 0;
+	});
 }
 
 items = {
 	enabled = groupboxes.items
 		:AddToggle({
-			Default = config.items.enabled,
-			Text = "Enabled",
+			Default = config.items.enabled;
+			Text = "Enabled";
 		})
 		:OnChanged(function(value)
 			lib_ui:Notify(value and "[items] Enabled ESP" or "[items] Disabled ESP", 1)
-		end),
+		end);
 
 	distance = groupboxes.items
 		:AddToggle({
-			Default = config.items.distance,
-			Text = "Distance",
+			Default = config.items.distance;
+			Text = "Distance";
 		})
 		:OnChanged(function(value)
 			lib_ui:Notify(value and "[items] Enabled Distance" or "[items] Disabled Distance", 1)
-		end),
+		end);
 
 	nametag = groupboxes.items
 		:AddToggle({
-			Default = config.items.nametag,
-			Text = "Nametag",
+			Default = config.items.nametag;
+			Text = "Nametag";
 		})
 		:OnChanged(function(value)
 			lib_ui:Notify(value and "[items] Enabled Nametag" or "[items] Disabled Nametag", 1)
-		end),
+		end);
 
 	tracer = groupboxes.items
 		:AddToggle({
-			Default = config.items.tracer,
-			Text = "Tracer",
+			Default = config.items.tracer;
+			Text = "Tracer";
 		})
 		:OnChanged(function(value)
 			lib_ui:Notify(value and "[items] Enabled Tracer" or "[items] Disabled Tracer", 1)
-		end),
+		end);
 
     color = groupboxes.items:AddColorPicker({
-		Default = config.items.color,
-		Text = "Color",
-	}),
+		Default = config.items.color;
+		Text = "Color";
+	});
 
 	distance_limit = groupboxes.items:AddSlider({
-		Default = config.items.distance_limit,
-		Text = "ESP Distance Limit",
-		Min = 0,
-		Max = 10000,
-		Rounding = 0,
-	}),
+		Default = config.items.distance_limit;
+		Text = "ESP Distance Limit";
+		Min = 0;
+		Max = 10000;
+		Rounding = 0;
+	});
 }
 
 items_config = {}
@@ -549,8 +551,8 @@ for _, tab in pairs(config.items.entries) do
 
 	items_config[name.."_enabled"] = groupboxes.items_config
 		:AddToggle({
-			Default = Enabled,
-			Text = name.." ESP Enabled",
+			Default = Enabled;
+			Text = name.." ESP Enabled";
 		})
 		:OnChanged(function(value)
 			lib_ui:Notify(value and "[items] Enabled "..name.." ESP" or "[items] Disabled "..name.." ESP", 1)
@@ -560,52 +562,52 @@ end
 ammo = {
 	enabled = groupboxes.ammo
 		:AddToggle({
-			Default = config.ammo.enabled,
-			Text = "Enabled",
+			Default = config.ammo.enabled;
+			Text = "Enabled";
 		})
 		:OnChanged(function(value)
 			lib_ui:Notify(value and "[ammo] Enabled ESP" or "[ammo] Disabled ESP", 1)
-		end),
+		end);
 
 	distance = groupboxes.ammo
 		:AddToggle({
-			Default = config.ammo.distance,
-			Text = "Distance",
+			Default = config.ammo.distance;
+			Text = "Distance";
 		})
 		:OnChanged(function(value)
 			lib_ui:Notify(value and "[ammo] Enabled Distance" or "[ammo] Disabled Distance", 1)
-		end),
+		end);
 
 	nametag = groupboxes.ammo
 		:AddToggle({
-			Default = config.ammo.nametag,
-			Text = "Nametag",
+			Default = config.ammo.nametag;
+			Text = "Nametag";
 		})
 		:OnChanged(function(value)
 			lib_ui:Notify(value and "[ammo] Enabled Nametag" or "[ammo] Disabled Nametag", 1)
-		end),
+		end);
 
 	tracer = groupboxes.ammo
 		:AddToggle({
-			Default = config.ammo.tracer,
-			Text = "Tracer",
+			Default = config.ammo.tracer;
+			Text = "Tracer";
 		})
 		:OnChanged(function(value)
 			lib_ui:Notify(value and "[ammo] Enabled Tracer" or "[ammo] Disabled Tracer", 1)
-		end),
+		end);
 
     color = groupboxes.ammo:AddColorPicker({
-		Default = config.ammo.color,
-		Text = "Color",
-	}),
+		Default = config.ammo.color;
+		Text = "Color";
+	});
 
 	distance_limit = groupboxes.ammo:AddSlider({
-		Default = config.ammo.distance_limit,
-		Text = "ESP Distance Limit",
-		Min = 0,
-		Max = 10000,
-		Rounding = 0,
-	}),
+		Default = config.ammo.distance_limit;
+		Text = "ESP Distance Limit";
+		Min = 0;
+		Max = 10000;
+		Rounding = 0;
+	});
 }
 
 ammo_config = {}
@@ -615,8 +617,8 @@ for _, tab in pairs(config.ammo.entries) do
 
 	ammo_config[name.."_enabled"] = groupboxes.ammo_config
 		:AddToggle({
-			Default = Enabled,
-			Text = name.." ESP Enabled",
+			Default = Enabled;
+			Text = name.." ESP Enabled";
 		})
 		:OnChanged(function(value)
 			lib_ui:Notify(value and "[ammo] Enabled "..name.." ESP" or "[ammo] Disabled "..name.." ESP", 1)
@@ -626,52 +628,52 @@ end
 weapons = {
 	enabled = groupboxes.weapons
 		:AddToggle({
-			Default = config.weapons.enabled,
-			Text = "Enabled",
+			Default = config.weapons.enabled;
+			Text = "Enabled";
 		})
 		:OnChanged(function(value)
 			lib_ui:Notify(value and "[weapons] Enabled ESP" or "[weapons] Disabled ESP", 1)
-		end),
+		end);
 
 	distance = groupboxes.weapons
 		:AddToggle({
-			Default = config.weapons.distance,
-			Text = "Distance",
+			Default = config.weapons.distance;
+			Text = "Distance";
 		})
 		:OnChanged(function(value)
 			lib_ui:Notify(value and "[weapons] Enabled Distance" or "[weapons] Disabled Distance", 1)
-		end),
+		end);
 
 	nametag = groupboxes.weapons
 		:AddToggle({
-			Default = config.weapons.nametag,
-			Text = "Nametag",
+			Default = config.weapons.nametag;
+			Text = "Nametag";
 		})
 		:OnChanged(function(value)
 			lib_ui:Notify(value and "[weapons] Enabled Nametag" or "[weapons] Disabled Nametag", 1)
-		end),
+		end);
 
 	tracer = groupboxes.weapons
 		:AddToggle({
-			Default = config.weapons.tracer,
-			Text = "Tracer",
+			Default = config.weapons.tracer;
+			Text = "Tracer";
 		})
 		:OnChanged(function(value)
 			lib_ui:Notify(value and "[weapons] Enabled Tracer" or "[weapons] Disabled Tracer", 1)
-		end),
+		end);
 
     color = groupboxes.weapons:AddColorPicker({
-		Default = config.weapons.color,
-		Text = "Color",
-	}),
+		Default = config.weapons.color;
+		Text = "Color";
+	});
 
 	distance_limit = groupboxes.weapons:AddSlider({
-		Default = config.weapons.distance_limit,
-		Text = "ESP Distance Limit",
-		Min = 0,
-		Max = 10000,
-		Rounding = 0,
-	}),
+		Default = config.weapons.distance_limit;
+		Text = "ESP Distance Limit";
+		Min = 0;
+		Max = 10000;
+		Rounding = 0;
+	});
 }
 
 weapons_config = {}
@@ -681,8 +683,8 @@ for _, tab in pairs(config.weapons.entries) do
 
 	weapons_config[name.."_enabled"] = groupboxes.weapons_config
 		:AddToggle({
-			Default = Enabled,
-			Text = name.." ESP Enabled",
+			Default = Enabled;
+			Text = name.." ESP Enabled";
 		})
 		:OnChanged(function(value)
 			lib_ui:Notify(value and "[ammo] Enabled "..name.." ESP" or "[ammo] Disabled "..name.." ESP", 1)
@@ -727,7 +729,7 @@ end
 datamodel = dx9.GetDatamodel()
 workspace = dx9.FindFirstChild(datamodel, "Workspace")
 services = {
-	players = dx9.FindFirstChild(datamodel, "Players"),
+	players = dx9.FindFirstChild(datamodel, "Players");
 }
 
 local_player = nil
@@ -857,27 +859,25 @@ if _G.PlayerTask == nil then
 										aimbot_target_screen_pos = screen_pos
 									end
 
-									--if not aimbot_settings.sticky_aim.Value or aimbot_settings.sticky_aim.Value and not aimbot_target_name then
-										local mouse_distance = _G.Get_Distance_From_Mouse(screen_pos)
-										local aimbot_range = 9999 --dx9.GetAimbotValue("range")
-										local aimbot_fov = dx9.GetAimbotValue("fov")
-										if mouse_distance and mouse_distance <= aimbot_fov and root_distance <= aimbot_range then
-											local current_aimbot_type = dx9.GetAimbotValue("type")
-											if current_aimbot_type == 1 then
-												if closest_player_value == nil or mouse_distance < closest_player_value then
-													closest_player_name = playerName
-													closest_player_value = mouse_distance
-													closest_player_screen_pos = screen_pos
-												end
-											elseif current_aimbot_type == 0 then
-												if closest_player_value == nil or root_distance < closest_player_value then
-													closest_player_name = playerName
-													closest_player_value = root_distance
-													closest_player_screen_pos = screen_pos
-												end
+									local mouse_distance = _G.Get_Distance_From_Mouse(screen_pos)
+									local aimbot_range = 9999 --dx9.GetAimbotValue("range")
+									local aimbot_fov = dx9.GetAimbotValue("fov")
+									if mouse_distance and mouse_distance <= aimbot_fov and root_distance <= aimbot_range then
+										local current_aimbot_type = dx9.GetAimbotValue("type")
+										if current_aimbot_type == 1 then
+											if closest_player_value == nil or mouse_distance < closest_player_value then
+												closest_player_name = playerName
+												closest_player_value = mouse_distance
+												closest_player_screen_pos = screen_pos
+											end
+										elseif current_aimbot_type == 0 then
+											if closest_player_value == nil or root_distance < closest_player_value then
+												closest_player_name = playerName
+												closest_player_value = root_distance
+												closest_player_screen_pos = screen_pos
 											end
 										end
-									--end
+									end
 								end
 								
 								if esp_settings.enabled.Value and players.enabled.Value then
@@ -902,7 +902,6 @@ if _G.PlayerTask == nil then
 			end
 
 			if aimbot_settings.enabled.Value then
-				--swapping targets
 				if aimbot_settings.sticky_aim.Value then
 					if dx9.isRightClickHeld() then
 						aimbot_target_name = nil
@@ -918,7 +917,6 @@ if _G.PlayerTask == nil then
 				end
 
 				if aimbot_target_name and _G.IsOnScreen(aimbot_target_screen_pos) then
-					--print(aimbot_target_name.." | x: "..aimbot_target_screen_pos.x.." | y: "..aimbot_target_screen_pos.y)
 					local mouse_moved = false
 					if mouse_moved == false then
 						dx9.SetAimbotValue("x", 0)
@@ -1037,11 +1035,8 @@ if _G.ParentESPCheck == nil then
 		end
 
 		if not skipThis and typeTab and typeConfigSettings and typeConfig then
-			--print(name)
 			local part = partName and dx9.FindFirstChild(parent, partName) or nil
-			--print(part)
 			if part and part ~= 0 then
-				--print("real")
 				local pivot = dx9.FindFirstChild(part, "Pivot")
 				local offset = {
 					x = 0,
@@ -1049,13 +1044,11 @@ if _G.ParentESPCheck == nil then
 					z = 0,
 				}
 				if pivot and pivot ~= 0 then
-					--print("pivot")
 					local pivot_pos = dx9.GetPosition(pivot)
 					offset.x = pivot_pos.x
 					offset.y = pivot_pos.y
 					offset.z = pivot_pos.z
 				end
-				--print("offset: "..offset.x..", "..offset.y..", "..offset.z)
 				local my_root_pos = dx9.GetPosition(my_root)
 				local root_pos = dx9.GetPosition(part)
 				local final_pos = {
@@ -1064,12 +1057,9 @@ if _G.ParentESPCheck == nil then
 					z = root_pos.z + offset.z,
 				}
 				local root_distance = _G.Get_Distance(my_root_pos, final_pos)
-				--print(""..root_distance.." studs")
 				if root_distance < typeTab.distance_limit.Value then
 					local root_screen_pos = dx9.WorldToScreen({final_pos.x, final_pos.y, final_pos.z})
-					--print("pos: "..final_pos.x..", "..final_pos.y..", "..final_pos.z)
 					if _G.IsOnScreen(root_screen_pos) then
-						--print("draw")
 						lib_esp.draw({
 							esp_type = "misc",
 							target = part,

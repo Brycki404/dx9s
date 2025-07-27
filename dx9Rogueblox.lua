@@ -1,157 +1,161 @@
 --indent size 4
 
 config = _G.config or {
+	urls = {
+		DXLibUI = "https://raw.githubusercontent.com/B0NBunny/DXLibUI/refs/heads/main/main.lua";
+		LibESP = "https://pastebin.com/raw/Pwn8GxMB";
+	};
     settings = {
-		menu_toggle_keybind = "[F2]",
+		menu_toggle_keybind = "[F2]";
 		
-		esp_enabled = true,
-    	box_type = 1, -- 1 = "Corners", 2 = "2D Box", 3 = "3D Box"
-    	tracer_type = 1, -- 1= "Near-Bottom", 2 = "Bottom", 3 = "Top", 4 = "Mouse"
-    },
+		esp_enabled = true;
+    	box_type = 1; -- 1 = "Corners", 2 = "2D Box", 3 = "3D Box"
+    	tracer_type = 1; -- 1= "Near-Bottom", 2 = "Bottom", 3 = "Top", 4 = "Mouse"
+    };
     trinkets = {
-        enabled = true,
-        distance = true,
-        healthbar = false,
-        nametag = true,
-        tracer = false,
-		color = { 255, 255, 255 },
-		distance_limit = 10000,
+        enabled = true;
+        distance = true;
+        healthbar = false;
+        nametag = true;
+        tracer = false;
+		color = { 255, 255, 255 };
+		distance_limit = 10000;
 		entries = {
 			{
-				name = "Ring",
-				Enabled = true,
-			},
+				name = "Ring";
+				Enabled = true;
+			};
             {
-				name = "Amulet",
-				Enabled = true,
-			},
+				name = "Amulet";
+				Enabled = true;
+			};
             {
-				name = "Mushroom",
-				Enabled = true,
-			},
+				name = "Mushroom";
+				Enabled = true;
+			};
             {
-				name = "Goblet",
-				Enabled = true,
-			},
-		},
-	},
-}
+				name = "Goblet";
+				Enabled = true;
+			};
+		};
+	};
+};
 if _G.config == nil then
 	_G.config = config
 	config = _G.config
 end
 
-lib_ui = loadstring(dx9.Get("https://raw.githubusercontent.com/soupg/DXLibUI/main/main.lua"))()
+lib_ui = loadstring(dx9.Get(config.urls.DXLibUI))()
 
-lib_esp = loadstring(dx9.Get("https://pastebin.com/raw/Pwn8GxMB"))()
+lib_esp = loadstring(dx9.Get(config.urls.LibESP))()
 
 interface = lib_ui:CreateWindow({
-	Title = "Rogueblox | dx9ware | By @Brycki",
-	Size = { 500, 500 },
-	Resizable = true,
+	Title = "Rogueblox | dx9ware | By @Brycki";
+	Size = { 500, 500 };
+	Resizable = true;
 
-	ToggleKey = config.settings.menu_toggle_keybind,
+	ToggleKey = config.settings.menu_toggle_keybind;
 
-	FooterToggle = false,
-	FooterRGB = true,
-	FontColor = { 255, 255, 255 },
-	MainColor = { 32, 26, 68 },
-	BackgroundColor = { 26, 21, 55 },
-	AccentColor = { 81, 37, 112 },
-	OutlineColor = { 54, 47, 90 },
+	FooterToggle = false;
+	FooterRGB = true;
+	FontColor = { 255, 255, 255 };
+	MainColor = { 32, 26, 68 };
+	BackgroundColor = { 26, 21, 55 };
+	AccentColor = { 81, 37, 112 };
+	OutlineColor = { 54, 47, 90 };
 })
 
 tabs = {
-	settings = interface:AddTab("Settings"),
-	trinkets = interface:AddTab("Trinkets"),
+	settings = interface:AddTab("Settings");
+	trinkets = interface:AddTab("Trinkets");
 }
 
 groupboxes = {
-	esp_settings = tabs.settings:AddLeftGroupbox("ESP"),
-	trinkets = tabs.trinkets:AddLeftGroupbox("Trinket ESP"),
-	trinkets_config = tabs.trinkets:AddRightGroupbox("Trinket Config"),
+	esp_settings = tabs.settings:AddLeftGroupbox("ESP");
+	trinkets = tabs.trinkets:AddLeftGroupbox("Trinket ESP");
+	trinkets_config = tabs.trinkets:AddRightGroupbox("Trinket Config");
 }
 
 esp_settings = {
 	enabled = groupboxes.esp_settings
 		:AddToggle({
-			Default = config.settings.esp_enabled,
-			Text = "ESP Enabled",
+			Default = config.settings.esp_enabled;
+			Text = "ESP Enabled";
 		})
 		:OnChanged(function(value)
 			lib_ui:Notify(value and "[settings] Enabled Global ESP" or "[settings] Disabled Global ESP", 1)
-		end),
+		end);
 
 	box_type = groupboxes.esp_settings
 		:AddDropdown({
-			Text = "Box Type",
-			Default = config.settings.box_type,
-			Values = { "Corners", "2D Box", "3D Box" },
+			Text = "Box Type";
+			Default = config.settings.box_type;
+			Values = { "Corners", "2D Box", "3D Box" };
 		})
 		:OnChanged(function(value)
 			lib_ui:Notify("[settings] Box Type: " .. value, 1)
-		end),
+		end);
 
 	tracer_type = groupboxes.esp_settings
 		:AddDropdown({
-			Text = "Tracer Type",
-			Default = config.settings.tracer_type,
-			Values = { "Near-Bottom", "Bottom", "Top", "Mouse" },
+			Text = "Tracer Type";
+			Default = config.settings.tracer_type;
+			Values = { "Near-Bottom", "Bottom", "Top", "Mouse" };
 		})
 		:OnChanged(function(value)
 			lib_ui:Notify("[settings] Tracer Type: " .. value, 1)
-		end),
+		end);
 }
 
 trinkets = {
 	enabled = groupboxes.trinkets
 		:AddToggle({
-			Default = config.trinkets.enabled,
-			Text = "Enabled",
+			Default = config.trinkets.enabled;
+			Text = "Enabled";
 		})
 		:OnChanged(function(value)
 			lib_ui:Notify(value and "[trinkets] Enabled ESP" or "[trinkets] Disabled ESP", 1)
-		end),
+		end);
 
 	distance = groupboxes.trinkets
 		:AddToggle({
-			Default = config.trinkets.distance,
-			Text = "Distance",
+			Default = config.trinkets.distance;
+			Text = "Distance";
 		})
 		:OnChanged(function(value)
 			lib_ui:Notify(value and "[trinkets] Enabled Distance" or "[trinkets] Disabled Distance", 1)
-		end),
+		end);
 
 	nametag = groupboxes.trinkets
 		:AddToggle({
-			Default = config.trinkets.nametag,
-			Text = "Nametag",
+			Default = config.trinkets.nametag;
+			Text = "Nametag";
 		})
 		:OnChanged(function(value)
 			lib_ui:Notify(value and "[trinkets] Enabled Nametag" or "[trinkets] Disabled Nametag", 1)
-		end),
+		end);
 
 	tracer = groupboxes.trinkets
 		:AddToggle({
-			Default = config.trinkets.tracer,
-			Text = "Tracer",
+			Default = config.trinkets.tracer;
+			Text = "Tracer";
 		})
 		:OnChanged(function(value)
 			lib_ui:Notify(value and "[trinkets] Enabled Tracer" or "[trinkets] Disabled Tracer", 1)
-		end),
+		end);
 
     color = groupboxes.trinkets:AddColorPicker({
-		Default = config.trinkets.color,
-		Text = "Color",
-	}),
+		Default = config.trinkets.color;
+		Text = "Color";
+	});
 
 	distance_limit = groupboxes.trinkets:AddSlider({
-		Default = config.trinkets.distance_limit,
-		Text = "ESP Distance Limit",
-		Min = 0,
-		Max = 10000,
-		Rounding = 0,
-	}),
+		Default = config.trinkets.distance_limit;
+		Text = "ESP Distance Limit";
+		Min = 0;
+		Max = 10000;
+		Rounding = 0;
+	});
 }
 
 trinkets_config = {}
@@ -161,8 +165,8 @@ for _, tab in pairs(config.trinkets.entries) do
 
 	trinkets_config[name.."_enabled"] = groupboxes.trinkets_config
 		:AddToggle({
-			Default = Enabled,
-			Text = name.." ESP Enabled",
+			Default = Enabled;
+			Text = name.." ESP Enabled";
 		})
 		:OnChanged(function(value)
 			lib_ui:Notify(value and "[trinkets] Enabled "..name.." ESP" or "[trinkets] Disabled "..name.." ESP", 1)
@@ -203,7 +207,7 @@ end
 datamodel = dx9.GetDatamodel()
 workspace = dx9.FindFirstChild(datamodel, "Workspace")
 services = {
-	players = dx9.FindFirstChild(datamodel, "Players"),
+	players = dx9.FindFirstChild(datamodel, "Players");
 }
 
 local_player = nil
@@ -333,17 +337,17 @@ if Debris_Folder and Debris_Folder ~= 0 then
                                 local root_screen_pos = dx9.WorldToScreen({root_pos.x, root_pos.y, root_pos.z})
                                 if _G.IsOnScreen(root_screen_pos) then
                                     lib_esp.draw({
-                                        esp_type = "misc",
-                                        target = basePart,
-                                        color = typeTab.color.Value,
-                                        healthbar = typeConfigSettings.healthbar,
-                                        nametag = typeTab.nametag.Value,
-                                        custom_nametag = name,
-                                        distance = typeTab.distance.Value,
-                                        custom_distance = ""..root_distance,
-                                        tracer = typeTab.tracer.Value,
-                                        tracer_type = current_tracer_type,
-                                        box_type = current_box_type,
+                                        esp_type = "misc";
+                                        target = basePart;
+                                        color = typeTab.color.Value;
+                                        healthbar = typeConfigSettings.healthbar;
+                                        nametag = typeTab.nametag.Value;
+                                        custom_nametag = name;
+                                        distance = typeTab.distance.Value;
+                                        custom_distance = ""..root_distance;
+                                        tracer = typeTab.tracer.Value;
+                                        tracer_type = current_tracer_type;
+                                        box_type = current_box_type;
                                     })
                                 end
                             end

@@ -3,281 +3,285 @@
 --dx9.ShowConsole(true)
 
 config = _G.config or {
+	urls = {
+		DXLibUI = "https://raw.githubusercontent.com/B0NBunny/DXLibUI/refs/heads/main/main.lua";
+		LibESP = "https://pastebin.com/raw/Pwn8GxMB";
+	};
     settings = {
-		menu_toggle_keybind = "[F2]",
+		menu_toggle_keybind = "[F2]";
 
-		esp_enabled = true,
-        box_type = 1, -- 1 = "Corners", 2 = "2D Box", 3 = "3D Box"
-        tracer_type = 1, -- 1= "Near-Bottom", 2 = "Bottom", 3 = "Top", 4 = "Mouse"
-    },
+		esp_enabled = true;
+        box_type = 1; -- 1 = "Corners", 2 = "2D Box", 3 = "3D Box"
+        tracer_type = 1; -- 1= "Near-Bottom", 2 = "Bottom", 3 = "Top", 4 = "Mouse"
+    };
     players = {
-        enabled = true,
-        distance = true,
-        healthbar = true,
-        healthtag = false,
-        nametag = true,
-        tracer = false,
-        color = { 0, 0, 255 },
-		distance_limit = 5000,
-    },
+        enabled = true;
+        distance = true;
+        healthbar = true;
+        healthtag = false;
+        nametag = true;
+        tracer = false;
+        color = { 0, 0, 255 };
+		distance_limit = 5000;
+    };
 	enemies = {
-        enabled = true,
-        distance = true,
-        healthbar = true,
-		healthtag = false,
-        nametag = true,
-        tracer = false,
-		color = { 255, 0, 0 },
-		distance_limit = 5000,
-    },
+        enabled = true;
+        distance = true;
+        healthbar = true;
+		healthtag = false;
+        nametag = true;
+        tracer = false;
+		color = { 255, 0, 0 };
+		distance_limit = 5000;
+    };
 	npcs = {
-		enabled = false,
-        distance = true,
-        nametag = true,
-        tracer = false,
-		color = { 255, 255, 255 },
-		distance_limit = 5000,
-	},
+		enabled = false;
+        distance = true;
+        nametag = true;
+        tracer = false;
+		color = { 255, 255, 255 };
+		distance_limit = 5000;
+	};
 }
 if _G.config == nil then
 	_G.config = config
 	config = _G.config
 end
 
-lib_ui = loadstring(dx9.Get("https://raw.githubusercontent.com/soupg/DXLibUI/main/main.lua"))()
+lib_ui = loadstring(dx9.Get(config.urls.DXLibUI))()
 
-lib_esp = loadstring(dx9.Get("https://pastebin.com/raw/Pwn8GxMB"))()
+lib_esp = loadstring(dx9.Get(config.urls.LibESP))()
 
 interface = lib_ui:CreateWindow({
-	Title = "Deepwoken | dx9ware | By @Brycki",
-	Size = { 500, 500 },
-	Resizable = true,
+	Title = "Deepwoken | dx9ware | By @Brycki";
+	Size = { 500, 500 };
+	Resizable = true;
 
-	ToggleKey = config.settings.menu_toggle_keybind,
+	ToggleKey = config.settings.menu_toggle_keybind;
 
-	FooterToggle = false,
-	FooterRGB = true,
-	FontColor = { 255, 255, 255 },
-	MainColor = { 32, 26, 68 },
-	BackgroundColor = { 26, 21, 55 },
-	AccentColor = { 81, 37, 112 },
-	OutlineColor = { 54, 47, 90 },
+	FooterToggle = false;
+	FooterRGB = true;
+	FontColor = { 255, 255, 255 };
+	MainColor = { 32, 26, 68 };
+	BackgroundColor = { 26, 21, 55 };
+	AccentColor = { 81, 37, 112 };
+	OutlineColor = { 54, 47, 90 };
 })
 
 tabs = {
-	settings = interface:AddTab("Settings"),
-	players = interface:AddTab("Players"),
-	enemies = interface:AddTab("Enemies"),
-	npcs = interface:AddTab("NPCs"),
+	settings = interface:AddTab("Settings");
+	players = interface:AddTab("Players");
+	enemies = interface:AddTab("Enemies");
+	npcs = interface:AddTab("NPCs");
 }
 
 groupboxes = {
-	esp_settings = tabs.settings:AddLeftGroupbox("ESP"),
-	players = tabs.players:AddLeftGroupbox("Players ESP"),
-	enemies = tabs.enemies:AddLeftGroupbox("Enemies ESP"),
-	npcs = tabs.npcs:AddLeftGroupbox("NPCs ESP"),
+	esp_settings = tabs.settings:AddLeftGroupbox("ESP");
+	players = tabs.players:AddLeftGroupbox("Players ESP");
+	enemies = tabs.enemies:AddLeftGroupbox("Enemies ESP");
+	npcs = tabs.npcs:AddLeftGroupbox("NPCs ESP");
 }
 
 esp_settings = {
 	enabled = groupboxes.esp_settings
 		:AddToggle({
-			Default = config.settings.esp_enabled,
-			Text = "ESP Enabled",
+			Default = config.settings.esp_enabled;
+			Text = "ESP Enabled";
 		})
 		:OnChanged(function(value)
 			lib_ui:Notify(value and "[settings] Enabled Global ESP" or "[settings] Disabled Global ESP", 1)
-		end),
+		end);
 
 	box_type = groupboxes.esp_settings
 		:AddDropdown({
-			Text = "Box Type",
-			Default = config.settings.box_type,
-			Values = { "Corners", "2D Box", "3D Box" },
+			Text = "Box Type";
+			Default = config.settings.box_type;
+			Values = { "Corners", "2D Box", "3D Box" };
 		})
 		:OnChanged(function(value)
 			lib_ui:Notify("[settings] Box Type: " .. value, 1)
-		end),
+		end);
 
 	tracer_type = groupboxes.esp_settings
 		:AddDropdown({
-			Text = "Tracer Type",
-			Default = config.settings.tracer_type,
-			Values = { "Near-Bottom", "Bottom", "Top", "Mouse" },
+			Text = "Tracer Type";
+			Default = config.settings.tracer_type;
+			Values = { "Near-Bottom", "Bottom", "Top", "Mouse" };
 		})
 		:OnChanged(function(value)
 			lib_ui:Notify("[settings] Tracer Type: " .. value, 1)
-		end),
+		end);
 }
 
 players = {
 	enabled = groupboxes.players
 		:AddToggle({
-			Default = config.players.enabled,
-			Text = "Enabled",
+			Default = config.players.enabled;
+			Text = "Enabled";
 		})
 		:OnChanged(function(value)
 			lib_ui:Notify(value and "[players] Enabled ESP" or "[players] Disabled ESP", 1)
-		end),
+		end);
 
 	distance = groupboxes.players
 		:AddToggle({
-			Default = config.players.distance,
-			Text = "Distance",
+			Default = config.players.distance;
+			Text = "Distance";
 		})
 		:OnChanged(function(value)
 			lib_ui:Notify(value and "[players] Enabled Distance" or "[players] Disabled Distance", 1)
-		end),
+		end);
     
 	nametag = groupboxes.players
 		:AddToggle({
-			Default = config.players.nametag,
-			Text = "Nametag",
+			Default = config.players.nametag;
+			Text = "Nametag";
 		})
 		:OnChanged(function(value)
 			lib_ui:Notify(value and "[players] Enabled Nametag" or "[players] Disabled Nametag", 1)
-		end),
+		end);
 
     healthtag = groupboxes.players
 		:AddToggle({
-			Default = config.players.healthtag,
-			Text = "HealthTag",
+			Default = config.players.healthtag;
+			Text = "HealthTag";
 		})
 		:OnChanged(function(value)
 			lib_ui:Notify(value and "[players] Enabled HealthTag" or "[players] Disabled HealthTag", 1)
-		end),
+		end);
 
 	tracer = groupboxes.players
 		:AddToggle({
-			Default = config.players.tracer,
-			Text = "Tracer",
+			Default = config.players.tracer;
+			Text = "Tracer";
 		})
 		:OnChanged(function(value)
 			lib_ui:Notify(value and "[players] Enabled Tracer" or "[players] Disabled Tracer", 1)
-		end),
+		end);
 
     color = groupboxes.players:AddColorPicker({
-		Default = config.players.color,
-		Text = "Color",
-	}),
+		Default = config.players.color;
+		Text = "Color";
+	});
 
     distance_limit = groupboxes.players:AddSlider({
-		Default = config.players.distance_limit,
-		Text = "ESP Distance Limit",
-		Min = 0,
-		Max = 5000,
-		Rounding = 0,
-	}),
+		Default = config.players.distance_limit;
+		Text = "ESP Distance Limit";
+		Min = 0;
+		Max = 5000;
+		Rounding = 0;
+	});
 }
 
 enemies = {
 	enabled = groupboxes.enemies
 		:AddToggle({
-			Default = config.enemies.enabled,
-			Text = "Enabled",
+			Default = config.enemies.enabled;
+			Text = "Enabled";
 		})
 		:OnChanged(function(value)
 			lib_ui:Notify(value and "[Enemies] Enabled ESP" or "[Enemies] Disabled ESP", 1)
-		end),
+		end);
 
 	distance = groupboxes.enemies
 		:AddToggle({
-			Default = config.enemies.distance,
-			Text = "Distance",
+			Default = config.enemies.distance;
+			Text = "Distance";
 		})
 		:OnChanged(function(value)
 			lib_ui:Notify(value and "[hunting] Enabled Distance" or "[hunting] Disabled Distance", 1)
-		end),
+		end);
 
 	nametag = groupboxes.enemies
 		:AddToggle({
-			Default = config.enemies.nametag,
-			Text = "Nametag",
+			Default = config.enemies.nametag;
+			Text = "Nametag";
 		})
 		:OnChanged(function(value)
 			lib_ui:Notify(value and "[hunting] Enabled Nametag" or "[hunting] Disabled Nametag", 1)
-		end),
+		end);
 
 	healthtag = groupboxes.enemies
 		:AddToggle({
-			Default = config.enemies.healthtag,
-			Text = "HealthTag",
+			Default = config.enemies.healthtag;
+			Text = "HealthTag";
 		})
 		:OnChanged(function(value)
 			lib_ui:Notify(value and "[Enemies] Enabled HealthTag" or "[Enemies] Disabled HealthTag", 1)
-		end),
+		end);
 
 	tracer = groupboxes.enemies
 		:AddToggle({
-			Default = config.enemies.tracer,
-			Text = "Tracer",
+			Default = config.enemies.tracer;
+			Text = "Tracer";
 		})
 		:OnChanged(function(value)
 			lib_ui:Notify(value and "[Enemies] Enabled Tracer" or "[Enemies] Disabled Tracer", 1)
-		end),
+		end);
 
     color = groupboxes.enemies:AddColorPicker({
-		Default = config.enemies.color,
-		Text = "Color",
-	}),
+		Default = config.enemies.color;
+		Text = "Color";
+	});
 
 	distance_limit = groupboxes.enemies:AddSlider({
-		Default = config.enemies.distance_limit,
-		Text = "ESP Distance Limit",
-		Min = 0,
-		Max = 5000,
-		Rounding = 0,
-	}),
+		Default = config.enemies.distance_limit;
+		Text = "ESP Distance Limit";
+		Min = 0;
+		Max = 5000;
+		Rounding = 0;
+	});
 }
 
 npcs = {
 	enabled = groupboxes.npcs
 		:AddToggle({
-			Default = config.npcs.enabled,
-			Text = "Enabled",
+			Default = config.npcs.enabled;
+			Text = "Enabled";
 		})
 		:OnChanged(function(value)
 			lib_ui:Notify(value and "[NPCs] Enabled ESP" or "[NPCs] Disabled ESP", 1)
-		end),
+		end);
 
 	distance = groupboxes.npcs
 		:AddToggle({
-			Default = config.npcs.distance,
-			Text = "Distance",
+			Default = config.npcs.distance;
+			Text = "Distance";
 		})
 		:OnChanged(function(value)
 			lib_ui:Notify(value and "[NPCs] Enabled Distance" or "[NPCs] Disabled Distance", 1)
-		end),
+		end);
 
 	nametag = groupboxes.npcs
 		:AddToggle({
-			Default = config.npcs.nametag,
-			Text = "Nametag",
+			Default = config.npcs.nametag;
+			Text = "Nametag";
 		})
 		:OnChanged(function(value)
 			lib_ui:Notify(value and "[NPCs] Enabled Nametag" or "[NPCs] Disabled Nametag", 1)
-		end),
+		end);
 
 	tracer = groupboxes.npcs
 		:AddToggle({
-			Default = config.npcs.tracer,
-			Text = "Tracer",
+			Default = config.npcs.tracer;
+			Text = "Tracer";
 		})
 		:OnChanged(function(value)
 			lib_ui:Notify(value and "[NPCs] Enabled Tracer" or "[NPCs] Disabled Tracer", 1)
-		end),
+		end);
 
     color = groupboxes.npcs:AddColorPicker({
-		Default = config.npcs.color,
-		Text = "Color",
-	}),
+		Default = config.npcs.color;
+		Text = "Color";
+	});
 
 	distance_limit = groupboxes.npcs:AddSlider({
-		Default = config.npcs.distance_limit,
-		Text = "ESP Distance Limit",
-		Min = 0,
-		Max = 5000,
-		Rounding = 0,
-	}),
+		Default = config.npcs.distance_limit;
+		Text = "ESP Distance Limit";
+		Min = 0;
+		Max = 5000;
+		Rounding = 0;
+	});
 }
 
 if _G.Get_Distance == nil then
@@ -314,7 +318,7 @@ end
 datamodel = dx9.GetDatamodel()
 workspace = dx9.FindFirstChild(datamodel, "Workspace")
 services = {
-	players = dx9.FindFirstChild(datamodel, "Players"),
+	players = dx9.FindFirstChild(datamodel, "Players");
 }
 
 local_player = nil
@@ -418,16 +422,16 @@ if _G.LiveTask == nil then
                         local root_screen_pos = dx9.WorldToScreen({root_pos.x, root_pos.y, root_pos.z})
                         if _G.IsOnScreen(root_screen_pos) then
                         	lib_esp.draw({
-                                target = entity,
-                                color = entityTab.color.Value,
-                                healthbar = entityConfig.healthbar,
-                                nametag = entityTab.nametag.Value,
-                                custom_nametag = entityTab.healthtag.Value and entityName .. " | " .. "0" .. " hp" or entityName,
-                                distance = entityTab.distance.Value,
-                                custom_distance = ""..root_distance,
-                                tracer = entityTab.tracer.Value,
-                                tracer_type = current_tracer_type,
-                                box_type = current_box_type,
+                                target = entity;
+                                color = entityTab.color.Value;
+                                healthbar = entityConfig.healthbar;
+                                nametag = entityTab.nametag.Value;
+                                custom_nametag = entityTab.healthtag.Value and entityName .. " | " .. "0" .. " hp" or entityName;
+                                distance = entityTab.distance.Value;
+                                custom_distance = ""..root_distance;
+                                tracer = entityTab.tracer.Value;
+                                tracer_type = current_tracer_type;
+                                box_type = current_box_type;
                             })
                         end
                     end
@@ -454,17 +458,17 @@ if _G.NPCTask == nil then
                         local root_screen_pos = dx9.WorldToScreen({root_pos.x, root_pos.y, root_pos.z})
                         if _G._G.IsOnScreen(root_screen_pos) then
                             lib_esp.draw({
-                                target = npc,
-                                custom_root = npcName,
-                                color = npcs.color.Value,
-                                healthbar = false,
-                                nametag = npcs.nametag.Value,
-                                custom_nametag = npcName,
-                                distance = npcs.distance.Value,
-                                custom_distance = ""..root_distance,
-                                tracer = npcs.tracer.Value,
-                                tracer_type = current_tracer_type,
-                                box_type = current_box_type,
+                                target = npc;
+                                custom_root = npcName;
+                                color = npcs.color.Value;
+                                healthbar = false;
+                                nametag = npcs.nametag.Value;
+                                custom_nametag = npcName;
+                                distance = npcs.distance.Value;
+                                custom_distance = ""..root_distance;
+                                tracer = npcs.tracer.Value;
+                                tracer_type = current_tracer_type;
+                                box_type = current_box_type;
                             })
                         end
                     end

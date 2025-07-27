@@ -3,201 +3,205 @@
 --dx9.ShowConsole(true)
 
 config = _G.config or {
+	urls = {
+		DXLibUI = "https://raw.githubusercontent.com/B0NBunny/DXLibUI/refs/heads/main/main.lua";
+		LibESP = "https://pastebin.com/raw/Pwn8GxMB";
+	};
     settings = {
-		aimbot_enabled = true,
-		sticky_aim = false,
-		aimbot_part = 1, -- 1 = "Head", 2 = "HumanoidRootPart"
-		aimbot_smoothness = 5,
+		aimbot_enabled = true;
+		sticky_aim = false;
+		aimbot_part = 1; -- 1 = "Head", 2 = "HumanoidRootPart"
+		aimbot_smoothness = 5;
 		
-		menu_toggle_keybind = "[F2]",
+		menu_toggle_keybind = "[F2]";
 		
-		esp_enabled = true,
-    	box_type = 1, -- 1 = "Corners", 2 = "2D Box", 3 = "3D Box"
-    	tracer_type = 1, -- 1= "Near-Bottom", 2 = "Bottom", 3 = "Top", 4 = "Mouse"
-    },
+		esp_enabled = true;
+    	box_type = 1; -- 1 = "Corners", 2 = "2D Box", 3 = "3D Box"
+    	tracer_type = 1; -- 1= "Near-Bottom", 2 = "Bottom", 3 = "Top", 4 = "Mouse"
+    };
     players = {
-        enabled = true,
-        distance = true,
-        healthbar = false,
-        nametag = true,
-        tracer = false,
-        color = { 255, 255, 255 },
-		distance_limit = 5000,
-    },
+        enabled = true;
+        distance = true;
+        healthbar = false;
+        nametag = true;
+        tracer = false;
+        color = { 255, 255, 255 };
+		distance_limit = 5000;
+    };
     animals = {
-        enabled = false,
-        distance = true,
-        healthbar = false,
-		healthtag = false,
-        nametag = true,
-        tracer = false,
-		color = { 255, 255, 255 },
-		distance_limit = 5000,
+        enabled = false;
+        distance = true;
+        healthbar = false;
+		healthtag = false;
+        nametag = true;
+        tracer = false;
+		color = { 255, 255, 255 };
+		distance_limit = 5000;
 	entries = {
 			{
-				AnimalType = "Deer",
-				Enabled = true,
-			},
+				AnimalType = "Deer";
+				Enabled = true;
+			};
 			{
-				AnimalType = "Bison",
-				Enabled = true,
-			},
+				AnimalType = "Bison";
+				Enabled = true;
+			};
 			{
-				AnimalType = "Gator",
-				Enabled = true,
-			},
+				AnimalType = "Gator";
+				Enabled = true;
+			};
 			{
-				AnimalType = "Bear",
-				Enabled = true,
-			},
+				AnimalType = "Bear";
+				Enabled = true;
+			};
 			{
-				AnimalType = "Horse",
-				Enabled = false,
-			},
+				AnimalType = "Horse";
+				Enabled = false;
+			};
 			{
-				AnimalType = "Cow",
-				Enabled = false,
-			},
-		},
-    },
+				AnimalType = "Cow";
+				Enabled = false;
+			};
+		};
+    };
 	trees = {
-		enabled = false,
-        distance = true,
-        healthbar = false,
-        nametag = true,
-		healthtag = false,
-        tracer = false,
-		color = { 255, 255, 255 },
-		distance_limit = 5000,
-		thunderstruck_only = true,
-		entries = {},
-	},
+		enabled = false;
+        distance = true;
+        healthbar = false;
+        nametag = true;
+		healthtag = false;
+        tracer = false;
+		color = { 255, 255, 255 };
+		distance_limit = 5000;
+		thunderstruck_only = true;
+		entries = {};
+	};
 	ores = {
-		enabled = false,
-		hide_empty = false,
-        distance = true,
-        healthbar = false,
-        nametag = true,
-		healthtag = false,
-        tracer = false,
-		color = { 255, 255, 255 },
-		distance_limit = 5000,
+		enabled = false;
+		hide_empty = false;
+        distance = true;
+        healthbar = false;
+        nametag = true;
+		healthtag = false;
+        tracer = false;
+		color = { 255, 255, 255 };
+		distance_limit = 5000;
 		entries = {
 			{
-				OreName = "Coal",
-				Enabled = true,
-			},
+				OreName = "Coal";
+				Enabled = true;
+			};
 			{
-				OreName = "Copper",
-				Enabled = true,
-			},
+				OreName = "Copper";
+				Enabled = true;
+			};
 			{
-				OreName = "Zinc",
-				Enabled = true,
-			},
+				OreName = "Zinc";
+				Enabled = true;
+			};
 			{
-				OreName = "Iron",
-				Enabled = true,
-			},
+				OreName = "Iron";
+				Enabled = true;
+			};
 			{
-				OreName = "Silver",
-				Enabled = true,
-			},
+				OreName = "Silver";
+				Enabled = true;
+			};
 			{
-				OreName = "Gold",
-				Enabled = true,
-			},
+				OreName = "Gold";
+				Enabled = true;
+			};
 			{
-				OreName = "Limestone",
-				Enabled = true,
-			},
+				OreName = "Limestone";
+				Enabled = true;
+			};
 			{
-				OreName = "Quartz",
-				Enabled = true,
-			},
-		},
-	},
+				OreName = "Quartz";
+				Enabled = true;
+			};
+		};
+	};
 }
 if _G.config == nil then
 	_G.config = config
 	config = _G.config
 end
 
-lib_ui = loadstring(dx9.Get("https://raw.githubusercontent.com/soupg/DXLibUI/main/main.lua"))()
+lib_ui = loadstring(dx9.Get(config.urls.DXLibUI))()
 
-lib_esp = loadstring(dx9.Get("https://pastebin.com/raw/Pwn8GxMB"))()
+lib_esp = loadstring(dx9.Get(config.urls.LibESP))()
 
 interface = lib_ui:CreateWindow({
-	Title = "The Wild West | dx9ware | By @Brycki",
-	Size = { 500, 500 },
-	Resizable = true,
+	Title = "The Wild West | dx9ware | By @Brycki";
+	Size = { 500, 500 };
+	Resizable = true;
 
-	ToggleKey = config.settings.menu_toggle_keybind,
+	ToggleKey = config.settings.menu_toggle_keybind;
 
-	FooterToggle = false,
-	FooterRGB = true,
-	FontColor = { 255, 255, 255 },
-	MainColor = { 32, 26, 68 },
-	BackgroundColor = { 26, 21, 55 },
-	AccentColor = { 81, 37, 112 },
-	OutlineColor = { 54, 47, 90 },
+	FooterToggle = false;
+	FooterRGB = true;
+	FontColor = { 255, 255, 255 };
+	MainColor = { 32, 26, 68 };
+	BackgroundColor = { 26, 21, 55 };
+	AccentColor = { 81, 37, 112 };
+	OutlineColor = { 54, 47, 90 };
 })
 
 tabs = {
-	settings = interface:AddTab("Settings"),
-	players = interface:AddTab("Players"),
-	animals = interface:AddTab("Hunting"),
-	trees = interface:AddTab("Logging"),
-	ores = interface:AddTab("Mining"),
+	settings = interface:AddTab("Settings");
+	players = interface:AddTab("Players");
+	animals = interface:AddTab("Hunting");
+	trees = interface:AddTab("Logging");
+	ores = interface:AddTab("Mining");
 }
 
 groupboxes = {
-	esp_settings = tabs.settings:AddLeftGroupbox("ESP"),
-	aimbot_settings = tabs.settings:AddRightGroupbox("Aimbot"),
-	players = tabs.players:AddMiddleGroupbox("Players ESP"),
-	animals = tabs.animals:AddLeftGroupbox("Hunting ESP"),
-	hunting = tabs.animals:AddRightGroupbox("Hunting Config"),
-	trees = tabs.trees:AddMiddleGroupbox("Logging ESP"),
-	ores = tabs.ores:AddLeftGroupbox("Mining ESP"),
-	oreconfig = tabs.ores:AddRightGroupbox("Mining Config"),
+	esp_settings = tabs.settings:AddLeftGroupbox("ESP");
+	aimbot_settings = tabs.settings:AddRightGroupbox("Aimbot");
+	players = tabs.players:AddMiddleGroupbox("Players ESP");
+	animals = tabs.animals:AddLeftGroupbox("Hunting ESP");
+	hunting = tabs.animals:AddRightGroupbox("Hunting Config");
+	trees = tabs.trees:AddMiddleGroupbox("Logging ESP");
+	ores = tabs.ores:AddLeftGroupbox("Mining ESP");
+	oreconfig = tabs.ores:AddRightGroupbox("Mining Config");
 }
 
 esp_settings = {
 	enabled = groupboxes.esp_settings
 		:AddToggle({
-			Default = config.settings.esp_enabled,
-			Text = "ESP Enabled",
+			Default = config.settings.esp_enabled;
+			Text = "ESP Enabled";
 		})
 		:OnChanged(function(value)
 			lib_ui:Notify(value and "[settings] Enabled Global ESP" or "[settings] Disabled Global ESP", 1)
-		end),
+		end);
 
 	box_type = groupboxes.esp_settings
 		:AddDropdown({
-			Text = "Box Type",
-			Default = config.settings.box_type,
-			Values = { "Corners", "2D Box", "3D Box" },
+			Text = "Box Type";
+			Default = config.settings.box_type;
+			Values = { "Corners", "2D Box", "3D Box" };
 		})
 		:OnChanged(function(value)
 			lib_ui:Notify("[settings] Box Type: " .. value, 1)
-		end),
+		end);
 
 	tracer_type = groupboxes.esp_settings
 		:AddDropdown({
-			Text = "Tracer Type",
-			Default = config.settings.tracer_type,
-			Values = { "Near-Bottom", "Bottom", "Top", "Mouse" },
+			Text = "Tracer Type";
+			Default = config.settings.tracer_type;
+			Values = { "Near-Bottom", "Bottom", "Top", "Mouse" };
 		})
 		:OnChanged(function(value)
 			lib_ui:Notify("[settings] Tracer Type: " .. value, 1)
-		end),
+		end);
 }
 
 aimbot_settings = {
 	enabled = groupboxes.aimbot_settings
 		:AddToggle({
-			Default = config.settings.aimbot_enabled,
-			Text = "Aimbot Enabled",
+			Default = config.settings.aimbot_enabled;
+			Text = "Aimbot Enabled";
 		})
 		:OnChanged(function(value)
 			lib_ui:Notify(value and "[settings] Enabled Aimbot" or "[settings] Disabled Aimbot", 1)
@@ -205,34 +209,34 @@ aimbot_settings = {
 				_G.aimbot_target_name = nil
 				_G.aimbot_target_screen_pos = nil
 			end
-		end),
+		end);
 
 	sticky_aim = groupboxes.aimbot_settings
 		:AddToggle({
-			Default = config.settings.sticky_aim,
-			Text = "Sticky Aim Enabled",
+			Default = config.settings.sticky_aim;
+			Text = "Sticky Aim Enabled";
 		})
 		:OnChanged(function(value)
 			lib_ui:Notify(value and "[settings] Enabled Sticky Aim" or "[settings] Disabled Sticky Aim", 1)
-		end),
+		end);
 
 	part = groupboxes.aimbot_settings
 		:AddDropdown({
-			Text = "Aimbot Part",
-			Default = config.settings.aimbot_part,
-			Values = { "Head", "HumanoidRootPart" },
+			Text = "Aimbot Part";
+			Default = config.settings.aimbot_part;
+			Values = { "Head", "HumanoidRootPart" };
 		})
 		:OnChanged(function(value)
 			lib_ui:Notify("[settings] Aimbot Part: " .. value, 1)
-		end),
+		end);
 
 	smoothness = groupboxes.aimbot_settings:AddSlider({
-		Default = config.settings.aimbot_smoothness,
-		Text = "Aimbot Smoothness",
-		Min = 1,
-		Max = 50,
-		Rounding = 0,
-	}),
+		Default = config.settings.aimbot_smoothness;
+		Text = "Aimbot Smoothness";
+		Min = 1;
+		Max = 50;
+		Rounding = 0;
+	});
 }
 
 local aimbot_target_name = _G.aimbot_target_name or nil
@@ -241,107 +245,107 @@ local aimbot_target_screen_pos = _G.aimbot_target_screen_pos or nil
 players = {
 	enabled = groupboxes.players
 		:AddToggle({
-			Default = config.players.enabled,
-			Text = "Enabled",
+			Default = config.players.enabled;
+			Text = "Enabled";
 		})
 		:OnChanged(function(value)
 			lib_ui:Notify(value and "[players] Enabled ESP" or "[players] Disabled ESP", 1)
-		end),
+		end);
 
 	distance = groupboxes.players
 		:AddToggle({
-			Default = config.players.distance,
-			Text = "Distance",
+			Default = config.players.distance;
+			Text = "Distance";
 		})
 		:OnChanged(function(value)
 			lib_ui:Notify(value and "[players] Enabled Distance" or "[players] Disabled Distance", 1)
-		end),
+		end);
     
 	nametag = groupboxes.players
 		:AddToggle({
-			Default = config.players.nametag,
-			Text = "Nametag",
+			Default = config.players.nametag;
+			Text = "Nametag";
 		})
 		:OnChanged(function(value)
 			lib_ui:Notify(value and "[players] Enabled Nametag" or "[players] Disabled Nametag", 1)
-		end),
+		end);
 
 	tracer = groupboxes.players
 		:AddToggle({
-			Default = config.players.tracer,
-			Text = "Tracer",
+			Default = config.players.tracer;
+			Text = "Tracer";
 		})
 		:OnChanged(function(value)
 			lib_ui:Notify(value and "[players] Enabled Tracer" or "[players] Disabled Tracer", 1)
-		end),
+		end);
 
     distance_limit = groupboxes.players:AddSlider({
-		Default = config.players.distance_limit,
-		Text = "ESP Distance Limit",
-		Min = 0,
-		Max = 5000,
-		Rounding = 0,
-	}),
+		Default = config.players.distance_limit;
+		Text = "ESP Distance Limit";
+		Min = 0;
+		Max = 5000;
+		Rounding = 0;
+	});
 }
 
 animals = {
 	enabled = groupboxes.animals
 		:AddToggle({
-			Default = config.animals.enabled,
-			Text = "Enabled",
+			Default = config.animals.enabled;
+			Text = "Enabled";
 		})
 		:OnChanged(function(value)
 			lib_ui:Notify(value and "[hunting] Enabled ESP" or "[hunting] Disabled ESP", 1)
-		end),
+		end);
 
 	distance = groupboxes.animals
 		:AddToggle({
-			Default = config.animals.distance,
-			Text = "Distance",
+			Default = config.animals.distance;
+			Text = "Distance";
 		})
 		:OnChanged(function(value)
 			lib_ui:Notify(value and "[hunting] Enabled Distance" or "[hunting] Disabled Distance", 1)
-		end),
+		end);
 
 	nametag = groupboxes.animals
 		:AddToggle({
-			Default = config.animals.nametag,
-			Text = "Nametag",
+			Default = config.animals.nametag;
+			Text = "Nametag";
 		})
 		:OnChanged(function(value)
 			lib_ui:Notify(value and "[hunting] Enabled Nametag" or "[hunting] Disabled Nametag", 1)
-		end),
+		end);
 
 	healthtag = groupboxes.animals
 		:AddToggle({
-			Default = config.animals.healthtag,
-			Text = "HealthTag",
+			Default = config.animals.healthtag;
+			Text = "HealthTag";
 		})
 		:OnChanged(function(value)
 			lib_ui:Notify(value and "[hunting] Enabled HealthTag" or "[hunting] Disabled HealthTag", 1)
-		end),
+		end);
 
 	tracer = groupboxes.animals
 		:AddToggle({
-			Default = config.animals.tracer,
-			Text = "Tracer",
+			Default = config.animals.tracer;
+			Text = "Tracer";
 		})
 		:OnChanged(function(value)
 			lib_ui:Notify(value and "[hunting] Enabled Tracer" or "[hunting] Disabled Tracer", 1)
-		end),
+		end);
 
     color = groupboxes.animals:AddColorPicker({
-		Default = config.animals.color,
-		Text = "Color",
-	}),
+		Default = config.animals.color;
+		Text = "Color";
+	});
 
 	distance_limit = groupboxes.animals:AddSlider({
-		Default = config.animals.distance_limit,
-		Text = "ESP Distance Limit",
-		Min = 0,
-		Max = 5000,
-		Rounding = 0,
-	}),
+		Default = config.animals.distance_limit;
+		Text = "ESP Distance Limit";
+		Min = 0;
+		Max = 5000;
+		Rounding = 0;
+	});
 }
 
 hunting = {}
@@ -350,8 +354,8 @@ for _, animalTab in pairs(config.animals.entries) do
 	local animalEnabled = animalTab.Enabled
 	hunting[animalType.."_enabled"] = groupboxes.hunting
 		:AddToggle({
-			Default = animalEnabled,
-			Text = animalType.." ESP Enabled",
+			Default = animalEnabled;
+			Text = animalType.." ESP Enabled";
 		})
 		:OnChanged(function(value)
 			lib_ui:Notify(value and "[hunting] Enabled "..animalType.." ESP" or "[hunting] Disabled "..animalType.." ESP", 1)
@@ -359,156 +363,156 @@ for _, animalTab in pairs(config.animals.entries) do
 
 	hunting[animalType.."_color"] = groupboxes.hunting
 		:AddColorPicker({
-			Default = config.animals.color,
-			Text = animalType.." Color",
+			Default = config.animals.color;
+			Text = animalType.." Color";
 		})
 
 	hunting[animalType.."_distance_limit"] = groupboxes.hunting
 		:AddSlider({
-			Default = config.animals.distance_limit,
-			Text = animalType.." ESP Distance Limit",
-			Min = 0,
-			Max = 5000,
-			Rounding = 0,
+			Default = config.animals.distance_limit;
+			Text = animalType.." ESP Distance Limit";
+			Min = 0;
+			Max = 5000;
+			Rounding = 0;
 		})
 end
 
 trees = {
 	enabled = groupboxes.trees
 		:AddToggle({
-			Default = config.trees.enabled,
-			Text = "Enabled",
+			Default = config.trees.enabled;
+			Text = "Enabled";
 		})
 		:OnChanged(function(value)
 			lib_ui:Notify(value and "[logging] Enabled ESP" or "[logging] Disabled ESP", 1)
-		end),
+		end);
 
 	thunderstruck_only = groupboxes.trees
 		:AddToggle({
-			Default = config.trees.thunderstruck_only,
-			Text = "Thunderstruck Only",
+			Default = config.trees.thunderstruck_only;
+			Text = "Thunderstruck Only";
 		})
 		:OnChanged(function(value)
 			lib_ui:Notify(value and "[logging] Enabled Thunderstruck Only" or "[logging] Disabled Thundrstruck Only", 1)
-		end),
+		end);
 
 	distance = groupboxes.trees
 		:AddToggle({
-			Default = config.trees.distance,
-			Text = "Distance",
+			Default = config.trees.distance;
+			Text = "Distance";
 		})
 		:OnChanged(function(value)
 			lib_ui:Notify(value and "[logging] Enabled Distance" or "[logging] Disabled Distance", 1)
-		end),
+		end);
 
 	nametag = groupboxes.trees
 		:AddToggle({
-			Default = config.trees.nametag,
-			Text = "Nametag",
+			Default = config.trees.nametag;
+			Text = "Nametag";
 		})
 		:OnChanged(function(value)
 			lib_ui:Notify(value and "[logging] Enabled Nametag" or "[logging] Disabled Nametag", 1)
-		end),
+		end);
 
 	healthtag = groupboxes.trees
 		:AddToggle({
-			Default = config.trees.healthtag,
-			Text = "HealthTag",
+			Default = config.trees.healthtag;
+			Text = "HealthTag";
 		})
 		:OnChanged(function(value)
 			lib_ui:Notify(value and "[logging] Enabled HealthTag" or "[logging] Disabled HealthTag", 1)
-		end),
+		end);
 
 	tracer = groupboxes.trees
 		:AddToggle({
-			Default = config.trees.tracer,
-			Text = "Tracer",
+			Default = config.trees.tracer;
+			Text = "Tracer";
 		})
 		:OnChanged(function(value)
 			lib_ui:Notify(value and "[logging] Enabled Tracer" or "[logging] Disabled Tracer", 1)
-		end),
+		end);
 
     color = groupboxes.trees:AddColorPicker({
-		Default = config.trees.color,
-		Text = "Color",
-	}),
+		Default = config.trees.color;
+		Text = "Color";
+	});
 
 	distance_limit = groupboxes.trees:AddSlider({
-		Default = config.trees.distance_limit,
-		Text = "ESP Distance Limit",
-		Min = 0,
-		Max = 5000,
-		Rounding = 0,
-	}),
+		Default = config.trees.distance_limit;
+		Text = "ESP Distance Limit";
+		Min = 0;
+		Max = 5000;
+		Rounding = 0;
+	});
 }
 
 ores = {
 	enabled = groupboxes.ores
 		:AddToggle({
-			Default = config.ores.enabled,
-			Text = "Enabled",
+			Default = config.ores.enabled;
+			Text = "Enabled";
 		})
 		:OnChanged(function(value)
 			lib_ui:Notify(value and "[mining] Enabled ESP" or "[mining] Disabled ESP", 1)
-		end),
+		end);
 
 	hide_empty = groupboxes.ores
 		:AddToggle({
-			Default = config.ores.hide_empty,
-			Text = "Hide Empty",
+			Default = config.ores.hide_empty;
+			Text = "Hide Empty";
 		})
 		:OnChanged(function(value)
 			lib_ui:Notify(value and "[mining] Enabled Hide Empty" or "[mining] Disabled Hide Empty", 1)
-		end),
+		end);
 
 	distance = groupboxes.ores
 		:AddToggle({
-			Default = config.ores.distance,
-			Text = "Distance",
+			Default = config.ores.distance;
+			Text = "Distance";
 		})
 		:OnChanged(function(value)
 			lib_ui:Notify(value and "[mining] Enabled Distance" or "[mining] Disabled Distance", 1)
-		end),
+		end);
 
 	nametag = groupboxes.ores
 		:AddToggle({
-			Default = config.ores.nametag,
-			Text = "Nametag",
+			Default = config.ores.nametag;
+			Text = "Nametag";
 		})
 		:OnChanged(function(value)
 			lib_ui:Notify(value and "[mining] Enabled Nametag" or "[mining] Disabled Nametag", 1)
-		end),
+		end);
 
 	healthtag = groupboxes.ores
 		:AddToggle({
-			Default = config.ores.healthtag,
-			Text = "HealthTag",
+			Default = config.ores.healthtag;
+			Text = "HealthTag";
 		})
 		:OnChanged(function(value)
 			lib_ui:Notify(value and "[mining] Enabled HealthTag" or "[mining] Disabled HealthTag", 1)
-		end),
+		end);
 
 	tracer = groupboxes.ores
 		:AddToggle({
-			Default = config.ores.tracer,
-			Text = "Tracer",
+			Default = config.ores.tracer;
+			Text = "Tracer";
 		})
 		:OnChanged(function(value)
 			lib_ui:Notify(value and "[mining] Enabled Tracer" or "[mining] Disabled Tracer", 1)
-		end),
+		end);
 
     color = groupboxes.ores:AddColorPicker({
-		Default = config.ores.color,
-		Text = "Color",
-	}),
+		Default = config.ores.color;
+		Text = "Color";
+	});
 
 	distance_limit = groupboxes.ores:AddSlider({
-		Default = config.ores.distance_limit,
-		Text = "ESP Distance Limit",
-		Min = 0,
-		Max = 5000,
-		Rounding = 0,
-	}),
+		Default = config.ores.distance_limit;
+		Text = "ESP Distance Limit";
+		Min = 0;
+		Max = 5000;
+		Rounding = 0;
+	});
 }
 
 oreconfig = {}
@@ -517,8 +521,8 @@ for _, oreTab in pairs(config.ores.entries) do
 	local oreEnabled = oreTab.Enabled
 	oreconfig[oreName.."_enabled"] = groupboxes.oreconfig
 		:AddToggle({
-			Default = oreEnabled,
-			Text = oreName.." ESP Enabled",
+			Default = oreEnabled;
+			Text = oreName.." ESP Enabled";
 		})
 		:OnChanged(function(value)
 			lib_ui:Notify(value and "[mining] Enabled "..oreName.." ESP" or "[mining] Disabled "..oreName.." ESP", 1)
@@ -526,17 +530,17 @@ for _, oreTab in pairs(config.ores.entries) do
 
 	oreconfig[oreName.."_color"] = groupboxes.oreconfig
 		:AddColorPicker({
-			Default = config.ores.color,
-			Text = oreName.." Color",
+			Default = config.ores.color;
+			Text = oreName.." Color";
 		})
 
 	oreconfig[oreName.."_distance_limit"] = groupboxes.oreconfig
 		:AddSlider({
-			Default = config.ores.distance_limit,
-			Text = oreName.." ESP Distance Limit",
-			Min = 0,
-			Max = 5000,
-			Rounding = 0,
+			Default = config.ores.distance_limit;
+			Text = oreName.." ESP Distance Limit";
+			Min = 0;
+			Max = 5000;
+			Rounding = 0;
 		})
 end
 
@@ -581,7 +585,7 @@ workspace = dx9.FindFirstChild(datamodel, "Workspace")
 local workspace = _G.workspace
 
 services = {
-	players = dx9.FindFirstChild(datamodel, "Players"),
+	players = dx9.FindFirstChild(datamodel, "Players");
 }
 
 local_player = nil
@@ -851,16 +855,16 @@ if _G.AnimalEspTask == nil then
 								local root_screen_pos = dx9.WorldToScreen({root_pos.x, root_pos.y, root_pos.z})
 								if _G.IsOnScreen(root_screen_pos) then
 									lib_esp.draw({
-										target = animal,
-										color = animalType and hunting[animalType.."_color"].Value or animals.color.Value,
-										healthbar = config.animals.healthbar,
-										nametag = animals.nametag.Value,
-										custom_nametag = animals.healthtag.Value and animalName .. " | " .. health .. " hp" or animalName,
-										distance = animals.distance.Value,
-										custom_distance = ""..root_distance,
-										tracer = animals.tracer.Value,
-										tracer_type = current_tracer_type,
-										box_type = current_box_type,
+										target = animal;
+										color = animalType and hunting[animalType.."_color"].Value or animals.color.Value;
+										healthbar = config.animals.healthbar;
+										nametag = animals.nametag.Value;
+										custom_nametag = animals.healthtag.Value and animalName .. " | " .. health .. " hp" or animalName;
+										distance = animals.distance.Value;
+										custom_distance = ""..root_distance;
+										tracer = animals.tracer.Value;
+										tracer_type = current_tracer_type;
+										box_type = current_box_type;
 									})
 								end
 							end
@@ -925,17 +929,17 @@ if _G.OreEspTask == nil then
 											local screen_pos = dx9.WorldToScreen({meshpart_pos.x, meshpart_pos.y, meshpart_pos.z})
 											if _G._G.IsOnScreen(screen_pos) then
 												lib_esp.draw({
-													target = model,
-													custom_root = meshpartName,
-													color = oreconfig[oreName.."_color"].Value or ores.color.Value,
-													healthbar = config.ores.healthbar,
-													nametag = ores.nametag.Value,
-													custom_nametag = ores.healthtag.Value and typeName .. " | " .. remainingNumber .. " left" or typeName,
-													distance = ores.distance.Value,
-													custom_distance = ""..got_distance,
-													tracer = ores.tracer.Value,
-													tracer_type = current_tracer_type,
-													box_type = current_box_type,
+													target = model;
+													custom_root = meshpartName;
+													color = oreconfig[oreName.."_color"].Value or ores.color.Value;
+													healthbar = config.ores.healthbar;
+													nametag = ores.nametag.Value;
+													custom_nametag = ores.healthtag.Value and typeName .. " | " .. remainingNumber .. " left" or typeName;
+													distance = ores.distance.Value;
+													custom_distance = ""..got_distance;
+													tracer = ores.tracer.Value;
+													tracer_type = current_tracer_type;
+													box_type = current_box_type;
 												})
 											end
 										end
@@ -984,17 +988,17 @@ if _G.TreeEspTask == nil then
 							local screen_pos = dx9.WorldToScreen({meshpart_pos.x, meshpart_pos.y, meshpart_pos.z})
 							if _G.IsOnScreen(screen_pos) then
 								lib_esp.draw({
-									target = model,
-									custom_root = meshpartName,
-									color = trees.color.Value,
-									healthbar = config.trees.healthbar,
-									nametag = trees.nametag.Value,
-									custom_nametag = trees.healthtag.Value and modelName .. " | " .. health .. " hp" or modelName,
-									distance = trees.distance.Value,
-									custom_distance = ""..got_distance,
-									tracer = trees.tracer.Value,
-									tracer_type = current_tracer_type,
-									box_type = current_box_type,
+									target = model;
+									custom_root = meshpartName;
+									color = trees.color.Value;
+									healthbar = config.trees.healthbar;
+									nametag = trees.nametag.Value;
+									custom_nametag = trees.healthtag.Value and modelName .. " | " .. health .. " hp" or modelName;
+									distance = trees.distance.Value;
+									custom_distance = ""..got_distance;
+									tracer = trees.tracer.Value;
+									tracer_type = current_tracer_type;
+									box_type = current_box_type;
 								})
 							end
 						end
