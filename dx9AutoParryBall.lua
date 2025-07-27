@@ -174,10 +174,7 @@ if _G.AutoParry_BladeBall_Task == nil then
 			local speed = math.sqrt(vel.x^2+vel.y^2+vel.z^2)
 
 			local lpos = local_player_table.Position
-			local x = (lpos.x-ballpos.x)*(lpos.x-ballpos.x)
-			local y = (lpos.y-ballpos.y)*(lpos.y-ballpos.y)
-			local z = (lpos.z-ballpos.z)*(lpos.z-ballpos.z)
-			local distance = math.floor(math.sqrt(x+y+z))
+			local distance = _G.Get_Distance(lpos, ballpos)
 
 			local highlight = dx9.FindFirstChild(my_character, "Highlight")
 			if highlight and highlight ~= 0 and distance <= 60 and distance / speed < 0.55 then
