@@ -69,7 +69,7 @@ if _G.Get_Distance == nil then
 		local b = (v1.y - v2.y) * (v1.y - v2.y)
 		local c = (v1.z - v2.z) * (v1.z - v2.z)
 
-		return math.floor(math.sqrt(a + b + c) + 0.5)
+		return math.sqrt(a + b + c)
 	end
 end
 
