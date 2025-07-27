@@ -20,7 +20,6 @@ config = _G.config or {
     players = {
         enabled = true;
         distance = true;
-        healthbar = true;
         nametag = true;
         tracer = false;
         color = { 0, 255, 0 };
@@ -29,7 +28,6 @@ config = _G.config or {
     items = {
         enabled = true;
         distance = true;
-        healthbar = false;
         nametag = true;
         tracer = false;
 		color = { 255, 255, 255 };
@@ -76,7 +74,6 @@ config = _G.config or {
 	ammo = {
 		enabled = true;
         distance = true;
-        healthbar = true;
         nametag = true;
         tracer = false;
 		color = { 255, 255, 0 };
@@ -183,7 +180,6 @@ config = _G.config or {
 	weapons = {
 		enabled = true;
         distance = true;
-        healthbar = false;
         nametag = true;
         tracer = false;
 		color = { 255, 0, 0 };
@@ -459,15 +455,6 @@ players = {
 		})
 		:OnChanged(function(value)
 			lib_ui:Notify(value and "[players] Enabled Nametag" or "[players] Disabled Nametag", 1)
-		end);
-
-	healthbar = groupboxes.players
-		:AddToggle({
-			Default = config.players.healthbar;
-			Text = "Healthbar";
-		})
-		:OnChanged(function(value)
-			lib_ui:Notify(value and "[hunting] Enabled Healthbar" or "[hunting] Disabled Healthbar", 1)
 		end);
 
 	tracer = groupboxes.players
@@ -885,7 +872,7 @@ if _G.PlayerTask == nil then
 										lib_esp.draw({
 											target = character,
 											color = playerColor,
-											healthbar = players.healthbar.Value,
+											healthbar = false,
 											nametag = players.nametag.Value,
 											distance = players.distance.Value,
 											custom_distance = ""..root_distance,
@@ -1064,7 +1051,7 @@ if _G.ParentESPCheck == nil then
 							esp_type = "misc",
 							target = part,
 							color = typeTab.color.Value,
-							healthbar = typeConfigSettings.healthbar,
+							healthbar = false,
 							nametag = typeTab.nametag.Value,
 							custom_nametag = name,
 							distance = typeTab.distance.Value,
