@@ -172,7 +172,6 @@ if _G.AutoParry_BladeBall_Task == nil then
 			local ballpos = dx9.GetPosition(v)
 			local vel = dx9.GetVelocity(v)
 			local speed = math.sqrt(vel.x^2+vel.y^2+vel.z^2)
-			local velocity = vel.x + vel.y + vel.z
 
 			local lpos = local_player_table.Position
 			local x = (lpos.x-ballpos.x)*(lpos.x-ballpos.x)
