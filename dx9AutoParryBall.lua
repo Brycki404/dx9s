@@ -19,7 +19,7 @@ end
 lib_ui = loadstring(dx9.Get(config.urls.DXLibUI))()
 
 interface = lib_ui:CreateWindow({
-	Title = "Auto Parry Ball | dx9ware | By @Brycki";
+	Title = "Ball Auto Parry | dx9ware | By @Brycki";
 	Size = { 500, 500 };
 	Resizable = true;
 
