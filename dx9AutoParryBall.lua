@@ -13,14 +13,14 @@ config = _G.config or {
 		minimum_distance_enabled = false;
 		maximum_reach_enabled = true;
 		maximum_eta_enabled = true;
-		minimum_distance = 4;
-		maximum_reach = 47;
-		maximum_eta = 0.4;
+		minimum_distance = 0.5;
+		maximum_reach = 60;
+		maximum_eta = 0.55;
 		simulation_rate = 1/60;
 		maximum_Hz_Cache = 15;
 		Sec_precision = 3;
 		Hz_precision = 0;
-		click_cooldown = 0.03;
+		click_cooldown = 0.15;
 		game = 1; -- 1 = "Blade Ball", 2 = "Death Ball"
 	};
 };
@@ -269,7 +269,6 @@ if my_player ~= nil and my_player ~= 0 then
 					if highlight and highlight ~= 0 then
 						if _G.clearedConsole == true then
 							_G.clearedConsole = false
-							dx9.ShowConsole(true)
 						end
 						local Balls = (InTraining == false and dx9.FindFirstChild(workspace, "Balls")) or (InTraining == true and dx9.FindFirstChild(workspace, "TrainingBalls"))
 						if Balls and Balls ~= 0 then
@@ -318,7 +317,7 @@ if my_player ~= nil and my_player ~= 0 then
 											print("Attempt Click")
 										end
 									elseif eta ~= nil then
-										if (autoparry_settings.click_cooldown.Value == 0) or (timeSinceLastAutoParry == 0) or (timeSinceLastAutoParry >= math.min(autoparry_settings.click_cooldown.Value, math.max((eta and eta ~= 0 and eta/3 or 0), config.settings.simulation_rate + 0.02))) then
+										if (autoparry_settings.click_cooldown.Value == 0) or (timeSinceLastAutoParry == 0) or (timeSinceLastAutoParry >= math.min(autoparry_settings.click_cooldown.Value, math.max(eta/2, config.settings.simulation_rate + 0.02))) then
 											print("Click")
 											dx9.Mouse1Click()
 											_G.lastAutoParryTime = os.clock()
@@ -351,7 +350,6 @@ if my_player ~= nil and my_player ~= 0 then
 				if _G.clearedConsole == false then
 					_G.clearedConsole = true
 					dx9.ClearConsole()
-					dx9.ShowConsole(false)
 				end
 			end 
 		end
