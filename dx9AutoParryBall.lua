@@ -14,13 +14,13 @@ config = _G.config or {
 		maximum_reach_enabled = true;
 		maximum_eta_enabled = true;
 		minimum_distance = 4;
-		maximum_reach = 60;
-		maximum_eta = 0.24;
+		maximum_reach = 47;
+		maximum_eta = 0.37;
 		simulation_rate = 1/60;
 		maximum_Hz_Cache = 15;
 		Sec_precision = 3;
 		Hz_precision = 0;
-		click_cooldown = 0.01;
+		click_cooldown = 0.19;
 		game = 1; -- 1 = "Blade Ball", 2 = "Death Ball"
 	};
 };
@@ -39,6 +39,10 @@ end
 
 if _G.lastAutoParryTime == nil then
 	_G.lastAutoParryTime = 0
+end
+
+if _G.clearedConsole == nil then
+	_G.clearedConsole = false
 end
 
 if _G.lastElapsedCycleTimesCache == nil then
@@ -168,7 +172,7 @@ autoparry_settings.click_cooldown = groupboxes.autoparry_settings:AddSlider({
 		Text = "Click Cooldown";
 		Min = 0;
 		Max = 1.2;
-		Rounding = 1;
+		Rounding = 2;
 	}):AddTooltip("The delay before you can auto-parry again")
 
 if _G.Get_Distance == nil then
@@ -256,6 +260,10 @@ if my_player ~= nil and my_player ~= 0 then
 			end
 
 			if my_character ~= nil and my_character ~= 0 then
+				if _G.clearedConsole == true then
+					_G.clearedConsole = false
+					dx9.ShowConsole(true)
+				end
 				my_root = dx9.FindFirstChild(my_character, "HumanoidRootPart")
 				if my_root ~= nil and my_root ~= 0 then
 					local highlight = dx9.FindFirstChild(my_character, "Highlight")
@@ -272,11 +280,11 @@ if my_player ~= nil and my_player ~= 0 then
 									t = balls[name]
 								end
 
-								local pos = dx9.GetPosition(v)
-								local dist = _G.Get_Distance(pos, ballpos)
+								local lpos = dx9.GetPosition(my_root) or local_player_table.Position
+								local ballpos = dx9.GetPosition(v)
+								local dist = _G.Get_Distance(lpos, ballpos)
 
-								if (t.pos == nil) or (t.dist == nil) or ((t.dist ~= nil) and (dist < t.dis)) then
-									t.pos = pos
+								if (t.dist == nil) or ((t.dist ~= nil) and (dist < t.dist)) then
 									t.dist = dist
 								end
 
@@ -288,9 +296,7 @@ if my_player ~= nil and my_player ~= 0 then
 
 							for i,t in pairs(balls) do
 								print("\n")
-								local ballpos = t.pos
-								local lpos = dx9.GetPosition(my_root) or local_player_table.Position
-								local distance = _G.Get_Distance(lpos, ballpos)
+								local distance = t.dist
 								print("dist: "..distance.." studs")
 								
 								local speed = t.speed
@@ -309,14 +315,10 @@ if my_player ~= nil and my_player ~= 0 then
 									local eta = distance / speed
 									print("eta: "..eta.." seconds")
 									if autoparry_settings.maximum_eta_enabled.Value or autoparry_settings.maximum_reach_enabled.Value then
-										print("a")
 										if autoparry_settings.maximum_reach_enabled.Value ~= true or (autoparry_settings.maximum_reach_enabled.Value and distance <= autoparry_settings.maximum_reach.Value) then
-											print("b")
 											if autoparry_settings.maximum_eta_enabled.Value ~= true or (autoparry_settings.maximum_eta_enabled.Value and eta <= autoparry_settings.maximum_eta.Value) then
-												print("c")
 												local timeSinceLastAutoParry = startTime - _G.lastAutoParryTime
-												print("d")
-												if (autoparry_settings.click_cooldown.Value == 0) or (timeSinceLastAutoParry == 0) or (timeSinceLastAutoParry >= autoparry_settings.click_cooldown.Value) then
+												if (autoparry_settings.click_cooldown.Value == 0) or (timeSinceLastAutoParry == 0) or (timeSinceLastAutoParry >= math.min(autoparry_settings.click_cooldown.Value, math.max(eta/2, config.settings.simulation_rate)) then
 													print("Click")
 													dx9.Mouse1Click()
 													_G.lastAutoParryTime = os.clock()
@@ -331,6 +333,11 @@ if my_player ~= nil and my_player ~= 0 then
 						end
 					end
 				end
+			end
+			if ((my_character == nil) or (my_character == 0)) and _G.clearedConsole == false then
+				_G.clearedConsole = true
+				dx9.ClearConsole()
+				dx9.ShowConsole(false)
 			end
 		end
 	end
