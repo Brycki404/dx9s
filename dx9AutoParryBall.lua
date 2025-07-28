@@ -180,8 +180,7 @@ services = {
 }
 
 local_player = nil
-local_player_table = dx9.get_localplayer()
-
+local_player_table = nil
 current_game = _G.Get_Index("game", game_settings.game.Value)
 
 if local_player == nil then
@@ -194,14 +193,15 @@ if local_player == nil then
 	end
 end
 
-if local_player == nil or local_player == 0 then
-	local_player = local_player_table
+if local_player == nil then
+	local_player_table = dx9.get_localplayer()
 end
 
 function get_local_player_name()
 	if dx9.GetType(local_player) == "Player" then
 		return dx9.GetName(local_player)
 	else
+		local_player_table = dx9.get_localplayer()
 		return local_player_table.Info.Name
 	end
 end
