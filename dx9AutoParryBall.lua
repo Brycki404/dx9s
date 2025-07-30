@@ -1,6 +1,5 @@
-local startTime = os.clock();
+local startTime = os.clock()
 --indent size 4
-dx9.ShowConsole(true);
 
 config = _G.config or {
 	urls = {
@@ -8,6 +7,14 @@ config = _G.config or {
 	};
 	settings = {
 		menu_toggle_keybind = "[F3]";
+
+		game = 1; -- 1 = "Blade Ball", 2 = "Death Ball"
+		fps = 4; -- 1 = 60, 2 = 120, 3 = 144, 4 = 240
+
+		maximum_Hz_Cache = 15;
+		Sec_precision = 4;
+		Hz_precision = 0;
+
 		autoparry_enabled = true;
 		autoparry_keybind = "[F4]";
 		minimum_distance_enabled = false;
@@ -16,14 +23,9 @@ config = _G.config or {
 		minimum_distance = 0.5;
 		maximum_reach = 60;
 		maximum_eta = 0.55;
-		simulation_rate = 1/60;
-		maximum_Hz_Cache = 15;
-		Sec_precision = 3;
-		Hz_precision = 0;
-		click_cooldown = 0.15;
-		game = 1; -- 1 = "Blade Ball", 2 = "Death Ball"
+		click_cooldown = 0.55;
 	};
-};
+}
 if _G.config == nil then
 	_G.config = config
 	config = _G.config
@@ -35,10 +37,6 @@ end
 
 if _G.averageSec == nil then
 	_G.averageSec = 0
-end
-
-if _G.lastAutoParryTime == nil then
-	_G.lastAutoParryTime = 0
 end
 
 if _G.clearedConsole == nil then
@@ -104,6 +102,14 @@ game_settings.game = groupboxes.game_settings
 	:OnChanged(function(value)
 		lib_ui:Notify("[settings] Game: " .. value, 1)
 	end)
+game_settings.fps = groupboxes.game_settings:AddDropdown({
+		Text = "Your Game's FPS";
+		Default = config.settings.fps;
+		Values = { "60", "120", "144", "240" };
+	})
+	:OnChanged(function(value)
+		lib_ui:Notify("[settings] FPS: " .. value, 1)
+	end)
 game_settings.sec = groupboxes.game_settings
 	:AddLabel("Avg. Program Cycle: ".._G.averageSec.." s")
 game_settings.hz = groupboxes.game_settings
@@ -113,7 +119,7 @@ autoparry_settings = {}
 autoparry_settings.enabled = groupboxes.autoparry_settings
 		:AddToggle({
 			Default = config.settings.autoparry_enabled;
-			Text = "ESP Enabled";
+			Text = "Auto Parry Enabled";
 		})
 		:OnChanged(function(value)
 			lib_ui:Notify(value and "[settings] Enabled Auto Parry" or "[settings] Disabled Auto Parry", 1)
@@ -162,7 +168,7 @@ autoparry_settings.maximum_eta_enabled = groupboxes.autoparry_settings
 autoparry_settings.maximum_eta = groupboxes.autoparry_settings:AddSlider({
 		Default = config.settings.maximum_eta;
 		Text = "Max. Arrival Time";
-		Min = config.settings.simulation_rate;
+		Min = 0;
 		Max = 1.25;
 		Rounding = 2;
 	}):AddTooltip("The maximum amount of estimated seconds away the ball is from you at which you will parry")
@@ -170,9 +176,9 @@ groupboxes.autoparry_settings:AddBorder()
 autoparry_settings.click_cooldown = groupboxes.autoparry_settings:AddSlider({
 		Default = config.settings.click_cooldown;
 		Text = "Click Cooldown";
-		Min = 0;
-		Max = 1.2;
-		Rounding = 2;
+		Min = (1/game_settings.fps.Value);
+		Max = 0.55;
+		Rounding = 3;
 	}):AddTooltip("The delay before you can auto-parry again")
 
 if _G.Get_Distance == nil then
@@ -190,6 +196,8 @@ if _G.Get_Index == nil then
 		local table = nil
 		if type == "game" then
 			table = { "Blade Ball", "Death Ball" }
+		elseif type == "fps" then
+			table = { "60", "120", "144", "240" }
 		end
 
 		if table then
@@ -213,6 +221,7 @@ services = {
 local_player = nil
 local_player_table = dx9.get_localplayer()
 current_game = _G.Get_Index("game", game_settings.game.Value)
+current_fps = tonumber(_G.Get_Index("fps", game_settings.fps.Value))
 
 if local_player == nil then
 	for _, player in pairs(dx9.GetChildren(services.players)) do
@@ -234,6 +243,30 @@ function get_local_player_name()
 end
 
 local_player_name = get_local_player_name()
+
+if _G.devmode == nil then
+	_G.devmode = false
+end
+
+if local_player_name == "B0NBunny" then
+	game_settings.dev = groupboxes.game_settings
+		:AddToggle({
+			Default = false;
+			Text = "Dev Mode Enabled";
+		})
+		:OnChanged(function(value)
+			lib_ui:Notify(value and "[settings] Enabled Dev Mode" or "[settings] Disabled Dev Mode", 1)
+			if value then
+				_G.devmode = true
+				dx9.ClearConsole()
+				dx9.ShowConsole(true)
+			else
+				_G.devmode = false
+				dx9.ClearConsole()
+				dx9.ShowConsole(false)
+			end
+		end)
+end
 
 my_player = dx9.FindFirstChild(services.players, local_player_name)
 my_character = nil
@@ -260,8 +293,6 @@ if my_player ~= nil and my_player ~= 0 then
 				end
 			end
 
-			
-
 			if my_character ~= nil and my_character ~= 0 then
 				my_root = dx9.FindFirstChild(my_character, "HumanoidRootPart")
 				if my_root ~= nil and my_root ~= 0 then
@@ -273,69 +304,110 @@ if my_player ~= nil and my_player ~= 0 then
 						local Balls = (InTraining == false and dx9.FindFirstChild(workspace, "Balls")) or (InTraining == true and dx9.FindFirstChild(workspace, "TrainingBalls"))
 						if Balls and Balls ~= 0 then
 							local balls = {}
-
+							
 							for i,v in pairs(dx9.GetChildren(Balls)) do
 								local name = dx9.GetName(v)
-								local t = balls[name]
-								if t == nil then
-									balls[name] = {}
-									t = balls[name]
-								end
+								local vtype = dx9.GetType(v)
+								if vtype == "Part" then
+									local t = balls[name]
+									if not t then
+										t = {}
+										balls[name] = t
+									end
 
-								local lpos = dx9.GetPosition(my_root) or local_player_table.Position
-								local ballpos = dx9.GetPosition(v)
-								local dist = _G.Get_Distance(lpos, ballpos)
+									local ballvel = dx9.GetVelocity(v)
+									local spd = math.sqrt(ballvel.x^2 + ballvel.y^2 + ballvel.z^2)
 
-								if (t.dist == nil) or ((t.dist ~= nil) and (dist < t.dist)) then
-									t.dist = dist
-								end
-
-								local velo = dx9.GetVelocity(v)
-								local spd = math.sqrt(velo.x^2 + velo.y^2 + velo.z^2)
-
-								if (t.speed == nil) or (t.speed == 0) or (spd > t.speed) then
-									t.speed = spd
+									if t.spd == nil or t.spd == 0 or spd > t.spd then
+										t.name = name
+										t.ballvel = ballvel
+										t.spd = spd
+										t.ball = v
+									end
 								end
 							end
 
 							for i,t in pairs(balls) do
-								print("\n")
-								local distance = t.dist
-								print("dist: "..distance.." studs")
+								local name = t.name
+								local v = t.ball
+								local ballvel = t.ballvel
+								local spd = t.spd
+
+								local lpos = dx9.GetPosition(my_root) or local_player_table.Position
+								local ballpos = dx9.GetPosition(v)
+								local toPlayerFromBallPos = {
+									x = lpos.x - ballpos.x;
+									y = lpos.y - ballpos.y;
+									z = lpos.z - ballpos.z;
+								}
+								local dist = _G.Get_Distance(lpos, ballpos)
+								local unitToPlayerFromBallPos = {
+									x = toPlayerFromBallPos.x / dist;
+									y = toPlayerFromBallPos.y / dist;
+									z = toPlayerFromBallPos.z / dist;
+								}
 								
-								local speed = t.speed
-								print("spd: "..speed.." studs/second")
+								if spd < 0.01 then
+									spd = 0.01
+								end
+								local unitBallvel = {
+									x = ballvel.x / spd;
+									y = ballvel.y / spd;
+									z = ballvel.z / spd;
+								}
+								--local dot = toPlayer.x * ballvel.x + toPlayer.y * ballvel.y + toPlayer.z + ballvel.z
+								local dot = unitToPlayerFromBallPos.x * unitBallvel.x + unitToPlayerFromBallPos.y * unitBallvel.y + unitToPlayerFromBallPos.z * unitBallvel.z
+
+								local eta = dist / spd
+								local predictedPos = {
+									x = ballpos.x + ballvel.x * (1/current_fps);
+									y = ballpos.y + ballvel.y * (1/current_fps);
+									z = ballpos.z + ballvel.z * (1/current_fps);
+								}
+								local isFrozenThreat = spd < 5
+								
+								local isFacingMe = dot > 0
 							
-								local function attemptClick(eta)
-									local timeSinceLastAutoParry = startTime - _G.lastAutoParryTime
-									if eta == nil then
-										if (autoparry_settings.click_cooldown.Value == 0) or (timeSinceLastAutoParry == 0) or (timeSinceLastAutoParry >= autoparry_settings.click_cooldown.Value) then
-											print("Click")
-											dx9.Mouse1Click()
-											_G.lastAutoParryTime = os.clock()
-										else
-											print("Attempt Click")
+								local function attemptClick()
+									if _G.devmode then
+										print("["..name.."] | frozen: "..tostring(isFrozenThreat).." | dist: "..dist.." | spd: "..spd.." | eta:"..eta.." | dot: "..dot)
+										print("Attempt Click")
+										print(os.clock())
+									end
+									if (_G.nextParryTime == nil) or (_G.nextParryTime ~= nil and _G.nextParryTime < os.clock()) then
+										if (autoparry_settings.click_cooldown.Value > 0) then
+											_G.nextParryTime = os.clock() + autoparry_settings.click_cooldown.Value
+											if _G.devmode then
+												print(_G.nextParryTime)
+											end
 										end
-									elseif eta ~= nil then
-										if (autoparry_settings.click_cooldown.Value == 0) or (timeSinceLastAutoParry == 0) or (timeSinceLastAutoParry >= math.min(autoparry_settings.click_cooldown.Value, math.max(eta/2, config.settings.simulation_rate + 0.02))) then
+										if _G.devmode then
 											print("Click")
-											dx9.Mouse1Click()
-											_G.lastAutoParryTime = os.clock()
-										else
-											print("Attempt Click")
 										end
+										dx9.Mouse1Click()
 									end
 								end
 
-								if (autoparry_settings.minimum_distance_enabled.Value) and distance <= autoparry_settings.minimum_distance.Value then
-									attemptClick(nil)
-								else
-									local eta = distance / speed
-									print("eta: "..eta.." seconds")
-									if autoparry_settings.maximum_eta_enabled.Value or autoparry_settings.maximum_reach_enabled.Value then
-										if autoparry_settings.maximum_reach_enabled.Value ~= true or (autoparry_settings.maximum_reach_enabled.Value and distance <= autoparry_settings.maximum_reach.Value) then
+								if isFrozenThreat and dist <= 10 then
+									if autoparry_settings.maximum_reach_enabled.Value ~= true or (autoparry_settings.maximum_reach_enabled.Value and dist <= autoparry_settings.maximum_reach.Value) then
+										if _G.devmode then
+											print("1")
+										end
+										attemptClick()
+									end
+								elseif isFacingMe then
+									if (autoparry_settings.minimum_distance_enabled.Value) and dist <= autoparry_settings.minimum_distance.Value then
+										if _G.devmode then
+											print("2")
+										end
+										attemptClick()
+									elseif autoparry_settings.maximum_eta_enabled.Value or autoparry_settings.maximum_reach_enabled.Value then
+										if autoparry_settings.maximum_reach_enabled.Value ~= true or (autoparry_settings.maximum_reach_enabled.Value and dist <= autoparry_settings.maximum_reach.Value) then
 											if autoparry_settings.maximum_eta_enabled.Value ~= true or (autoparry_settings.maximum_eta_enabled.Value and eta <= autoparry_settings.maximum_eta.Value) then
-												attemptClick(eta)
+												if _G.devmode then
+													print("3")
+												end
+												attemptClick()
 											end
 										end
 									end
@@ -346,17 +418,20 @@ if my_player ~= nil and my_player ~= 0 then
 				end
 			end
 			if (highlight == nil) or (highlight == 0) then
-				_G.lastAutoParryTime = 0
+				_G.nextParryTime = os.clock() + (1/game_settings.fps.Value)
 				if _G.clearedConsole == false then
 					_G.clearedConsole = true
-					dx9.ClearConsole()
+					if _G.devmode then
+						print("\n\n\n")
+					end
+					--dx9.ClearConsole()
 				end
 			end 
 		end
 	end
 end
 
-local endTime = os.clock();
+local endTime = os.clock()
 local elapsedTime = endTime - startTime
 if _G.lastElapsedCycleTimesCache ~= nil then
 	if #_G.lastElapsedCycleTimesCache >= config.settings.maximum_Hz_Cache then
