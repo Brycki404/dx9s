@@ -225,8 +225,15 @@ if PlayerCharacterFolder ~= nil and PlayerCharacterFolder ~= 0 then
 			if autoparry_settings.enabled.Value then
 				if current_game == 1 then
 					--Blade Ball
-					local highlight = dx9.FindFirstChild(my_character, "Highlight")
-					if highlight and highlight ~= 0 then
+
+					--disabling highlight check for now because its sometimes
+					--absent which causes a delay
+					--unfortunately dx9ware doesnt have access to Roblox Attributes
+					--so i cant just use ball:GetAttribute("target")
+					--like most bladeball auto parry scripts
+
+					--local highlight = dx9.FindFirstChild(my_character, "Highlight")
+					--if highlight and highlight ~= 0 then
 						local Balls = dx9.FindFirstChild(workspace, "Balls")
 						if Balls and Balls ~= 0 then
 							for i,v in pairs(dx9.GetChildren(Balls)) do
@@ -262,7 +269,8 @@ if PlayerCharacterFolder ~= nil and PlayerCharacterFolder ~= 0 then
 								end
 							end
 						end
-					end
+					--end
+
 				end
 			end
 		end
