@@ -23,7 +23,7 @@ config = _G.config or {
 		minimum_distance = 0.5;
 		maximum_reach = 60;
 		maximum_eta = 0.55;
-		click_cooldown = 0.55;
+		click_cooldown = 0;
 	};
 }
 if _G.config == nil then
