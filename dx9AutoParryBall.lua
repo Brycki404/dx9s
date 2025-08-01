@@ -1,6 +1,6 @@
 local startTime = os.clock();
 --indent size 4
-dx9.ShowConsole(true);
+--dx9.ShowConsole(true);
 
 config = _G.config or {
 	urls = {
@@ -240,7 +240,7 @@ if PlayerCharacterFolder ~= nil and PlayerCharacterFolder ~= 0 then
 								local ballpos = dx9.GetPosition(v)
 								local vel = dx9.GetVelocity(v)
 								local speed = math.sqrt(vel.x^2 + vel.y^2 + vel.z^2)
-								print("spd: "..speed.." studs/second")
+								--print("spd: "..speed.." studs/second")
 
 								local skip = false
 								if speed == 0 or speed >= 10000 then
@@ -250,7 +250,7 @@ if PlayerCharacterFolder ~= nil and PlayerCharacterFolder ~= 0 then
 								if not skip then
 									local lpos = dx9.GetPosition(my_root) or local_player_table.Position
 									local distance = _G.Get_Distance(lpos, ballpos)
-									print("dist: "..distance.." studs")
+									--print("dist: "..distance.." studs")
 									if autoparry_settings.minimum_distance_enabled.Value and distance <= autoparry_settings.minimum_distance.Value then
 										dx9.Mouse1Click()
 										break
