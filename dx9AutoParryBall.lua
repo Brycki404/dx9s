@@ -39,6 +39,14 @@ if _G.averageSec == nil then
 	_G.averageSec = 0
 end
 
+if _G.highlightExists == nil then
+	_G.highlightExists = false
+end
+
+if _G.highlightRemoved == nil then
+	_G.highlightRemoved = false
+end
+
 if _G.clearedConsole == nil then
 	_G.clearedConsole = false
 end
@@ -271,7 +279,10 @@ end
 my_player = dx9.FindFirstChild(services.players, local_player_name)
 my_character = nil
 my_root = nil
-highlight = nil
+
+if _G.clearedConsole == true then
+	_G.clearedConsole = false
+end
 
 if my_player ~= nil and my_player ~= 0 then
 	if autoparry_settings.enabled.Value then
@@ -293,122 +304,119 @@ if my_player ~= nil and my_player ~= 0 then
 				end
 			end
 
+			local highlightPreviouslyExisted = ((_G.highlight ~= nil) and (_G.highlight ~= 0))
+
 			if my_character ~= nil and my_character ~= 0 then
 				my_root = dx9.FindFirstChild(my_character, "HumanoidRootPart")
 				if my_root ~= nil and my_root ~= 0 then
-					highlight = dx9.FindFirstChild(my_character, "Highlight")
-					if highlight and highlight ~= 0 then
-						if _G.clearedConsole == true then
-							_G.clearedConsole = false
+					_G.highlight = dx9.FindFirstChild(my_character, "Highlight")
+					local Balls = (InTraining == false and dx9.FindFirstChild(workspace, "Balls")) or (InTraining == true and dx9.FindFirstChild(workspace, "TrainingBalls"))
+					if Balls and Balls ~= 0 then
+						local balls = {}
+						
+						for i,v in pairs(dx9.GetChildren(Balls)) do
+							local name = dx9.GetName(v)
+							local vtype = dx9.GetType(v)
+							if vtype == "Part" then
+								local t = balls[name]
+								if not t then
+									t = {}
+									balls[name] = t
+								end
+
+								local ballvel = dx9.GetVelocity(v)
+								local spd = math.sqrt(ballvel.x^2 + ballvel.y^2 + ballvel.z^2)
+
+								if t.spd == nil or t.spd == 0 or spd > t.spd then
+									t.name = name
+									t.ballvel = ballvel
+									t.spd = spd
+									t.ball = v
+								end
+							end
 						end
-						local Balls = (InTraining == false and dx9.FindFirstChild(workspace, "Balls")) or (InTraining == true and dx9.FindFirstChild(workspace, "TrainingBalls"))
-						if Balls and Balls ~= 0 then
-							local balls = {}
+
+						for i,t in pairs(balls) do
+							local name = t.name
+							local v = t.ball
+							local ballvel = t.ballvel
+							local spd = t.spd
+
+							local lpos = dx9.GetPosition(my_root) or local_player_table.Position
+							local ballpos = dx9.GetPosition(v)
+							local toPlayerFromBallPos = {
+								x = lpos.x - ballpos.x;
+								y = lpos.y - ballpos.y;
+								z = lpos.z - ballpos.z;
+							}
+							local dist = _G.Get_Distance(lpos, ballpos)
+							local unitToPlayerFromBallPos = {
+								x = toPlayerFromBallPos.x / dist;
+								y = toPlayerFromBallPos.y / dist;
+								z = toPlayerFromBallPos.z / dist;
+							}
 							
-							for i,v in pairs(dx9.GetChildren(Balls)) do
-								local name = dx9.GetName(v)
-								local vtype = dx9.GetType(v)
-								if vtype == "Part" then
-									local t = balls[name]
-									if not t then
-										t = {}
-										balls[name] = t
-									end
+							if spd < 0.01 then
+								spd = 0.01
+							end
+							local unitBallvel = {
+								x = ballvel.x / spd;
+								y = ballvel.y / spd;
+								z = ballvel.z / spd;
+							}
+							--local dot = toPlayer.x * ballvel.x + toPlayer.y * ballvel.y + toPlayer.z + ballvel.z
+							local dot = unitToPlayerFromBallPos.x * unitBallvel.x + unitToPlayerFromBallPos.y * unitBallvel.y + unitToPlayerFromBallPos.z * unitBallvel.z
 
-									local ballvel = dx9.GetVelocity(v)
-									local spd = math.sqrt(ballvel.x^2 + ballvel.y^2 + ballvel.z^2)
-
-									if t.spd == nil or t.spd == 0 or spd > t.spd then
-										t.name = name
-										t.ballvel = ballvel
-										t.spd = spd
-										t.ball = v
+							local eta = dist / spd
+							local predictedPos = {
+								x = ballpos.x + ballvel.x * (1/current_fps);
+								y = ballpos.y + ballvel.y * (1/current_fps);
+								z = ballpos.z + ballvel.z * (1/current_fps);
+							}
+							local isFrozenThreat = spd < 5
+							
+							local isFacingMe = dot > 0
+						
+							local function attemptClick()
+								if _G.devmode then
+									print("["..name.."] | frozen: "..tostring(isFrozenThreat).." | dist: "..dist.." | spd: "..spd.." | eta:"..eta.." | dot: "..dot)
+									print("Attempt Click")
+									print(os.clock())
+								end
+								if (_G.nextParryTime == nil) or (_G.nextParryTime ~= nil and _G.nextParryTime < os.clock()) then
+									if (autoparry_settings.click_cooldown.Value > 0) then
+										_G.nextParryTime = os.clock() + autoparry_settings.click_cooldown.Value
+										if _G.devmode then
+											print(_G.nextParryTime)
+										end
 									end
+									if _G.devmode then
+										print("Click")
+									end
+									dx9.Mouse1Click()
 								end
 							end
 
-							for i,t in pairs(balls) do
-								local name = t.name
-								local v = t.ball
-								local ballvel = t.ballvel
-								local spd = t.spd
-
-								local lpos = dx9.GetPosition(my_root) or local_player_table.Position
-								local ballpos = dx9.GetPosition(v)
-								local toPlayerFromBallPos = {
-									x = lpos.x - ballpos.x;
-									y = lpos.y - ballpos.y;
-									z = lpos.z - ballpos.z;
-								}
-								local dist = _G.Get_Distance(lpos, ballpos)
-								local unitToPlayerFromBallPos = {
-									x = toPlayerFromBallPos.x / dist;
-									y = toPlayerFromBallPos.y / dist;
-									z = toPlayerFromBallPos.z / dist;
-								}
-								
-								if spd < 0.01 then
-									spd = 0.01
-								end
-								local unitBallvel = {
-									x = ballvel.x / spd;
-									y = ballvel.y / spd;
-									z = ballvel.z / spd;
-								}
-								--local dot = toPlayer.x * ballvel.x + toPlayer.y * ballvel.y + toPlayer.z + ballvel.z
-								local dot = unitToPlayerFromBallPos.x * unitBallvel.x + unitToPlayerFromBallPos.y * unitBallvel.y + unitToPlayerFromBallPos.z * unitBallvel.z
-
-								local eta = dist / spd
-								local predictedPos = {
-									x = ballpos.x + ballvel.x * (1/current_fps);
-									y = ballpos.y + ballvel.y * (1/current_fps);
-									z = ballpos.z + ballvel.z * (1/current_fps);
-								}
-								local isFrozenThreat = spd < 5
-								
-								local isFacingMe = dot > 0
-							
-								local function attemptClick()
+							if isFrozenThreat and dist <= 10 then
+								if autoparry_settings.maximum_reach_enabled.Value ~= true or (autoparry_settings.maximum_reach_enabled.Value and dist <= autoparry_settings.maximum_reach.Value) then
 									if _G.devmode then
-										print("["..name.."] | frozen: "..tostring(isFrozenThreat).." | dist: "..dist.." | spd: "..spd.." | eta:"..eta.." | dot: "..dot)
-										print("Attempt Click")
-										print(os.clock())
+										print("1")
 									end
-									if (_G.nextParryTime == nil) or (_G.nextParryTime ~= nil and _G.nextParryTime < os.clock()) then
-										if (autoparry_settings.click_cooldown.Value > 0) then
-											_G.nextParryTime = os.clock() + autoparry_settings.click_cooldown.Value
-											if _G.devmode then
-												print(_G.nextParryTime)
-											end
-										end
-										if _G.devmode then
-											print("Click")
-										end
-										dx9.Mouse1Click()
-									end
+									attemptClick()
 								end
-
-								if isFrozenThreat and dist <= 10 then
-									if autoparry_settings.maximum_reach_enabled.Value ~= true or (autoparry_settings.maximum_reach_enabled.Value and dist <= autoparry_settings.maximum_reach.Value) then
-										if _G.devmode then
-											print("1")
-										end
-										attemptClick()
+							elseif isFacingMe then
+								if (autoparry_settings.minimum_distance_enabled.Value) and dist <= autoparry_settings.minimum_distance.Value then
+									if _G.devmode then
+										print("2")
 									end
-								elseif isFacingMe then
-									if (autoparry_settings.minimum_distance_enabled.Value) and dist <= autoparry_settings.minimum_distance.Value then
-										if _G.devmode then
-											print("2")
-										end
-										attemptClick()
-									elseif autoparry_settings.maximum_eta_enabled.Value or autoparry_settings.maximum_reach_enabled.Value then
-										if autoparry_settings.maximum_reach_enabled.Value ~= true or (autoparry_settings.maximum_reach_enabled.Value and dist <= autoparry_settings.maximum_reach.Value) then
-											if autoparry_settings.maximum_eta_enabled.Value ~= true or (autoparry_settings.maximum_eta_enabled.Value and eta <= autoparry_settings.maximum_eta.Value) then
-												if _G.devmode then
-													print("3")
-												end
-												attemptClick()
+									attemptClick()
+								elseif autoparry_settings.maximum_eta_enabled.Value or autoparry_settings.maximum_reach_enabled.Value then
+									if autoparry_settings.maximum_reach_enabled.Value ~= true or (autoparry_settings.maximum_reach_enabled.Value and dist <= autoparry_settings.maximum_reach.Value) then
+										if autoparry_settings.maximum_eta_enabled.Value ~= true or (autoparry_settings.maximum_eta_enabled.Value and eta <= autoparry_settings.maximum_eta.Value) then
+											if _G.devmode then
+												print("3")
 											end
+											attemptClick()
 										end
 									end
 								end
@@ -417,8 +425,14 @@ if my_player ~= nil and my_player ~= 0 then
 					end
 				end
 			end
-			if (highlight == nil) or (highlight == 0) then
-				_G.nextParryTime = os.clock() + (1/game_settings.fps.Value)
+			if my_character and my_character ~= 0 and my_root and my_root ~= 0 and _G.highlight and _G.highlight ~= 0 then
+				_G.highlightExists = true
+			else
+				_G.highlightExists = false
+			end
+			if highlightPreviouslyExisted == true and _G.highlightExists == false and _G.highlightRemoved == false then
+				_G.highlightRemoved = true
+				_G.nextParryTime = nil --os.clock() + (1/game_settings.fps.Value)
 				if _G.clearedConsole == false then
 					_G.clearedConsole = true
 					if _G.devmode then
@@ -426,6 +440,7 @@ if my_player ~= nil and my_player ~= 0 then
 					end
 					--dx9.ClearConsole()
 				end
+				_G.highlightRemoved = false
 			end 
 		end
 	end
