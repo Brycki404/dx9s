@@ -462,7 +462,6 @@ if my_player ~= nil and my_player ~= 0 then
 							local function attemptClick()
 								if _G.devmode then
 									--print("["..name.."] | frozen: "..tostring(isFrozenThreat).." | dist: "..dist.." | spd: "..spd.." | eta:"..eta.." | dot: "..dot)
-									--print("Attempt Click @ "..os.clock())
 								end
 								passedBallChecks = true
 							end
@@ -495,6 +494,7 @@ if my_player ~= nil and my_player ~= 0 then
 					end
 
 					if passedBallChecks then
+						print("Attempt Click @ "..os.clock())
 						if autoparry_settings.must_have_highlight_enabled.Value then
 							if newHighlightExists then
 								passedHighlightCheck1 = true
@@ -506,6 +506,8 @@ if my_player ~= nil and my_player ~= 0 then
 						if passedHighlightCheck1 then
 							if _G.nextParryTime == nil or _G.nextParryTime ~= nil and _G.nextParryTime < os.clock() then
 								passedClickChecks = true
+							elseif _G.devmode then
+								print(_G.nextParryTime-os.clock().." seconds left")
 							end
 						end
 						
