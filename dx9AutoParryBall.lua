@@ -17,13 +17,15 @@ config = _G.config or {
 
 		autoparry_enabled = true;
 		autoparry_keybind = "[F4]";
+		no_double_clicks_enabled = true;
+		must_have_highlight_enabled = false;
 		minimum_distance_enabled = false;
 		maximum_reach_enabled = true;
 		maximum_eta_enabled = true;
 		minimum_distance = 0.5;
 		maximum_reach = 60;
 		maximum_eta = 0.55;
-		click_cooldown = 0;
+		click_cooldown = 0.55;
 	};
 }
 if _G.config == nil then
@@ -39,6 +41,11 @@ if _G.averageSec == nil then
 	_G.averageSec = 0
 end
 
+------
+if _G.clickedForThisHighlight == nil then
+	_G.clickedForThisHighlight = false
+end
+
 if _G.highlightExists == nil then
 	_G.highlightExists = false
 end
@@ -46,6 +53,7 @@ end
 if _G.highlightRemoved == nil then
 	_G.highlightRemoved = false
 end
+------
 
 if _G.clearedConsole == nil then
 	_G.clearedConsole = false
@@ -132,6 +140,22 @@ autoparry_settings.enabled = groupboxes.autoparry_settings
 		:OnChanged(function(value)
 			lib_ui:Notify(value and "[settings] Enabled Auto Parry" or "[settings] Disabled Auto Parry", 1)
 		end)
+autoparry_settings.no_double_clicks_enabled = groupboxes.autoparry_settings
+		:AddToggle({
+			Default = config.settings.no_double_clicks_enabled;
+			Text = "No Double Clicks Enabled";
+		})
+		:OnChanged(function(value)
+			lib_ui:Notify(value and "[settings] Enabled No Double Clicks" or "[settings] Disabled No Double Clicks", 1)
+		end)
+autoparry_settings.must_have_highlight_enabled = groupboxes.autoparry_settings
+		:AddToggle({
+			Default = config.settings.must_have_highlight_enabled;
+			Text = "Must Have Highlight Enabled";
+		})
+		:OnChanged(function(value)
+			lib_ui:Notify(value and "[settings] Enabled Must Have Highlight" or "[settings] Disabled Must Have Highlight", 1)
+		end)
 groupboxes.autoparry_settings:AddBorder()
 autoparry_settings.minimum_distance_enabled = groupboxes.autoparry_settings
 		:AddToggle({
@@ -184,7 +208,7 @@ groupboxes.autoparry_settings:AddBorder()
 autoparry_settings.click_cooldown = groupboxes.autoparry_settings:AddSlider({
 		Default = config.settings.click_cooldown;
 		Text = "Click Cooldown";
-		Min = (1/game_settings.fps.Value);
+		Min = 0; --(1/game_settings.fps.Value);
 		Max = 0.55;
 		Rounding = 3;
 	}):AddTooltip("The delay before you can auto-parry again")
@@ -284,6 +308,19 @@ if _G.clearedConsole == true then
 	_G.clearedConsole = false
 end
 
+if _G.clearCooldown == nil then
+	_G.clearCooldown = function()
+		if _G.clearedConsole == false then
+			_G.clearedConsole = true
+			if _G.devmode then
+				print("clear cooldown")
+			end
+			--dx9.ClearConsole()
+		end
+		_G.nextParryTime = nil
+	end
+end
+
 if my_player ~= nil and my_player ~= 0 then
 	if autoparry_settings.enabled.Value then
 		if current_game == 1 then
@@ -304,39 +341,84 @@ if my_player ~= nil and my_player ~= 0 then
 				end
 			end
 
-			local highlightPreviouslyExisted = ((_G.highlight ~= nil) and (_G.highlight ~= 0))
+			local lastHighlight = _G.highlight
+			local newHighlight = nil
+			local lastHighlightExisted = lastHighlight ~= nil and lastHighlight ~= 0 and true or false
+			local newHighlightExists = false
+			local characterExists = my_character ~= nil and my_character ~= 0 and true or false
+			local rootExists = false
+			local ballsFolderExists = false
 
-			if my_character ~= nil and my_character ~= 0 then
+			local passedBallChecks = false
+			local passedHighlightCheck1 = false
+			local passedClickChecks = false
+
+			if characterExists then
 				my_root = dx9.FindFirstChild(my_character, "HumanoidRootPart")
-				if my_root ~= nil and my_root ~= 0 then
-					_G.highlight = dx9.FindFirstChild(my_character, "Highlight")
-					local Balls = (InTraining == false and dx9.FindFirstChild(workspace, "Balls")) or (InTraining == true and dx9.FindFirstChild(workspace, "TrainingBalls"))
-					if Balls and Balls ~= 0 then
-						local balls = {}
-						
-						for i,v in pairs(dx9.GetChildren(Balls)) do
-							local name = dx9.GetName(v)
-							local vtype = dx9.GetType(v)
-							if vtype == "Part" then
-								local t = balls[name]
-								if not t then
-									t = {}
-									balls[name] = t
-								end
+			end
+			
+			rootExists = my_root and my_root ~= 0 and true or false
 
-								local ballvel = dx9.GetVelocity(v)
-								local spd = math.sqrt(ballvel.x^2 + ballvel.y^2 + ballvel.z^2)
+			if characterExists and rootExists then
+				newHighlight = dx9.FindFirstChild(my_character, "Highlight")
+				newHighlightExists = newHighlight ~= nil and newHighlight ~= 0 and true or false
+				if newHighlight ~= lastHighlight then
+					print("\nlastHighlight: "..tostring(lastHighlight).."\nnewHighlight: "..tostring(newHighlight))
+					_G.highlight = newHighlight
+				end
+				if autoparry_settings.no_double_clicks_enabled.Value then
+					if lastHighlightExisted and newHighlightExists then
+						if _G.highlightRemoved == true then
+							_G.highlightRemoved = nil
+						end
+						if lastHighlight ~= newHighlight then
+							print("swap Highlight")
+							_G.clearCooldown()
+						end
+					elseif newHighlightExists then
+						if _G.highlightRemoved == true then
+							_G.highlightRemoved = nil
+						end
+						print("brand new Highlight")
+						_G.clearCooldown()
+					elseif autoparry_settings.must_have_highlight_enabled.Value and lastHighlightExisted then
+						print("removed Highlight")
+						if _G.highlightRemoved ~= true then
+							_G.highlightRemoved = true
+							_G.clearCooldown()
+						end
+					end
+				end
 
-								if t.spd == nil or t.spd == 0 or spd > t.spd then
-									t.name = name
-									t.ballvel = ballvel
-									t.spd = spd
-									t.ball = v
-								end
+				local Balls = InTraining == false and dx9.FindFirstChild(workspace, "Balls") or InTraining == true and dx9.FindFirstChild(workspace, "TrainingBalls")
+				ballsFolderExists = Balls ~= nil and Balls ~= 0 and true or false
+				if ballsFolderExists then
+					local balls = {}
+					
+					for i,v in pairs(dx9.GetChildren(Balls)) do
+						local name = dx9.GetName(v)
+						local vtype = dx9.GetType(v)
+						if vtype == "Part" then
+							local t = balls[name]
+							if not t then
+								t = {}
+								balls[name] = t
+							end
+
+							local ballvel = dx9.GetVelocity(v)
+							local spd = math.sqrt(ballvel.x^2 + ballvel.y^2 + ballvel.z^2)
+
+							if t.spd == nil or t.spd == 0 or spd > t.spd then
+								t.name = name
+								t.ballvel = ballvel
+								t.spd = spd
+								t.ball = v
 							end
 						end
+					end
 
-						for i,t in pairs(balls) do
+					for i,t in pairs(balls) do
+						if not passedBallChecks then
 							local name = t.name
 							local v = t.ball
 							local ballvel = t.ballvel
@@ -379,42 +461,30 @@ if my_player ~= nil and my_player ~= 0 then
 						
 							local function attemptClick()
 								if _G.devmode then
-									print("["..name.."] | frozen: "..tostring(isFrozenThreat).." | dist: "..dist.." | spd: "..spd.." | eta:"..eta.." | dot: "..dot)
-									print("Attempt Click")
-									print(os.clock())
+									--print("["..name.."] | frozen: "..tostring(isFrozenThreat).." | dist: "..dist.." | spd: "..spd.." | eta:"..eta.." | dot: "..dot)
+									--print("Attempt Click @ "..os.clock())
 								end
-								if (_G.nextParryTime == nil) or (_G.nextParryTime ~= nil and _G.nextParryTime < os.clock()) then
-									if (autoparry_settings.click_cooldown.Value > 0) then
-										_G.nextParryTime = os.clock() + autoparry_settings.click_cooldown.Value
-										if _G.devmode then
-											print(_G.nextParryTime)
-										end
-									end
-									if _G.devmode then
-										print("Click")
-									end
-									dx9.Mouse1Click()
-								end
+								passedBallChecks = true
 							end
 
 							if isFrozenThreat and dist <= 10 then
-								if autoparry_settings.maximum_reach_enabled.Value ~= true or (autoparry_settings.maximum_reach_enabled.Value and dist <= autoparry_settings.maximum_reach.Value) then
+								if autoparry_settings.maximum_reach_enabled.Value ~= true or autoparry_settings.maximum_reach_enabled.Value and dist <= autoparry_settings.maximum_reach.Value then
 									if _G.devmode then
-										print("1")
+										--print("1")
 									end
 									attemptClick()
 								end
 							elseif isFacingMe then
-								if (autoparry_settings.minimum_distance_enabled.Value) and dist <= autoparry_settings.minimum_distance.Value then
+								if autoparry_settings.minimum_distance_enabled.Value and dist <= autoparry_settings.minimum_distance.Value then
 									if _G.devmode then
-										print("2")
+										--print("2")
 									end
 									attemptClick()
 								elseif autoparry_settings.maximum_eta_enabled.Value or autoparry_settings.maximum_reach_enabled.Value then
-									if autoparry_settings.maximum_reach_enabled.Value ~= true or (autoparry_settings.maximum_reach_enabled.Value and dist <= autoparry_settings.maximum_reach.Value) then
-										if autoparry_settings.maximum_eta_enabled.Value ~= true or (autoparry_settings.maximum_eta_enabled.Value and eta <= autoparry_settings.maximum_eta.Value) then
+									if autoparry_settings.maximum_reach_enabled.Value ~= true or autoparry_settings.maximum_reach_enabled.Value and dist <= autoparry_settings.maximum_reach.Value then
+										if autoparry_settings.maximum_eta_enabled.Value ~= true or autoparry_settings.maximum_eta_enabled.Value and eta <= autoparry_settings.maximum_eta.Value then
 											if _G.devmode then
-												print("3")
+												--print("3")
 											end
 											attemptClick()
 										end
@@ -423,25 +493,39 @@ if my_player ~= nil and my_player ~= 0 then
 							end
 						end
 					end
-				end
-			end
-			if my_character and my_character ~= 0 and my_root and my_root ~= 0 and _G.highlight and _G.highlight ~= 0 then
-				_G.highlightExists = true
-			else
-				_G.highlightExists = false
-			end
-			if highlightPreviouslyExisted == true and _G.highlightExists == false and _G.highlightRemoved == false then
-				_G.highlightRemoved = true
-				_G.nextParryTime = nil --os.clock() + (1/game_settings.fps.Value)
-				if _G.clearedConsole == false then
-					_G.clearedConsole = true
-					if _G.devmode then
-						print("\n\n\n")
+
+					if passedBallChecks then
+						if autoparry_settings.must_have_highlight_enabled.Value then
+							if newHighlightExists then
+								passedHighlightCheck1 = true
+							end
+						else
+							passedHighlightCheck1 = true
+						end
+
+						if passedHighlightCheck1 then
+							if _G.nextParryTime == nil or _G.nextParryTime ~= nil and _G.nextParryTime < os.clock() then
+								passedClickChecks = true
+							end
+						end
+						
+						if passedClickChecks then
+							_G.nextParryTime = os.clock() + autoparry_settings.click_cooldown.Value
+							--if (autoparry_settings.click_cooldown.Value > 0) then
+								--_G.nextParryTime = os.clock() + autoparry_settings.click_cooldown.Value
+
+								--if _G.devmode then
+									--print("nextParryTime: ".._G.nextParryTime)
+								--end
+							--end
+							if _G.devmode then
+								print("Click @ "..os.clock())
+							end
+							dx9.Mouse1Click()
+						end
 					end
-					--dx9.ClearConsole()
 				end
-				_G.highlightRemoved = false
-			end 
+			end
 		end
 	end
 end
