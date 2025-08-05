@@ -46,6 +46,12 @@ config = _G.config or {
 				Enabled = true;
 			};
 			{
+				name = "Limo";
+				part = "DriveSeat";
+				parent = "Limo";
+				Enabled = true;
+			};
+			{
 				name = "Disk";
 				part = "Root";
 				parent = "Disk";
