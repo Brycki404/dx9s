@@ -3,19 +3,19 @@
 trinketconfig = _G.trinketconfig or {
 	{
 		name = "Ring";
-		Enabled = true;
+		Enabled = false;
 	};
 	{
 		name = "Amulet";
-		Enabled = true;
+		Enabled = false;
 	};
 	{
 		name = "Mushroom";
-		Enabled = true;
+		Enabled = false;
 	};
 	{
 		name = "Goblet";
-		Enabled = true;
+		Enabled = false;
 	};
 }
 if _G.trinketconfig == nil then
@@ -38,9 +38,9 @@ config = _G.config or {
 	players = {
         enabled = true;
         distance = true;
-        healthbar = false;
-		healthtag = false;
-		maxhealthtag = false;
+        healthbar = true;
+		healthtag = true;
+		maxhealthtag = true;
         nametag = true;
         tracer = false;
 		color = { 0, 255, 0 };
@@ -49,9 +49,9 @@ config = _G.config or {
 	enemies = {
         enabled = true;
         distance = true;
-        healthbar = false;
-		healthtag = false;
-		maxhealthtag = false;
+        healthbar = true;
+		healthtag = true;
+		maxhealthtag = true;
         nametag = true;
         tracer = false;
 		color = { 255, 0, 0 };
