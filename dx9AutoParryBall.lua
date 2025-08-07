@@ -1,5 +1,11 @@
-local startTime = os.clock()
 --indent size 4
+local startTime = os.clock()
+
+ballCache = _G.ballCache or {}
+if _G.ballCache == nil then
+	_G.ballCache = ballCache
+	ballCache = _G.ballCache
+end
 
 config = _G.config or {
 	urls = {
@@ -22,6 +28,7 @@ config = _G.config or {
 		maximum_eta_enabled = true;
 		maximum_reach = 60;
 		maximum_eta = 0.55;
+		prediction_visualizer_enabled = true;
 	};
 }
 if _G.config == nil then
@@ -109,8 +116,7 @@ groupboxes.autoparry_settings = tabs.game:AddRightGroupbox("Auto Parry")
 groupboxes.debugging = tabs.debugging:AddMiddleGroupbox("Debugging")
 
 debugging = {}
-debugging.console = groupboxes.debugging
-	:AddToggle({
+debugging.console = groupboxes.debugging:AddToggle({
 		Default = false;
 		Text = "Console Enabled";
 	})
@@ -126,16 +132,12 @@ debugging.console = groupboxes.debugging
 			dx9.ShowConsole(false)
 		end
 	end)
-debugging.sec = groupboxes.debugging
-	:AddLabel("Avg. Program Cycle: ".._G.averageSec.." s")
-debugging.hz = groupboxes.debugging
-	:AddLabel("Avg. Program Cycle: ".._G.averageHz.." Hz")
-debugging.clock = groupboxes.debugging
-	:AddLabel("clock: "..os.clock())
+debugging.sec = groupboxes.debugging:AddLabel("Avg. Program Cycle: ".._G.averageSec.." s")
+debugging.hz = groupboxes.debugging:AddLabel("Avg. Program Cycle: ".._G.averageHz.." Hz")
+debugging.clock = groupboxes.debugging:AddLabel("clock: "..os.clock())
 
 game_settings = {}
-game_settings.game = groupboxes.game_settings
-	:AddDropdown({
+game_settings.game = groupboxes.game_settings:AddDropdown({
 		Text = "Game";
 		Default = config.settings.game;
 		Values = { "Blade Ball", "Death Ball" };
@@ -143,9 +145,7 @@ game_settings.game = groupboxes.game_settings
 	:OnChanged(function(value)
 		lib_ui:Notify("[settings] Game: " .. value, 1)
 	end)
---[[
-game_settings.fps = groupboxes.game_settings
-	:AddDropdown({
+game_settings.fps = groupboxes.game_settings:AddDropdown({
 		Text = "Your Game's FPS";
 		Default = config.settings.fps;
 		Values = { "60", "120", "144", "240" };
@@ -153,18 +153,16 @@ game_settings.fps = groupboxes.game_settings
 	:OnChanged(function(value)
 		lib_ui:Notify("[settings] FPS: " .. value, 1)
 	end)
-]]
+
 autoparry_settings = {}
-autoparry_settings.enabled = groupboxes.autoparry_settings
-		:AddToggle({
+autoparry_settings.enabled = groupboxes.autoparry_settings:AddToggle({
 			Default = config.settings.autoparry_enabled;
 			Text = "Auto Parry Enabled";
 		})
 		:OnChanged(function(value)
 			lib_ui:Notify(value and "[settings] Enabled Auto Parry" or "[settings] Disabled Auto Parry", 1)
 		end)
-autoparry_settings.must_have_highlight_enabled = groupboxes.autoparry_settings
-		:AddToggle({
+autoparry_settings.must_have_highlight_enabled = groupboxes.autoparry_settings:AddToggle({
 			Default = config.settings.must_have_highlight_enabled;
 			Text = "Must Have Highlight Enabled";
 		})
@@ -172,8 +170,7 @@ autoparry_settings.must_have_highlight_enabled = groupboxes.autoparry_settings
 			lib_ui:Notify(value and "[settings] Enabled Must Have Highlight" or "[settings] Disabled Must Have Highlight", 1)
 		end)
 groupboxes.autoparry_settings:AddBorder()
-autoparry_settings.maximum_reach_enabled = groupboxes.autoparry_settings
-		:AddToggle({
+autoparry_settings.maximum_reach_enabled = groupboxes.autoparry_settings:AddToggle({
 			Default = config.settings.maximum_reach_enabled;
 			Text = "Max. Reach Enabled";
 		})
@@ -188,8 +185,7 @@ autoparry_settings.maximum_reach = groupboxes.autoparry_settings:AddSlider({
 		Rounding = 0;
 	}):AddTooltip("The maximum distance that you can parry from")
 groupboxes.autoparry_settings:AddBorder()
-autoparry_settings.maximum_eta_enabled = groupboxes.autoparry_settings
-		:AddToggle({
+autoparry_settings.maximum_eta_enabled = groupboxes.autoparry_settings:AddToggle({
 			Default = config.settings.maximum_eta_enabled;
 			Text = "Max. Arrival Time Enabled";
 		})
@@ -203,15 +199,13 @@ autoparry_settings.maximum_eta = groupboxes.autoparry_settings:AddSlider({
 		Max = 1.25;
 		Rounding = 2;
 	}):AddTooltip("The maximum amount of estimated seconds away the ball is from you at which you will parry")
---[[
-autoparry_settings.cooldown = groupboxes.autoparry_settings:AddSlider({
-		Default = 0.15;
-		Text = "Click Cooldown";
-		Min = 0.001;
-		Max = 0.550;
-		Rounding = 3;
-	})
-]]
+autoparry_settings.prediction_visualizer_enabled = groupboxes.autoparry_settings:AddToggle({
+			Default = config.settings.prediction_visualizer_enabled;
+			Text = "Prediction Visualizer Enabled";
+		})
+		:OnChanged(function(value)
+			lib_ui:Notify(value and "[settings] Enabled Prediction Visualizer" or "[settings] Disabled Prediction Visualizer", 1)
+		end)
 
 if _G.Get_Distance == nil then
 	_G.Get_Distance = function(v1, v2)
@@ -332,7 +326,13 @@ if my_player ~= nil and my_player ~= 0 then
 			
 			rootExists = my_root and my_root ~= 0 and true or false
 
-			if characterExists and rootExists then
+			if not characterExists or not rootExists then
+				_G.ballCache = {}
+				print("no character")
+				_G.waitingForBallReturn1 = false
+				_G.waitingForBallReturn2 = false
+				_G.waitingForBallReturn3 = false
+			elseif characterExists and rootExists then
 				newHighlight = dx9.FindFirstChild(my_character, "Highlight")
 				newHighlightExists = newHighlight ~= nil and newHighlight ~= 0 and true or false
 				newParryHighlight = dx9.FindFirstChild(my_character, "ParryHighlight")
@@ -376,41 +376,32 @@ if my_player ~= nil and my_player ~= 0 then
 					passedHighlightChecks = true
 				end
 
+				local lpos = dx9.GetPosition(my_root) --or local_player_table.Position
+				local lvel = dx9.GetVelocity(my_root)
+				local lpredictedpos = {
+					x = lpos.x + lvel.x * (1/current_fps);
+					y = lpos.y + lvel.y * (1/current_fps);
+					z = lpos.z + lvel.z * (1/current_fps);
+				}
+
 				local Balls = InTraining == false and dx9.FindFirstChild(workspace, "Balls") or InTraining == true and dx9.FindFirstChild(workspace, "TrainingBalls")
 				ballsFolderExists = Balls ~= nil and Balls ~= 0 and true or false
 				if ballsFolderExists then
-					local balls = {}
-					
-					for i,v in pairs(dx9.GetChildren(Balls)) do
+					local BallsChildren = dx9.GetChildren(Balls) or {}
+					local currentBallName = nil
+
+					for i, v in pairs(BallsChildren) do
 						local vtype = dx9.GetType(v)
 						if vtype == "Part" then
+							local memaddress = tostring(v)
 							local name = dx9.GetName(v)
-							local t = balls[name]
+							currentBallName = name
+							local t = _G.ballCache[name]
 							if not t then
 								t = {}
-								balls[name] = t
+								_G.ballCache[name] = t
 							end
 
-							local ballvel = dx9.GetVelocity(v)
-							local spd = math.sqrt(ballvel.x^2 + ballvel.y^2 + ballvel.z^2)
-
-							if t.spd == nil or t.spd == 0 or spd > t.spd then
-								t.name = name
-								t.ballvel = ballvel
-								t.spd = spd
-								t.ball = v
-							end
-						end
-					end
-
-					for i,t in pairs(balls) do
-						if not passedBallChecks then
-							local name = t.name
-							local v = t.ball
-							local ballvel = t.ballvel
-							local spd = t.spd
-
-							local lpos = dx9.GetPosition(my_root) --or local_player_table.Position
 							local ballpos = dx9.GetPosition(v)
 							local toPlayerFromBallPos = {
 								x = lpos.x - ballpos.x;
@@ -424,80 +415,142 @@ if my_player ~= nil and my_player ~= 0 then
 								z = toPlayerFromBallPos.z / dist;
 							}
 							
-							if spd < 0.01 then
-								spd = 0.01
+							local ballvel = dx9.GetVelocity(v)
+							local spd = math.sqrt(ballvel.x^2 + ballvel.y^2 + ballvel.z^2)
+							
+							if spd <= 0 then
+								if autoparry_settings.prediction_visualizer_enabled.Value then
+									local predictedScreenPos = dx9.WorldToScreen({ballpos.x, ballpos.y, ballpos.z})
+									dx9.DrawCircle({predictedScreenPos.x, predictedScreenPos.y}, {0, 0, 255}, 10)
+								end
+								if v ~= t.ball then
+									t.ballpos = ballpos
+									t.dist = dist
+								elseif v == t.ball then
+									_G.ballCache[name] = nil
+								end
+							elseif spd > 0 then
+								if autoparry_settings.prediction_visualizer_enabled.Value then
+									local predictedScreenPos = dx9.WorldToScreen({ballpos.x, ballpos.y, ballpos.z})
+									dx9.DrawCircle({predictedScreenPos.x, predictedScreenPos.y}, {0, 255, 0}, 10)
+								end
+								local unitBallvel = {
+									x = ballvel.x / spd;
+									y = ballvel.y / spd;
+									z = ballvel.z / spd;
+								}
+								--local dot = toPlayer.x * ballvel.x + toPlayer.y * ballvel.y + toPlayer.z + ballvel.z
+								local dot = unitToPlayerFromBallPos.x * unitBallvel.x + unitToPlayerFromBallPos.y * unitBallvel.y + unitToPlayerFromBallPos.z * unitBallvel.z
+
+								local eta = (t.dist ~= nil and t.dist or dist) / spd
+
+								t.ball = v
+								t.name = name
+								
+								t.ballvel = ballvel
+								t.spd = spd
+								t.dot = dot
+								t.eta = eta
+								t.predictedBallPos = ballpos
 							end
-							local unitBallvel = {
-								x = ballvel.x / spd;
-								y = ballvel.y / spd;
-								z = ballvel.z / spd;
-							}
-							--local dot = toPlayer.x * ballvel.x + toPlayer.y * ballvel.y + toPlayer.z + ballvel.z
-							local dot = unitToPlayerFromBallPos.x * unitBallvel.x + unitToPlayerFromBallPos.y * unitBallvel.y + unitToPlayerFromBallPos.z * unitBallvel.z
+						end
+					end
 
-							local eta = dist / spd
-							local predictedPos = {
-								x = ballpos.x + ballvel.x * (1/current_fps);
-								y = ballpos.y + ballvel.y * (1/current_fps);
-								z = ballpos.z + ballvel.z * (1/current_fps);
-							}
-							local isFrozenThreat = spd < 5
-							
-							local isFacingMe = dot > 0
+					local predictThisFrame = (_G.lastPredicted == nil or _G.lastPredicted ~= nil and os.clock()-_G.lastPredicted >= (1/current_fps) and true) or false
 
-							--if passedHighlightChecks and passedParriedCheck then
-							--	if _G.consoleEnabled then
-							--		print("["..name.."] | frozen: "..tostring(isFrozenThreat).." | dist: "..dist.." | spd: "..spd.." | eta:"..eta.." | dot: "..dot)
-							--	end
-							--end
+					for name, t in pairs(_G.ballCache) do
+						if currentBallName ~= nil and name ~= currentBallName then
+							_G.ballCache[name] = nil
+						elseif currentBallName == name then
+							local spd = t.spd
+							if spd > 0 then
+								local v = t.ball
+								local ballpos = t.ballpos
+								local dist = t.dist
+								local ballvel = t.ballvel
+								local dot = t.dot
+								local eta = t.eta
+
+								if predictThisFrame then
+									local oldPredictedBallPos = t.predictedBallPos
+									local newPredictedBallPos = {
+										x = oldPredictedBallPos.x + ballvel.x * (1/current_fps);
+										y = oldPredictedBallPos.y + ballvel.y * (1/current_fps);
+										z = oldPredictedBallPos.z + ballvel.z * (1/current_fps);
+									}
+									local predictedDist = _G.Get_Distance(lpredictedpos, newPredictedBallPos)
+									local predictedEta = predictedDist / spd
+									t.predictedBallPos = newPredictedBallPos
+									t.predictedDist = predictedDist
+									t.predictedEta = predictedEta
+								end
+								local isFrozenThreat = spd < 5
 							
-							if isFacingMe then
-								if isFrozenThreat and dist <= 6 then
-									if not autoparry_settings.maximum_reach_enabled.Value or autoparry_settings.maximum_reach_enabled.Value and dist <= autoparry_settings.maximum_reach.Value then
-										if _G.consoleEnabled then
-											--print("1")
-										end
-										passedBallChecks = true
-										selected_eta = eta
-										selected_spd = spd
-										break
-									end
-								elseif autoparry_settings.maximum_eta_enabled.Value or autoparry_settings.maximum_reach_enabled.Value then
-									if not autoparry_settings.maximum_reach_enabled.Value or autoparry_settings.maximum_reach_enabled.Value and dist <= autoparry_settings.maximum_reach.Value then
-										if not autoparry_settings.maximum_eta_enabled.Value or autoparry_settings.maximum_eta_enabled.Value and eta <= autoparry_settings.maximum_eta.Value then
-											if _G.consoleEnabled then
-												--print("2")
+								local isFacingMe = dot > 0
+
+								--[[if _G.consoleEnabled then
+									print("["..name.."] | frozen: "..tostring(isFrozenThreat).." | dist: "..dist.." | spd: "..spd.." | eta:"..eta.." | dot: "..dot)
+								end]]
+
+								if autoparry_settings.prediction_visualizer_enabled.Value then
+									local predictedScreenPos = dx9.WorldToScreen({t.predictedBallPos.x, t.predictedBallPos.y, t.predictedBallPos.z})
+									dx9.DrawCircle({predictedScreenPos.x, predictedScreenPos.y}, {255, 255, 0}, 10)
+								end
+								
+								if not passedBallChecks then
+									if isFacingMe then
+										if isFrozenThreat and t.predictedDist <= 6 then
+											if not autoparry_settings.maximum_reach_enabled.Value or autoparry_settings.maximum_reach_enabled.Value and t.predictedDist <= autoparry_settings.maximum_reach.Value then
+												if _G.consoleEnabled then
+													--print("1")
+												end
+												passedBallChecks = true
+												selected_eta = t.predictedEta
+												selected_spd = spd
+												break
 											end
-											passedBallChecks = true
-											selected_eta = eta
-											selected_spd = spd
-											break
+										elseif autoparry_settings.maximum_eta_enabled.Value or autoparry_settings.maximum_reach_enabled.Value then
+											if not autoparry_settings.maximum_reach_enabled.Value or autoparry_settings.maximum_reach_enabled.Value and t.predictedDist <= autoparry_settings.maximum_reach.Value then
+												if not autoparry_settings.maximum_eta_enabled.Value or autoparry_settings.maximum_eta_enabled.Value and t.predictedEta <= autoparry_settings.maximum_eta.Value then
+													if _G.consoleEnabled then
+														--print("2")
+													end
+													passedBallChecks = true
+													selected_eta = t.predictedEta
+													selected_spd = spd
+													break
+												end
+											end
 										end
 									end
 								end
 							end
 						end
 					end
+
+					if predictThisFrame then
+						_G.lastPredicted = os.clock()
+					end
 				end
 
 				if passedBallChecks then
 					_G.lastAttemptedClick = os.clock()
 					attemptedClick = true
-					if _G.consoleEnabled then
+					--[[if _G.consoleEnabled then
 						print("\nHighlight Address: "..tostring(_G.highlight))
 						print("Parry Highlight Address: "..tostring(_G.parryHighlight))
 						print("Fake Highlight Address: "..tostring(_G.fakeHighlight).."\n")
-					end
+					end]]
 					if passedHighlightChecks then
 						if passedParriedCheck then
-							if _G.clickedForThisHighlight == false then
+							--if _G.clickedForThisHighlight == false then
 								_G.highlightSwapped = false
-								--[[if (_G.nextParryTime == nil or (_G.nextParryTime ~= nil and os.clock() >= _G.nextParryTime)) then
-									_G.nextParryTime = os.clock() + autoparry_settings.cooldown.Value
+								if (_G.nextParryTime == nil or (_G.nextParryTime ~= nil and os.clock() >= _G.nextParryTime)) then
+									_G.nextParryTime = os.clock() + selected_eta * 0.15 --autoparry_settings.cooldown.Value
 									if _G.consoleEnabled then
 										print("now: "..os.clock())
 										print("next: ".._G.nextParryTime)
-									end]]
+									end
 									if _G.consoleEnabled then
 										print("\n\n\nClicked!\n\n\n")
 									end
@@ -505,13 +558,13 @@ if my_player ~= nil and my_player ~= 0 then
 									clicked = true
 									_G.lastClick = os.clock()
 									dx9.Mouse1Click()
-								--[[else
+								else
 									if _G.consoleEnabled then
 										print("now: "..os.clock())
 										print("remaining: ".._G.nextParryTime - os.clock())
 									end
-								end]]
-							end
+								end
+							--end
 						end
 					end
 				end
