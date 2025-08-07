@@ -3,7 +3,7 @@
 config = _G.config or {
 	urls = {
 		DXLibUI = "https://raw.githubusercontent.com/B0NBunny/DXLibUI/refs/heads/main/main.lua";
-		LibESP = "https://pastebin.com/raw/Pwn8GxMB";
+		LibESP = "https://raw.githubusercontent.com/B0NBunny/DXLibESP/refs/heads/main/main.lua";
 	};
     settings = {
 		aimbot_enabled = true;
@@ -1085,3 +1085,4 @@ end
 if _G.WorkspaceESPTask then
 	_G.WorkspaceESPTask()
 end
+
