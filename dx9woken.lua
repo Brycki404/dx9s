@@ -19,6 +19,7 @@ config = _G.config or {
         distance = true;
         healthbar = true;
         healthtag = false;
+		maxhealthtag = false;
         nametag = true;
         tracer = false;
         color = { 0, 0, 255 };
@@ -29,6 +30,7 @@ config = _G.config or {
         distance = true;
         healthbar = true;
 		healthtag = false;
+		maxhealthtag = false;
         nametag = true;
         tracer = false;
 		color = { 255, 0, 0 };
@@ -89,7 +91,7 @@ esp_settings = {
 			Text = "ESP Enabled";
 		})
 		:OnChanged(function(value)
-			lib_ui:Notify(value and "[settings] Enabled Global ESP" or "[settings] Disabled Global ESP", 1)
+			lib_ui:Notify(value and "[Settings] Enabled Global ESP" or "[Settings] Disabled Global ESP", 1)
 		end);
 
 	box_type = groupboxes.esp_settings
@@ -99,7 +101,7 @@ esp_settings = {
 			Values = { "Corners", "2D Box", "3D Box" };
 		})
 		:OnChanged(function(value)
-			lib_ui:Notify("[settings] Box Type: " .. value, 1)
+			lib_ui:Notify("[Settings] Box Type: " .. value, 1)
 		end);
 
 	tracer_type = groupboxes.esp_settings
@@ -109,7 +111,7 @@ esp_settings = {
 			Values = { "Near-Bottom", "Bottom", "Top", "Mouse" };
 		})
 		:OnChanged(function(value)
-			lib_ui:Notify("[settings] Tracer Type: " .. value, 1)
+			lib_ui:Notify("[Settings] Tracer Type: " .. value, 1)
 		end);
 }
 
@@ -120,7 +122,7 @@ players = {
 			Text = "Enabled";
 		})
 		:OnChanged(function(value)
-			lib_ui:Notify(value and "[players] Enabled ESP" or "[players] Disabled ESP", 1)
+			lib_ui:Notify(value and "[Players] Enabled ESP" or "[Players] Disabled ESP", 1)
 		end);
 
 	distance = groupboxes.players
@@ -129,7 +131,7 @@ players = {
 			Text = "Distance";
 		})
 		:OnChanged(function(value)
-			lib_ui:Notify(value and "[players] Enabled Distance" or "[players] Disabled Distance", 1)
+			lib_ui:Notify(value and "[Players] Enabled Distance" or "[Players] Disabled Distance", 1)
 		end);
     
 	nametag = groupboxes.players
@@ -138,7 +140,15 @@ players = {
 			Text = "Nametag";
 		})
 		:OnChanged(function(value)
-			lib_ui:Notify(value and "[players] Enabled Nametag" or "[players] Disabled Nametag", 1)
+			lib_ui:Notify(value and "[Players] Enabled Nametag" or "[Players] Disabled Nametag", 1)
+		end);
+
+	healthbar = groupboxes.players:AddToggle({
+			Default = config.players.healthbar;
+			Text = "HealthBar";
+		})
+		:OnChanged(function(value)
+			lib_ui:Notify(value and "[Players] Enabled HealthBar" or "[Players] Disabled HealthBar", 1)
 		end);
 
     healthtag = groupboxes.players
@@ -147,7 +157,15 @@ players = {
 			Text = "HealthTag";
 		})
 		:OnChanged(function(value)
-			lib_ui:Notify(value and "[players] Enabled HealthTag" or "[players] Disabled HealthTag", 1)
+			lib_ui:Notify(value and "[Players] Enabled HealthTag" or "[Players] Disabled HealthTag", 1)
+		end);
+
+	maxhealthtag = groupboxes.players:AddToggle({
+			Default = config.players.maxhealthtag;
+			Text = "MaxHealthTag";
+		})
+		:OnChanged(function(value)
+			lib_ui:Notify(value and "[Players] Enabled MaxHealthTag" or "[Players] Disabled MaxHealthTag", 1)
 		end);
 
 	tracer = groupboxes.players
@@ -156,7 +174,7 @@ players = {
 			Text = "Tracer";
 		})
 		:OnChanged(function(value)
-			lib_ui:Notify(value and "[players] Enabled Tracer" or "[players] Disabled Tracer", 1)
+			lib_ui:Notify(value and "[Players] Enabled Tracer" or "[Players] Disabled Tracer", 1)
 		end);
 
     color = groupboxes.players:AddColorPicker({
@@ -189,7 +207,7 @@ enemies = {
 			Text = "Distance";
 		})
 		:OnChanged(function(value)
-			lib_ui:Notify(value and "[hunting] Enabled Distance" or "[hunting] Disabled Distance", 1)
+			lib_ui:Notify(value and "[Enemies] Enabled Distance" or "[Enemies] Disabled Distance", 1)
 		end);
 
 	nametag = groupboxes.enemies
@@ -198,7 +216,15 @@ enemies = {
 			Text = "Nametag";
 		})
 		:OnChanged(function(value)
-			lib_ui:Notify(value and "[hunting] Enabled Nametag" or "[hunting] Disabled Nametag", 1)
+			lib_ui:Notify(value and "[Enemies] Enabled Nametag" or "[Enemies] Disabled Nametag", 1)
+		end);
+
+	healthbar = groupboxes.enemies:AddToggle({
+			Default = config.enemies.healthbar;
+			Text = "HealthBar";
+		})
+		:OnChanged(function(value)
+			lib_ui:Notify(value and "[Enemies] Enabled HealthBar" or "[Enemies] Disabled HealthBar", 1)
 		end);
 
 	healthtag = groupboxes.enemies
@@ -208,6 +234,14 @@ enemies = {
 		})
 		:OnChanged(function(value)
 			lib_ui:Notify(value and "[Enemies] Enabled HealthTag" or "[Enemies] Disabled HealthTag", 1)
+		end);
+
+	maxhealthtag = groupboxes.enemies:AddToggle({
+			Default = config.enemies.maxhealthtag;
+			Text = "MaxHealthTag";
+		})
+		:OnChanged(function(value)
+			lib_ui:Notify(value and "[Enemies] Enabled MaxHealthTag" or "[Enemies] Disabled MaxHealthTag", 1)
 		end);
 
 	tracer = groupboxes.enemies
@@ -413,6 +447,19 @@ if _G.LiveTask == nil then
                     entityTab = players
                     entityConfig = config.players
                 end
+				local humanoid = dx9.FindFirstChild(entity, "Humanoid")
+				local health = nil
+				local maxhealth = nil
+				if humanoid ~= nil and humanoid ~= 0 then
+					health = dx9.GetHealth(humanoid) or nil
+					maxhealth = dx9.GetMaxHealth(humanoid) or nil
+				end
+				if health ~= nil then
+					health = math.floor(health)
+				end
+				if maxhealth ~= nil then
+					maxhealth = math.floor(maxhealth)
+				end
                 local root = dx9.FindFirstChild(entity, "HumanoidRootPart")
                 if root and root ~= 0 then
                     local my_root_pos = dx9.GetPosition(my_root)
@@ -421,12 +468,18 @@ if _G.LiveTask == nil then
                     if root_distance < entityTab.distance_limit.Value then
                         local root_screen_pos = dx9.WorldToScreen({root_pos.x, root_pos.y, root_pos.z})
                         if _G.IsOnScreen(root_screen_pos) then
+							local customName = entityName
+							if entityTab.healthtag.Value and entityTab.maxhealthtag.Value and health ~= nil and maxhealth ~= nil then
+								customName = entityName .. " | " .. tostring(health) .. "/" .. tostring(maxhealth) .. " hp"
+							elseif entityTab.healthtag.Value and health ~= nil then
+								customName = entityName .. " | " .. tostring(health) .. " hp"
+							end
                         	lib_esp.draw({
                                 target = entity;
                                 color = entityTab.color.Value;
                                 healthbar = entityConfig.healthbar;
                                 nametag = entityTab.nametag.Value;
-                                custom_nametag = entityTab.healthtag.Value and entityName .. " | " .. "0" .. " hp" or entityName;
+                                custom_nametag = customName;
                                 distance = entityTab.distance.Value;
                                 custom_distance = ""..root_distance;
                                 tracer = entityTab.tracer.Value;
