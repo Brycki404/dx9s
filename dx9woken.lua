@@ -5,7 +5,7 @@
 config = _G.config or {
 	urls = {
 		DXLibUI = "https://raw.githubusercontent.com/B0NBunny/DXLibUI/refs/heads/main/main.lua";
-		LibESP = "https://pastebin.com/raw/Pwn8GxMB";
+		LibESP = "https://raw.githubusercontent.com/B0NBunny/DXLibESP/refs/heads/main/main.lua";
 	};
     settings = {
 		menu_toggle_keybind = "[F2]";
@@ -480,3 +480,4 @@ end
 if _G.NPCTask then
 	_G.NPCTask()
 end
+
