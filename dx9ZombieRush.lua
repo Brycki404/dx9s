@@ -469,11 +469,13 @@ if _G.ZombiesTask == nil then
                                 aimbot_target_screen_pos.x + screen_size.width/2,
                                 aimbot_target_screen_pos.y + screen_size.height/2
                             }, aimbot_settings.first_person_smoothness.Value, aimbot_settings.first_person_sensitivity.Value)
-                            dx9.ThirdPersonAim({
-                                aimbot_target_screen_pos.x,
-                                aimbot_target_screen_pos.y
-                            }, aimbot_settings.third_person_horizontal_smoothness.Value, aimbot_settings.third_person_vertical_smoothness.Value)
-                            mouse_moved = true
+                            if not dx9.isRightClickHeld() then
+								dx9.ThirdPersonAim({
+									aimbot_target_screen_pos.x,
+									aimbot_target_screen_pos.y
+								}, aimbot_settings.third_person_horizontal_smoothness.Value, aimbot_settings.third_person_vertical_smoothness.Value)
+							end
+							mouse_moved = true
                         end
                     end
                 else
