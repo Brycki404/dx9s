@@ -1,5 +1,6 @@
 --indent size 4
 
+--[[
 trinketconfig = _G.trinketconfig or {
 	{
 		name = "Ring";
@@ -21,6 +22,30 @@ trinketconfig = _G.trinketconfig or {
 if _G.trinketconfig == nil then
 	_G.trinketconfig = trinketconfig
 	trinketconfig = _G.trinketconfig
+end
+]]
+
+oreconfig = _G.oreconfig or {
+	{
+		name = "Mythril";
+		Enabled = true;
+	};
+	{
+		name = "Tin";
+		Enabled = true;
+	};
+	{
+		name = "Iron";
+		Enabled = true;
+	};
+	{
+		name = "Copper";
+		Enabled = true;
+	};
+}
+if _G.oreconfig == nil then
+	_G.oreconfig = oreconfig
+	oreconfig = _G.oreconfig
 end
 
 config = _G.config or {
@@ -57,33 +82,26 @@ config = _G.config or {
 		color = { 255, 0, 0 };
 		distance_limit = 10000;
 	};
-	npcs = {
-        enabled = true;
-        distance = true;
-        healthbar = false;
-        nametag = true;
-        tracer = false;
-		color = { 0, 0, 255 };
-		distance_limit = 10000;
-	};
-	drops = {
-        enabled = true;
+	ores = {
+        enabled = false;
         distance = true;
         healthbar = false;
         nametag = true;
         tracer = false;
 		color = { 255, 255, 255 };
 		distance_limit = 10000;
+		entries = oreconfig;
 	};
-	chests = {
-        enabled = true;
+	npcs = {
+        enabled = false;
         distance = true;
         healthbar = false;
         nametag = true;
         tracer = false;
-		color = { 255, 255, 0 };
+		color = { 79, 176, 255 };
 		distance_limit = 10000;
 	};
+	--[[
     trinkets = {
         enabled = true;
         distance = true;
@@ -94,6 +112,7 @@ config = _G.config or {
 		distance_limit = 10000;
 		entries = trinketconfig;
 	};
+	]]
 };
 if _G.config == nil then
 	_G.config = config
@@ -105,7 +124,7 @@ lib_ui = loadstring(dx9.Get(config.urls.DXLibUI))()
 lib_esp = loadstring(dx9.Get(config.urls.LibESP))()
 
 interface = lib_ui:CreateWindow({
-	Title = "Rogueblox | dx9ware | By @Brycki";
+	Title = "Rogue Lineage | dx9ware | By @Brycki";
 	Size = { 500, 500 };
 	Resizable = true;
 
@@ -124,10 +143,11 @@ tabs = {
 	settings = interface:AddTab("Settings");
 	players = interface:AddTab("Players");
 	enemies = interface:AddTab("Enemies");
+	ores = interface:AddTab("Ores");
 	npcs = interface:AddTab("NPCs");
-	chests = interface:AddTab("Chests");
-	drops = interface:AddTab("Drops");
+	--[[
 	trinkets = interface:AddTab("Trinkets");
+	]]
 }
 
 groupboxes = {
@@ -137,14 +157,15 @@ groupboxes = {
 
 	enemies = tabs.enemies:AddLeftGroupbox("Enemy ESP");
 
+	ores = tabs.ores:AddLeftGroupbox("Ore ESP");
+	ores_config = tabs.ores:AddRightGroupbox("Ore Config");
+
 	npcs = tabs.npcs:AddLeftGroupbox("NPC ESP");
 
-	chests = tabs.chests:AddLeftGroupbox("Chest ESP");
-
-	drops = tabs.drops:AddLeftGroupbox("Drops ESP");
-
+	--[[
 	trinkets = tabs.trinkets:AddLeftGroupbox("Trinket ESP");
 	trinkets_config = tabs.trinkets:AddRightGroupbox("Trinket Config");
+	]]
 }
 
 esp_settings = {
@@ -328,6 +349,72 @@ enemies = {
 	});
 }
 
+ores = {
+	enabled = groupboxes.ores
+		:AddToggle({
+			Default = config.ores.enabled;
+			Text = "Enabled";
+		})
+		:OnChanged(function(value)
+			lib_ui:Notify(value and "[ores] Enabled ESP" or "[ores] Disabled ESP", 1)
+		end);
+
+	distance = groupboxes.ores
+		:AddToggle({
+			Default = config.ores.distance;
+			Text = "Distance";
+		})
+		:OnChanged(function(value)
+			lib_ui:Notify(value and "[ores] Enabled Distance" or "[ores] Disabled Distance", 1)
+		end);
+
+	nametag = groupboxes.ores
+		:AddToggle({
+			Default = config.ores.nametag;
+			Text = "Nametag";
+		})
+		:OnChanged(function(value)
+			lib_ui:Notify(value and "[ores] Enabled Nametag" or "[ores] Disabled Nametag", 1)
+		end);
+
+	tracer = groupboxes.ores
+		:AddToggle({
+			Default = config.ores.tracer;
+			Text = "Tracer";
+		})
+		:OnChanged(function(value)
+			lib_ui:Notify(value and "[ores] Enabled Tracer" or "[ores] Disabled Tracer", 1)
+		end);
+
+    color = groupboxes.ores:AddColorPicker({
+		Default = config.ores.color;
+		Text = "Color";
+	});
+
+	distance_limit = groupboxes.ores:AddSlider({
+		Default = config.ores.distance_limit;
+		Text = "ESP Distance Limit";
+		Min = 0;
+		Max = 10000;
+		Rounding = 0;
+	});
+}
+
+ores_config = {}
+for _, tab in pairs(config.ores.entries) do
+	local name = tab.name
+	local Enabled = tab.Enabled
+
+	ores_config[name.."_enabled"] = groupboxes.ores_config
+		:AddToggle({
+			Default = Enabled;
+			Text = name.." ESP Enabled";
+		})
+		:OnChanged(function(value)
+			lib_ui:Notify(value and "[ores] Enabled "..name.." ESP" or "[ores] Disabled "..name.." ESP", 1)
+		end)
+end
+
 npcs = {
 	enabled = groupboxes.npcs
 		:AddToggle({
@@ -379,108 +466,7 @@ npcs = {
 	});
 }
 
-chests = {
-	enabled = groupboxes.chests
-		:AddToggle({
-			Default = config.chests.enabled;
-			Text = "Enabled";
-		})
-		:OnChanged(function(value)
-			lib_ui:Notify(value and "[chests] Enabled ESP" or "[chests] Disabled ESP", 1)
-		end);
-
-	distance = groupboxes.chests
-		:AddToggle({
-			Default = config.chests.distance;
-			Text = "Distance";
-		})
-		:OnChanged(function(value)
-			lib_ui:Notify(value and "[chests] Enabled Distance" or "[chests] Disabled Distance", 1)
-		end);
-
-	nametag = groupboxes.chests
-		:AddToggle({
-			Default = config.chests.nametag;
-			Text = "Nametag";
-		})
-		:OnChanged(function(value)
-			lib_ui:Notify(value and "[chests] Enabled Nametag" or "[chests] Disabled Nametag", 1)
-		end);
-
-	tracer = groupboxes.chests
-		:AddToggle({
-			Default = config.chests.tracer;
-			Text = "Tracer";
-		})
-		:OnChanged(function(value)
-			lib_ui:Notify(value and "[chests] Enabled Tracer" or "[chests] Disabled Tracer", 1)
-		end);
-
-    color = groupboxes.chests:AddColorPicker({
-		Default = config.chests.color;
-		Text = "Color";
-	});
-
-	distance_limit = groupboxes.chests:AddSlider({
-		Default = config.chests.distance_limit;
-		Text = "ESP Distance Limit";
-		Min = 0;
-		Max = 10000;
-		Rounding = 0;
-	});
-}
-
-drops = {
-	enabled = groupboxes.drops
-		:AddToggle({
-			Default = config.drops.enabled;
-			Text = "Enabled";
-		})
-		:OnChanged(function(value)
-			lib_ui:Notify(value and "[drops] Enabled ESP" or "[drops] Disabled ESP", 1)
-		end);
-
-	distance = groupboxes.drops
-		:AddToggle({
-			Default = config.drops.distance;
-			Text = "Distance";
-		})
-		:OnChanged(function(value)
-			lib_ui:Notify(value and "[drops] Enabled Distance" or "[drops] Disabled Distance", 1)
-		end);
-
-	nametag = groupboxes.drops
-		:AddToggle({
-			Default = config.drops.nametag;
-			Text = "Nametag";
-		})
-		:OnChanged(function(value)
-			lib_ui:Notify(value and "[drops] Enabled Nametag" or "[drops] Disabled Nametag", 1)
-		end);
-
-	tracer = groupboxes.drops
-		:AddToggle({
-			Default = config.drops.tracer;
-			Text = "Tracer";
-		})
-		:OnChanged(function(value)
-			lib_ui:Notify(value and "[drops] Enabled Tracer" or "[drops] Disabled Tracer", 1)
-		end);
-
-    color = groupboxes.drops:AddColorPicker({
-		Default = config.drops.color;
-		Text = "Color";
-	});
-
-	distance_limit = groupboxes.drops:AddSlider({
-		Default = config.drops.distance_limit;
-		Text = "ESP Distance Limit";
-		Min = 0;
-		Max = 10000;
-		Rounding = 0;
-	});
-}
-
+--[[
 trinkets = {
 	enabled = groupboxes.trinkets
 		:AddToggle({
@@ -559,6 +545,7 @@ if _G.SplitString == nil then
 		return t
 	end
 end
+]]
 
 if _G.Get_Distance == nil then
 	_G.Get_Distance = function(v1, v2)
@@ -632,15 +619,15 @@ my_head = nil
 my_root = nil
 my_humanoid = nil
 
-local Living_Folder = dx9.FindFirstChild(workspace, "Living")
-if Living_Folder == nil or Living_Folder == 0 then
+local Live_Folder = dx9.FindFirstChild(workspace, "Live")
+if Live_Folder == nil or Live_Folder == 0 then
     return
 end
 
 if my_player == nil or my_player == 0 then
 	return
 elseif my_player ~= nil and my_player ~= 0 then
-    my_character = dx9.FindFirstChild(Living_Folder, local_player_name)
+    my_character = dx9.FindFirstChild(Live_Folder, local_player_name)
 end
 
 if my_character == nil or my_character == 0 then
@@ -675,12 +662,12 @@ if not esp_settings.enabled.Value then
 	return
 end
 
-if _G.LivingTask == nil then
-	_G.LivingTask = function()
+if _G.LiveTask == nil then
+	_G.LiveTask = function()
         if players.enabled.Value or enemies.enabled.Value then
-			local Living_Folder_Children = dx9.GetChildren(Living_Folder)
-			if #Living_Folder_Children > 0 then
-				for _, entity in pairs(Living_Folder_Children) do
+			local Live_Folder_Children = dx9.GetChildren(Live_Folder)
+			if #Live_Folder_Children > 0 then
+				for _, entity in pairs(Live_Folder_Children) do
 					local entityName = dx9.GetName(entity)
 					local entityTab = enemies
 					local entityConfig = config.enemies
@@ -694,7 +681,6 @@ if _G.LivingTask == nil then
 						entityName = subName
 					end
 					if entityTab == players and players.enabled.Value or entityTab == enemies and enemies.enabled.Value then
-
 						local humanoid = dx9.FindFirstChild(entity, "Humanoid")
 						local health = nil
 						local maxhealth = nil
@@ -743,16 +729,134 @@ if _G.LivingTask == nil then
         end
 	end
 end
-if _G.LivingTask then
-	_G.LivingTask()
+if _G.LiveTask then
+	_G.LiveTask()
 end
 
-if _G.DebrisTask == nil then
-	_G.DebrisTask = function()
-		local Debris_Folder = dx9.FindFirstChild(workspace, "Debris")
-		if Debris_Folder and Debris_Folder ~= 0 then
+if _G.NPCTask == nil then
+	_G.NPCTask = function()
+        if npcs.enabled.Value then
+			local NPCs_Folder = dx9.FindFirstChild(workspace, "NPCs")
+			if NPCs_Folder ~= nil and NPCs_Folder ~= 0 then
+				local NPCs_Folder_Children = dx9.GetChildren(NPCs_Folder)
+				if #NPCs_Folder_Children > 0 then
+					for _, npc in pairs(NPCs_Folder_Children) do
+						local npcName = dx9.GetName(npc)
+						local root = dx9.FindFirstChild(npc, "HumanoidRootPart")
+						if root ~= nil and root ~= 0 then
+							local my_root_pos = dx9.GetPosition(my_root)
+							local root_pos = dx9.GetPosition(root)
+							local root_distance = _G.Get_Distance(my_root_pos, root_pos)
+							if root_distance < npcs.distance_limit.Value then
+								local root_screen_pos = dx9.WorldToScreen({root_pos.x, root_pos.y, root_pos.z})
+								if _G.IsOnScreen(root_screen_pos) then
+									lib_esp.draw({
+										esp_type = "misc";
+										target = root;
+										color = npcs.color.Value;
+										healthbar = config.npcs.healthbar;
+										nametag = npcs.nametag.Value;
+										custom_nametag = npcName;
+										distance = npcs.distance.Value;
+										custom_distance = ""..root_distance;
+										tracer = npcs.tracer.Value;
+										tracer_type = current_tracer_type;
+										box_type = current_box_type;
+									})
+								end
+							end
+						end
+					end
+				end
+        	end
+		end
+	end
+end
+if _G.NPCTask then
+	_G.NPCTask()
+end
+
+dx9.ShowConsole(true)
+
+if _G.OreTask == nil then
+	_G.OreTask = function()
+        if ores.enabled.Value then
+			local Ores_Folder = dx9.FindFirstChild(workspace, "Ores")
+			if Ores_Folder ~= nil and Ores_Folder ~= 0 then
+				local Ores_Folder_Children = dx9.GetChildren(Ores_Folder)
+				if #Ores_Folder_Children > 0 then
+					for _, ore in pairs(Ores_Folder_Children) do
+						local oreName = dx9.GetName(ore)
+
+						local skipThis = true
+						local isType = 0
+						if skipThis == true then
+							for _, tab in pairs(config.ores.entries) do
+								local Name = tab.name
+
+								if oreName == Name then
+									isType = 1
+									if ores_config[Name.."_enabled"].Value then
+										skipThis = false
+									end
+									break
+								end
+							end
+						end
+
+						if skipThis == true and isType == 0 then
+							skipThis = false
+						end
+
+						local typeTab = nil
+						local typeConfigSettings = nil
+						local typeConfig = nil
+						if isType == 0 or isType == 1 then
+							typeTab = ores
+							typeConfigSettings = config.ores
+							typeConfig = ores_config
+						end
+
+						if not skipThis and typeTab and typeConfigSettings and typeConfig then
+							local my_root_pos = dx9.GetPosition(my_root)
+							local ore_pos = dx9.GetPosition(ore)
+							local root_distance = _G.Get_Distance(my_root_pos, ore_pos)
+							if root_distance < ores.distance_limit.Value then
+								local root_screen_pos = dx9.WorldToScreen({ore_pos.x, ore_pos.y, ore_pos.z})
+								if _G.IsOnScreen(root_screen_pos) then
+									lib_esp.draw({
+										esp_type = "misc";
+										target = ore;
+										color = typeTab.color.Value;
+										healthbar = typeConfigSettings.healthbar;
+										nametag = typeTab.nametag.Value;
+										custom_nametag = oreName;
+										distance = typeTab.distance.Value;
+										custom_distance = ""..root_distance;
+										tracer = typeTab.tracer.Value;
+										tracer_type = current_tracer_type;
+										box_type = current_box_type;
+									})
+								end
+							end
+						end
+					end
+				end
+        	end
+		end
+	end
+end
+if _G.OreTask then
+	_G.OreTask()
+end
+
+--[[
+if _G.TrinketTask == nil then
+	_G.TrinketTask = function()
+		local Thrown_Folder = dx9.FindFirstChild(workspace, "Thrown")
+		if Thrown_Folder and Thrown_Folder ~= 0 then
 			if trinkets.enabled.Value then
-				local SpawnedItems_Folder = dx9.FindFirstChild(Debris_Folder, "SpawnedItems") --all children are BaseParts
+				local SpawnedItems_Folder = dx9.FindFirstChild(Thrown_Folder, "SpawnedItems") --all children are BaseParts
 				if SpawnedItems_Folder ~= nil and SpawnedItems_Folder ~= 0 then
 					local SpawnedItems_Folder_Children = dx9.GetChildren(SpawnedItems_Folder)
 					if #SpawnedItems_Folder_Children > 0 then
@@ -815,86 +919,10 @@ if _G.DebrisTask == nil then
 					end
 				end
 			end
-
-			if drops.enabled.Value then
-				local DroppedItems_Folder = dx9.FindFirstChild(Debris_Folder, "DroppedItems")
-				if DroppedItems_Folder ~= nil and DroppedItems_Folder ~= 0 then
-					local DroppedItems_Folder_Children = dx9.GetChildren(DroppedItems_Folder)
-					if #DroppedItems_Folder_Children > 0 then
-						for _, basePart in pairs(DroppedItems_Folder) do
-							local name = dx9.GetName(basePart)
-							local my_root_pos = dx9.GetPosition(my_root)
-							local root_pos = dx9.GetPosition(basePart)
-							local root_distance = _G.Get_Distance(my_root_pos, root_pos)
-							if root_distance < drops.distance_limit.Value then
-								local root_screen_pos = dx9.WorldToScreen({root_pos.x, root_pos.y, root_pos.z})
-								if _G.IsOnScreen(root_screen_pos) then
-									lib_esp.draw({
-										esp_type = "misc";
-										target = basePart;
-										color = drops.color.Value;
-										healthbar = config.drops.healthbar;
-										nametag = drops.nametag.Value;
-										custom_nametag = name;
-										distance = drops.distance.Value;
-										custom_distance = ""..root_distance;
-										tracer = drops.tracer.Value;
-										tracer_type = current_tracer_type;
-										box_type = current_box_type;
-									})
-								end
-							end
-						end
-					end
-				end
-			end
-
-			if chests.enabled.Value then
-				local Debris_Folder_Children = dx9.GetChildren(Debris_Folder)
-				if #Debris_Folder_Children > 0 then
-					for _, chest in pairs(Debris_Folder_Children) do
-						local className = dx9.GetType(chest)
-						if className == "Model" then
-							local name = dx9.GetName(chest)
-							local splits = _G.SplitString(name, "|")
-							local subName = string.sub(splits[1], 2)
-							print(subName)
-							if subName == "chest" then
-								local basePart = dx9.FindFirstChild("Bottom")
-								if basePart == nil or basePart == 0 then
-									basePart = dx9.FindFirstChild("Top")
-								end
-								if basePart ~= nil and basePart ~= 0 then
-									local my_root_pos = dx9.GetPosition(my_root)
-									local root_pos = dx9.GetPosition(basePart)
-									local root_distance = _G.Get_Distance(my_root_pos, root_pos)
-									if root_distance < drops.distance_limit.Value then
-										local root_screen_pos = dx9.WorldToScreen({root_pos.x, root_pos.y, root_pos.z})
-										if _G.IsOnScreen(root_screen_pos) then
-											lib_esp.draw({
-												esp_type = "misc";
-												target = basePart;
-												color = drops.color.Value;
-												healthbar = config.drops.healthbar;
-												nametag = drops.nametag.Value;
-												custom_nametag = subName;
-												distance = drops.distance.Value;
-												custom_distance = ""..root_distance;
-												tracer = drops.tracer.Value;
-												tracer_type = current_tracer_type;
-												box_type = current_box_type;
-											})
-										end
-									end
-								end
-							end
-						end
-					end
-				end
-			end
 		end
 	end
 end
-if _G.DebrisTask then
-	_G.DebrisTask()
+if _G.TrinketTask then
+	_G.TrinketTask()
 end
+]]
