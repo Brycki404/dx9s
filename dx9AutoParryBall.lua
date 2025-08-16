@@ -314,6 +314,7 @@ if my_player ~= nil and my_player ~= 0 then
 			local newHighlightExists = false
 			local newParryHighlightExists = false
 			local newFakeHighlightExists = false
+			
 			characterExists = my_character ~= nil and my_character ~= 0 and true or false
 			local rootExists = false
 			local ballsFolderExists = false
