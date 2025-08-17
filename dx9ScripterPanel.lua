@@ -126,6 +126,14 @@ debugging.hz = groupboxes.debugging:AddLabel("Avg. Program Cycle: ".._G.averageH
 debugging.clock = groupboxes.debugging:AddLabel("clock: "..os.clock())
 
 scripting = {}
+scripting.test_inputbox = groupboxes.scripting:AddTextBox({
+	Index = "Test_InputBox_1";
+	Placeholder = "Placeholder Text";
+	Default = nil;
+	MaxCharLimit = 10;
+	Prefix = "Text: <";
+	Suffix = ">";
+})
 scripting.test_keybinder = groupboxes.scripting:AddKeybindButton({
 	Index = "Test_Keybinder_1";
 	Text = "Test Keybind: [F4]";
