@@ -131,6 +131,7 @@ end)
 scripting.test_button = groupboxes.scripting:AddButton( "Test Button" , function()
 	lib_ui:Notify("Test Button Pressed!", 1)
 end):AddTooltip("Tooltip Text")
+scripting.test_button:ConnectKeybindButton(scripting.test_keybinder)
 scripting.test_toggle = groupboxes.scripting:AddToggle({
 	Index = "Test_Toggle_1";
 	Text = "Test Toggle";
@@ -138,6 +139,7 @@ scripting.test_toggle = groupboxes.scripting:AddToggle({
 }):AddTooltip("Tooltip Text"):OnChanged(function(value)
 	lib_ui:Notify("Toggled Test Toggle to "..tostring(value), 1)
 end)
+scripting.test_toggle:ConnectKeybindButton(scripting.test_keybinder)
 
 game_settings = {}
 game_settings.fps = groupboxes.game_settings:AddDropdown({
