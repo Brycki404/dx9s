@@ -3,7 +3,7 @@ local startTime = os.clock()
 
 config = _G.config or {
 	urls = {
-		DXLibUI = "https://raw.githubusercontent.com/B0NBunny/DXLibUI/refs/heads/main/main.lua";
+		DXLibUI = "https://raw.githubusercontent.com/B0NBunny/DXLibUI/refs/heads/personaldev/main.lua";
         LibESP = "https://raw.githubusercontent.com/B0NBunny/DXLibESP/refs/heads/main/main.lua";
 	};
 	settings = {
@@ -88,11 +88,12 @@ interface = lib_ui:CreateWindow({
 tabs = {}
 tabs.game = interface:AddTab("Game")
 tabs.debugging = interface:AddTab("Debugging")
-tabs.tools = interface:AddTab("Tools")
+tabs.scripting = interface:AddTab("Scripting")
 
 groupboxes = {}
 groupboxes.game_settings = tabs.game:AddMiddleGroupbox("Game Settings")
 groupboxes.debugging = tabs.debugging:AddMiddleGroupbox("Debugging")
+groupboxes.scripting = tabs.tools:AddMiddleGroupbox("Scripting")
 
 debugging = {}
 debugging.console = groupboxes.debugging:AddToggle({
@@ -113,6 +114,21 @@ debugging.console = groupboxes.debugging:AddToggle({
 debugging.sec = groupboxes.debugging:AddLabel("Avg. Program Cycle: ".._G.averageSec.." s")
 debugging.hz = groupboxes.debugging:AddLabel("Avg. Program Cycle: ".._G.averageHz.." Hz")
 debugging.clock = groupboxes.debugging:AddLabel("clock: "..os.clock())
+
+scripting = {}
+scripting.test_button = groupboxes.scripting:AddButton( "Test Button" , function()
+	lib_ui:Notify("Test Button Pressed!", 1)
+end):AddTooltip("Tooltip Text")
+scripting.test_toggle = groupboxes.scripting:AddToggle({
+	Index = "Test_Toggle_1";
+	Text = "Test Toggle";
+	Default = false;
+})
+scripting.test_keybinder = groupboxes.scripting:AddKeybindButton({
+	Index = "Test_Keybinder_1";
+	Text = "Test Keybind";
+	Default = "[F4]";
+})
 
 game_settings = {}
 game_settings.fps = groupboxes.game_settings:AddDropdown({
