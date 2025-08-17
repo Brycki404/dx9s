@@ -85,8 +85,6 @@ interface = lib_ui:CreateWindow({
 	OutlineColor = { 40, 40, 40 };
 })
 
-print("d")
-
 tabs = {}
 tabs.game = interface:AddTab("Game")
 tabs.debugging = interface:AddTab("Debugging")
