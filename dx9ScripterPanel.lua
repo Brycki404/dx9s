@@ -1,6 +1,4 @@
 --indent size 4
-dx9.ShowConsole(true);
-
 local startTime = os.clock()
 
 config = _G.config or {
@@ -87,6 +85,8 @@ interface = lib_ui:CreateWindow({
 	OutlineColor = { 40, 40, 40 };
 })
 
+print("d")
+
 tabs = {}
 tabs.game = interface:AddTab("Game")
 tabs.debugging = interface:AddTab("Debugging")
@@ -95,7 +95,7 @@ tabs.scripting = interface:AddTab("Scripting")
 groupboxes = {}
 groupboxes.game_settings = tabs.game:AddMiddleGroupbox("Game Settings")
 groupboxes.debugging = tabs.debugging:AddMiddleGroupbox("Debugging")
-groupboxes.scripting = tabs.tools:AddMiddleGroupbox("Scripting")
+groupboxes.scripting = tabs.scripting:AddMiddleGroupbox("Scripting")
 
 debugging = {}
 debugging.console = groupboxes.debugging:AddToggle({
@@ -118,6 +118,16 @@ debugging.hz = groupboxes.debugging:AddLabel("Avg. Program Cycle: ".._G.averageH
 debugging.clock = groupboxes.debugging:AddLabel("clock: "..os.clock())
 
 scripting = {}
+scripting.test_keybinder = groupboxes.scripting:AddKeybindButton({
+	Index = "Test_Keybinder_1";
+	Text = "Test Keybind: [F4]";
+	Default = "[F4]";
+}):AddTooltip("Tooltip Text")
+scripting.test_keybinder = scripting.test_keybinder:OnChanged(function(newKey)
+	local oldText = scripting.test_keybinder.Text
+	scripting.test_keybinder:SetText("Test Keybind: "..tostring(newKey))
+	lib_ui:Notify("Test Keybind Text set from '"..tostring(oldText).."' to '"..tostring(newKey).."'", 1)
+end)
 scripting.test_button = groupboxes.scripting:AddButton( "Test Button" , function()
 	lib_ui:Notify("Test Button Pressed!", 1)
 end):AddTooltip("Tooltip Text")
@@ -125,12 +135,9 @@ scripting.test_toggle = groupboxes.scripting:AddToggle({
 	Index = "Test_Toggle_1";
 	Text = "Test Toggle";
 	Default = false;
-})
-scripting.test_keybinder = groupboxes.scripting:AddKeybindButton({
-	Index = "Test_Keybinder_1";
-	Text = "Test Keybind";
-	Default = "[F4]";
-})
+}):AddTooltip("Tooltip Text"):OnChanged(function(value)
+	lib_ui:Notify("Toggled Test Toggle to "..tostring(value), 1)
+end)
 
 game_settings = {}
 game_settings.fps = groupboxes.game_settings:AddDropdown({
@@ -203,11 +210,9 @@ end
 local_player_name = get_local_player_name()
 
 my_player = dx9.FindFirstChild(services.players, local_player_name)
-my_character = nil
-my_root = nil
 
-if my_player == nil and my_player == 0 then
-    return
+if my_player ~= nil and my_player ~= 0 then
+    --do stuff
 end
 
 local endTime = os.clock()
