@@ -126,8 +126,8 @@ debugging.hz = groupboxes.debugging:AddLabel("Avg. Program Cycle: ".._G.averageH
 debugging.clock = groupboxes.debugging:AddLabel("clock: "..os.clock())
 
 scripting = {}
-scripting.test_inputbox = groupboxes.scripting:AddTextBox({
-	Index = "Test_InputBox_1";
+scripting.test_textbox = groupboxes.scripting:AddTextBox({
+	Index = "Test_TextBox_1";
 	Placeholder = "Placeholder Text";
 	Default = nil;
 	MaxCharLimit = 10;
