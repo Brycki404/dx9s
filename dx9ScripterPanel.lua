@@ -95,6 +95,16 @@ groupboxes.game_settings = tabs.game:AddMiddleGroupbox("Game Settings")
 groupboxes.debugging = tabs.debugging:AddMiddleGroupbox("Debugging")
 groupboxes.scripting = tabs.scripting:AddMiddleGroupbox("Scripting")
 
+game_settings = {}
+game_settings.fps = groupboxes.game_settings:AddDropdown({
+		Text = "Your Game's FPS";
+		Default = config.settings.fps;
+		Values = { "60", "120", "144", "240" };
+	})
+	:OnChanged(function(value)
+		lib_ui:Notify("[settings] FPS: " .. value, 1)
+	end)
+
 debugging = {}
 debugging.console = groupboxes.debugging:AddToggle({
 		Default = false;
@@ -138,16 +148,6 @@ scripting.test_toggle = groupboxes.scripting:AddToggle({
 	lib_ui:Notify("Toggled Test Toggle to "..tostring(value), 1)
 end)
 scripting.test_toggle:ConnectKeybindButton(scripting.test_keybinder)
-
-game_settings = {}
-game_settings.fps = groupboxes.game_settings:AddDropdown({
-		Text = "Your Game's FPS";
-		Default = config.settings.fps;
-		Values = { "60", "120", "144", "240" };
-	})
-	:OnChanged(function(value)
-		lib_ui:Notify("[settings] FPS: " .. value, 1)
-	end)
 
 if _G.Get_Distance == nil then
 	_G.Get_Distance = function(v1, v2)
