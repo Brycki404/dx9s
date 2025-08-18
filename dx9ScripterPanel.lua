@@ -113,8 +113,14 @@ debugging.clock = groupboxes.debug:AddLabel("Clock: "..os.clock())
 
 deepsearch = {}
 groupboxes.deepsearch:AddTitle("Instructions")
-local label1 = "Hover over the UI elements below to read a tooltip for them.\nText Boxes do not yet have a cursor, so follow the instructions below:\nWhen typing:\n    [Left Shift] and [Right Shift] to toggle capslock\n    [Subtract] on your NumPad to type dashes and underscores\n    [ENTER/RETURN] to stop typing\n    [SPACEBAR] to type a space\n    [BACKSPACE] to delete the last character"
-groupboxes.deepsearch:AddLabel(label1, {255, 255, 255})
+groupboxes.deepsearch:AddLabel("Hover over the UI elements below to read a tooltip for them.")
+groupboxes.deepsearch:AddLabel("Text Boxes do not yet have a cursor, so follow the instructions below:")
+groupboxes.deepsearch:AddLabel("When typing:")
+groupboxes.deepsearch:AddLabel("[LEFT SHIFT] and [RIGHT SHIFT] to toggle capslock")
+groupboxes.deepsearch:AddLabel("[SUBTRACT] on your NumPad to type dashes and underscores")
+groupboxes.deepsearch:AddLabel("[ENTER/RETURN] to stop typing")
+groupboxes.deepsearch:AddLabel("[SPACEBAR] to type a space")
+groupboxes.deepsearch:AddLabel("[BACKSPACE] to delete the last character")
 groupboxes.deepsearch:AddBorder()
 deepsearch.searchbox = groupboxes.deepsearch:AddTextBox({
 	Index = "deepsearch_searchbox";
@@ -132,32 +138,6 @@ deepsearch.searchbutton = groupboxes.deepsearch:AddButton( "Search" , function()
 	lib_ui:Notify("Searching for '"..(deepsearch.searchbox:GetValue() or "").."'", 1)
 end):AddTooltip("Click To Start A Search")
 
---[[ USE THIS CODE FOR STUFF LATER, IT'S GREAT
-scripting.test_keybinder = groupboxes.scripting:AddKeybindButton({
-	Index = "Test_Keybinder_1";
-	Text = "Test Keybind: [F4]";
-	Default = "[F4]";
-}):AddTooltip("Tooltip Text")
-scripting.test_keybinder = scripting.test_keybinder:OnChanged(function(newKey)
-	local oldText = scripting.test_keybinder.Text
-	scripting.test_keybinder:SetText("Test Keybind: "..tostring(newKey))
-	lib_ui:Notify("Test Keybind Text set from '"..tostring(oldText).."' to '"..tostring(newKey).."'", 1)
-end)
-
-scripting.test_button = groupboxes.scripting:AddButton( "Test Button" , function()
-	lib_ui:Notify("Test Button Pressed!", 1)
-end):AddTooltip("Tooltip Text")
-scripting.test_button:ConnectKeybindButton(scripting.test_keybinder)
-
-scripting.test_toggle = groupboxes.scripting:AddToggle({
-	Index = "Test_Toggle_1";
-	Text = "Test Toggle";
-	Default = false;
-}):AddTooltip("Tooltip Text"):OnChanged(function(value)
-	lib_ui:Notify("Toggled Test Toggle to "..tostring(value), 1)
-end)
-scripting.test_toggle:ConnectKeybindButton(scripting.test_keybinder)
-]]
 
 if _G.Get_Distance == nil then
 	_G.Get_Distance = function(v1, v2)
