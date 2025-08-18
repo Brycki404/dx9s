@@ -1,30 +1,5 @@
 --indent size 4
 
---[[
-trinketconfig = _G.trinketconfig or {
-	{
-		name = "Ring";
-		Enabled = false;
-	};
-	{
-		name = "Amulet";
-		Enabled = false;
-	};
-	{
-		name = "Mushroom";
-		Enabled = false;
-	};
-	{
-		name = "Goblet";
-		Enabled = false;
-	};
-}
-if _G.trinketconfig == nil then
-	_G.trinketconfig = trinketconfig
-	trinketconfig = _G.trinketconfig
-end
-]]
-
 oreconfig = _G.oreconfig or {
 	{
 		name = "Mythril";
@@ -101,7 +76,6 @@ config = _G.config or {
 		color = { 79, 176, 255 };
 		distance_limit = 10000;
 	};
-	--[[
     trinkets = {
         enabled = true;
         distance = true;
@@ -110,9 +84,7 @@ config = _G.config or {
         tracer = false;
 		color = { 255, 255, 255 };
 		distance_limit = 10000;
-		entries = trinketconfig;
 	};
-	]]
 };
 if _G.config == nil then
 	_G.config = config
@@ -466,7 +438,6 @@ npcs = {
 	});
 }
 
---[[
 trinkets = {
 	enabled = groupboxes.trinkets
 		:AddToggle({
@@ -518,21 +489,6 @@ trinkets = {
 	});
 }
 
-trinkets_config = {}
-for _, tab in pairs(config.trinkets.entries) do
-	local name = tab.name
-	local Enabled = tab.Enabled
-
-	trinkets_config[name.."_enabled"] = groupboxes.trinkets_config
-		:AddToggle({
-			Default = Enabled;
-			Text = name.." ESP Enabled";
-		})
-		:OnChanged(function(value)
-			lib_ui:Notify(value and "[trinkets] Enabled "..name.." ESP" or "[trinkets] Disabled "..name.." ESP", 1)
-		end)
-end
-
 if _G.SplitString == nil then
 	_G.SplitString = function(inputstr, sep)
 		if sep == nil then
@@ -545,7 +501,6 @@ if _G.SplitString == nil then
 		return t
 	end
 end
-]]
 
 if _G.Get_Distance == nil then
 	_G.Get_Distance = function(v1, v2)
@@ -850,69 +805,36 @@ if _G.OreTask then
 	_G.OreTask()
 end
 
---[[
 if _G.TrinketTask == nil then
 	_G.TrinketTask = function()
-		local Thrown_Folder = dx9.FindFirstChild(workspace, "Thrown")
-		if Thrown_Folder and Thrown_Folder ~= 0 then
-			if trinkets.enabled.Value then
-				local SpawnedItems_Folder = dx9.FindFirstChild(Thrown_Folder, "SpawnedItems") --all children are BaseParts
-				if SpawnedItems_Folder ~= nil and SpawnedItems_Folder ~= 0 then
-					local SpawnedItems_Folder_Children = dx9.GetChildren(SpawnedItems_Folder)
-					if #SpawnedItems_Folder_Children > 0 then
-						for _, basePart in pairs(SpawnedItems_Folder_Children) do
-							local name = dx9.GetName(basePart)
-
-							local skipThis = true
-							local isType = 0
-							if skipThis == true then
-								for _, tab in pairs(config.trinkets.entries) do
-									local Name = tab.name
-
-									if name == Name then
-										isType = 1
-										if trinkets_config[Name.."_enabled"].Value then
-											skipThis = false
-										end
-										break
-									end
-								end
-							end
-
-							if skipThis == true and isType == 0 then
-								skipThis = false
-							end
-
-							local typeTab = nil
-							local typeConfigSettings = nil
-							local typeConfig = nil
-							if isType == 0 or isType == 1 then
-								typeTab = trinkets
-								typeConfigSettings = config.trinkets
-								typeConfig = trinkets_config
-							end
-
-							if not skipThis and typeTab and typeConfigSettings and typeConfig then
-								local my_root_pos = dx9.GetPosition(my_root)
-								local root_pos = dx9.GetPosition(basePart)
-								local root_distance = _G.Get_Distance(my_root_pos, root_pos)
-								if root_distance < typeTab.distance_limit.Value then
-									local root_screen_pos = dx9.WorldToScreen({root_pos.x, root_pos.y, root_pos.z})
-									if _G.IsOnScreen(root_screen_pos) then
-										lib_esp.draw({
-											esp_type = "misc";
-											target = basePart;
-											color = typeTab.color.Value;
-											healthbar = typeConfigSettings.healthbar;
-											nametag = typeTab.nametag.Value;
-											custom_nametag = name;
-											distance = typeTab.distance.Value;
-											custom_distance = ""..root_distance;
-											tracer = typeTab.tracer.Value;
-											tracer_type = current_tracer_type;
-											box_type = current_box_type;
-										})
-									end
+		if trinkets.enabled.Value then
+			for i,v in pairs(dx9.GetChildren(workspace)) do
+				local vname = dx9.GetName(v)
+				local vtype = dx9.GetType(v)
+				if vname == "Folder" and vtype == "Folder" then
+					for i,v2 in pairs(dx9.GetChildren(v)) do
+						local v2name = dx9.GetName(v2)
+						local v2type = dx9.GetType(v2)
+						if v2name == "UnionOperation" and v2type == "UnionOperation" then
+							local my_root_pos = dx9.GetPosition(my_root)
+							local root_pos = dx9.GetPosition(v2)
+							local root_distance = _G.Get_Distance(my_root_pos, root_pos)
+							if root_distance < typeTab.distance_limit.Value then
+								local root_screen_pos = dx9.WorldToScreen({root_pos.x, root_pos.y, root_pos.z})
+								if _G.IsOnScreen(root_screen_pos) then
+									lib_esp.draw({
+										esp_type = "misc";
+										target = v2;
+										color = trinkets.color.Value;
+										healthbar = config.trinkets.healthbar;
+										nametag = trinkets.nametag.Value;
+										custom_nametag = "Trinket?";
+										distance = trinkets.distance.Value;
+										custom_distance = ""..root_distance;
+										tracer = trinkets.tracer.Value;
+										tracer_type = current_tracer_type;
+										box_type = current_box_type;
+									})
 								end
 							end
 						end
@@ -925,4 +847,3 @@ end
 if _G.TrinketTask then
 	_G.TrinketTask()
 end
-]]
