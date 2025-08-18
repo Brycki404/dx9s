@@ -124,7 +124,7 @@ deepsearch.searchbox = groupboxes.deepsearch:AddTextBox({
 	Placeholder = ">>INSTANCE NAME HERE<<";
 }):AddTooltip("Search For All Instances With This Name")
 deepsearch.searchbutton = groupboxes.deepsearch:AddButton( "Search" , function()
-	lib_ui:Notify("Searching...", 1)
+	lib_ui:Notify("Searching for '"..(deepsearch.searchbox:GetValue() or "").."'", 1)
 end):AddTooltip("Click To Start A Search")
 
 --[[ USE THIS CODE FOR STUFF LATER, IT'S GREAT
