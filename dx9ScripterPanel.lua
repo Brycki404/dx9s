@@ -112,6 +112,15 @@ debugging.hz = groupboxes.debug:AddLabel("Avg. Program Cycle: ".._G.averageHz.."
 debugging.clock = groupboxes.debug:AddLabel("Clock: "..os.clock())
 
 deepsearch = {}
+groupboxes.deepsearch:AddTitle("Instructions")
+local label1 = "Hover over the UI elements below to read a tooltip for them.\nText Boxes do not yet have a cursor, so follow the instructions below:\nWhen typing:\n    [Left Shift] and [Right Shift] to toggle capslock\n    [Subtract] on your NumPad to type dashes and underscores\n    [ENTER/RETURN] to stop typing\n    [SPACEBAR] to type a space\n    [BACKSPACE] to delete the last character"
+groupboxes.deepsearch:AddLabel(label1, {255, 255, 255})
+groupboxes.deepsearch:AddBorder()
+deepsearch.searchbox = groupboxes.deepsearch:AddTextBox({
+	Index = "deepsearch_searchbox";
+	Placeholder = ">>INSTANCE NAME HERE<<";
+}):AddTooltip("Search For All Instances With This Name")
+groupboxes.deepsearch:AddLabel(deepsearch.searchbox.Capslock and "Capslock: ENABLED" or "Capslock: DISABLED", deepsearch.searchbox.Capslock and {0, 255, 0} or {255, 0, 0})
 deepsearch.exactmatch = groupboxes.deepsearch:AddToggle({
 	Index = "deepsearch_exactmatch";
 	Text = "Exact Match";
@@ -119,10 +128,6 @@ deepsearch.exactmatch = groupboxes.deepsearch:AddToggle({
 }):AddTooltip("Whether Or Not The Instance Name You Search For Has To Be An Exact Match"):OnChanged(function(value)
 	lib_ui:Notify("Toggled Exact Match to "..tostring(value), 1)
 end)
-deepsearch.searchbox = groupboxes.deepsearch:AddTextBox({
-	Index = "deepsearch_searchbox";
-	Placeholder = ">>INSTANCE NAME HERE<<";
-}):AddTooltip("Search For All Instances With This Name")
 deepsearch.searchbutton = groupboxes.deepsearch:AddButton( "Search" , function()
 	lib_ui:Notify("Searching for '"..(deepsearch.searchbox:GetValue() or "").."'", 1)
 end):AddTooltip("Click To Start A Search")
