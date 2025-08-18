@@ -9,8 +9,6 @@ config = _G.config or {
 	settings = {
 		menu_toggle_keybind = "[F2]";
 
-		fps = 1; -- 1 = 60, 2 = 120, 3 = 144, 4 = 240
-
 		maximum_Hz_Cache = 15;
 		Sec_precision = 4;
 		Hz_precision = 0;
@@ -86,31 +84,19 @@ interface = lib_ui:CreateWindow({
 })
 
 tabs = {}
-tabs.game = interface:AddTab("Game")
-tabs.debugging = interface:AddTab("Debugging")
-tabs.scripting = interface:AddTab("Scripting")
+tabs.debug = interface:AddTab("Debug")
+tabs.deepsearch = interface:AddTab("Deep Search")
 
 groupboxes = {}
-groupboxes.game_settings = tabs.game:AddMiddleGroupbox("Game Settings")
-groupboxes.debugging = tabs.debugging:AddMiddleGroupbox("Debugging")
-groupboxes.scripting = tabs.scripting:AddMiddleGroupbox("Scripting")
-
-game_settings = {}
-game_settings.fps = groupboxes.game_settings:AddDropdown({
-		Text = "Your Game's FPS";
-		Default = config.settings.fps;
-		Values = { "60", "120", "144", "240" };
-	})
-	:OnChanged(function(value)
-		lib_ui:Notify("[settings] FPS: " .. value, 1)
-	end)
+groupboxes.debug = tabs.debug:AddMiddleGroupbox("Debugging")
+groupboxes.deepsearch = tabs.deepsearch:AddMiddleGroupbox("Deep Search")
 
 debugging = {}
-debugging.console = groupboxes.debugging:AddToggle({
+debugging.console = groupboxes.debug:AddToggle({
 		Default = false;
 		Text = "Console Enabled";
 	}):OnChanged(function(value)
-		lib_ui:Notify(value and "[debugging] Enabled Console" or "[debugging] Disabled Console", 1)
+		lib_ui:Notify(value and "[Debug] Enabled Console" or "[Debug] Disabled Console", 1)
 		if value then
 			_G.consoleEnabled = true
 			dx9.ClearConsole()
@@ -121,19 +107,27 @@ debugging.console = groupboxes.debugging:AddToggle({
 			dx9.ShowConsole(false)
 		end
 	end)
-debugging.sec = groupboxes.debugging:AddLabel("Avg. Program Cycle: ".._G.averageSec.." s")
-debugging.hz = groupboxes.debugging:AddLabel("Avg. Program Cycle: ".._G.averageHz.." Hz")
-debugging.clock = groupboxes.debugging:AddLabel("clock: "..os.clock())
+debugging.sec = groupboxes.debug:AddLabel("Avg. Program Cycle: ".._G.averageSec.." s")
+debugging.hz = groupboxes.debug:AddLabel("Avg. Program Cycle: ".._G.averageHz.." Hz")
+debugging.clock = groupboxes.debug:AddLabel("Clock: "..os.clock())
 
-scripting = {}
-scripting.test_textbox = groupboxes.scripting:AddTextBox({
-	Index = "Test_TextBox_1";
-	Placeholder = "Placeholder Text";
-	Default = nil;
-	MaxCharLimit = 10;
-	Prefix = "Text: <";
-	Suffix = ">";
-})
+deepsearch = {}
+deepsearch.exactmatch = groupboxes.deepsearch:AddToggle({
+	Index = "deepsearch_exactmatch";
+	Text = "Exact Match";
+	Default = false;
+}):AddTooltip("Whether Or Not The Instance Name You Search For Has To Be An Exact Match"):OnChanged(function(value)
+	lib_ui:Notify("Toggled Exact Match to "..tostring(value), 1)
+end)
+deepsearch.searchbox = groupboxes.deepsearch:AddTextBox({
+	Index = "deepsearch_searchbox";
+	Placeholder = ">>INSTANCE NAME HERE<<";
+}):AddTooltip("Search For All Instances With This Name")
+deepsearch.searchbutton = groupboxes.deepsearch:AddButton( "Search" , function()
+	lib_ui:Notify("Searching...", 1)
+end):AddTooltip("Click To Start A Search")
+
+--[[ USE THIS CODE FOR STUFF LATER, IT'S GREAT
 scripting.test_keybinder = groupboxes.scripting:AddKeybindButton({
 	Index = "Test_Keybinder_1";
 	Text = "Test Keybind: [F4]";
@@ -144,10 +138,12 @@ scripting.test_keybinder = scripting.test_keybinder:OnChanged(function(newKey)
 	scripting.test_keybinder:SetText("Test Keybind: "..tostring(newKey))
 	lib_ui:Notify("Test Keybind Text set from '"..tostring(oldText).."' to '"..tostring(newKey).."'", 1)
 end)
+
 scripting.test_button = groupboxes.scripting:AddButton( "Test Button" , function()
 	lib_ui:Notify("Test Button Pressed!", 1)
 end):AddTooltip("Tooltip Text")
 scripting.test_button:ConnectKeybindButton(scripting.test_keybinder)
+
 scripting.test_toggle = groupboxes.scripting:AddToggle({
 	Index = "Test_Toggle_1";
 	Text = "Test Toggle";
@@ -156,6 +152,7 @@ scripting.test_toggle = groupboxes.scripting:AddToggle({
 	lib_ui:Notify("Toggled Test Toggle to "..tostring(value), 1)
 end)
 scripting.test_toggle:ConnectKeybindButton(scripting.test_keybinder)
+]]
 
 if _G.Get_Distance == nil then
 	_G.Get_Distance = function(v1, v2)
