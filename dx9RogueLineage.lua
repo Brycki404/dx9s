@@ -117,9 +117,7 @@ tabs = {
 	enemies = interface:AddTab("Enemies");
 	ores = interface:AddTab("Ores");
 	npcs = interface:AddTab("NPCs");
-	--[[
 	trinkets = interface:AddTab("Trinkets");
-	]]
 }
 
 groupboxes = {
@@ -134,10 +132,7 @@ groupboxes = {
 
 	npcs = tabs.npcs:AddLeftGroupbox("NPC ESP");
 
-	--[[
-	trinkets = tabs.trinkets:AddLeftGroupbox("Trinket ESP");
-	trinkets_config = tabs.trinkets:AddRightGroupbox("Trinket Config");
-	]]
+	trinkets = tabs.trinkets:AddMiddleGroupbox("Trinket ESP");
 }
 
 esp_settings = {
