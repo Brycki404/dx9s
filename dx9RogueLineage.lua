@@ -117,9 +117,7 @@ tabs = {
 	enemies = interface:AddTab("Enemies");
 	ores = interface:AddTab("Ores");
 	npcs = interface:AddTab("NPCs");
-	--[[
 	trinkets = interface:AddTab("Trinkets");
-	]]
 }
 
 groupboxes = {
@@ -134,10 +132,7 @@ groupboxes = {
 
 	npcs = tabs.npcs:AddLeftGroupbox("NPC ESP");
 
-	--[[
-	trinkets = tabs.trinkets:AddLeftGroupbox("Trinket ESP");
-	trinkets_config = tabs.trinkets:AddRightGroupbox("Trinket Config");
-	]]
+	trinkets = tabs.trinkets:AddMiddleGroupbox("Trinket ESP");
 }
 
 esp_settings = {
@@ -731,8 +726,6 @@ if _G.NPCTask then
 	_G.NPCTask()
 end
 
-dx9.ShowConsole(true)
-
 if _G.OreTask == nil then
 	_G.OreTask = function()
         if ores.enabled.Value then
@@ -819,7 +812,7 @@ if _G.TrinketTask == nil then
 							local my_root_pos = dx9.GetPosition(my_root)
 							local root_pos = dx9.GetPosition(v2)
 							local root_distance = _G.Get_Distance(my_root_pos, root_pos)
-							if root_distance < typeTab.distance_limit.Value then
+							if root_distance < trinkets.distance_limit.Value then
 								local root_screen_pos = dx9.WorldToScreen({root_pos.x, root_pos.y, root_pos.z})
 								if _G.IsOnScreen(root_screen_pos) then
 									lib_esp.draw({
