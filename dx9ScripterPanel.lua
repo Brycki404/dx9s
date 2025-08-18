@@ -5,6 +5,7 @@ config = _G.config or {
 	urls = {
 		DXLibUI = "https://raw.githubusercontent.com/B0NBunny/DXLibUI/refs/heads/personaldev/main.lua";
         LibESP = "https://raw.githubusercontent.com/B0NBunny/DXLibESP/refs/heads/main/main.lua";
+		repr = "https://raw.githubusercontent.com/Ozzypig/repr/refs/heads/master/repr.lua"
 	};
 	settings = {
 		menu_toggle_keybind = "[F2]";
@@ -39,6 +40,13 @@ if _G.clearedConsole == true then
 	_G.clearedConsole = false
 end
 
+if _G.deepSearchCache == nil then
+	_G.deepSearchCache = {
+		Tree = {};
+		Hits = {};
+	}
+end
+
 if _G.lastElapsedCycleTimesCache == nil then
 	_G.lastElapsedCycleTimesCache = {}
 elseif _G.lastElapsedCycleTimesCache ~= nil then
@@ -62,6 +70,8 @@ elseif _G.lastElapsedCycleTimesCache ~= nil then
 		end
 	end
 end
+
+repr = loadstring(dx9.Get(config.urls.repr))()
 
 lib_ui = loadstring(dx9.Get(config.urls.DXLibUI))()
 
@@ -134,10 +144,6 @@ deepsearch.exactmatch = groupboxes.deepsearch:AddToggle({
 }):AddTooltip("Whether Or Not The Instance Name You Search For Has To Be An Exact Match"):OnChanged(function(value)
 	lib_ui:Notify("Toggled Exact Match to "..tostring(value), 1)
 end)
-deepsearch.searchbutton = groupboxes.deepsearch:AddButton( "Search" , function()
-	lib_ui:Notify("Searching for '"..(deepsearch.searchbox:GetValue() or "").."'", 1)
-end):AddTooltip("Click To Start A Search")
-
 
 if _G.Get_Distance == nil then
 	_G.Get_Distance = function(v1, v2)
@@ -169,6 +175,52 @@ if _G.Get_Index == nil then
 end
 
 datamodel = dx9.GetDatamodel()
+
+local reprSettings = {
+	pretty = true;              -- print with \n and indentation?
+	semicolons = true;          -- when printing tables, use semicolons (;) instead of commas (,)?
+	sortKeys = false;             -- when printing dictionary tables, sort keys alphabetically?
+	spaces = 2;                  -- when pretty printing, use how many spaces to indent?
+	tabs = false;                -- when pretty printing, use tabs instead of spaces?
+	robloxFullName = false;      -- when printing Roblox objects, print full name or just name? 
+	robloxProperFullName = false; -- when printing Roblox objects, print a proper* full name?
+	robloxClassName = false;      -- when printing Roblox objects, also print class name in parens?
+}
+
+function DeepSearch(name)
+	if datamodel then
+		local tree = {}
+		local hits = {}
+
+		function Search(instance, parent)
+			local children = dx9.GetChildren(instance)
+			if children then
+				if type(children) == "table" then
+					if #children == 0 then
+						parent[instance] = 0;
+					elseif #children > 0 then
+						for i, child in pairs(children) do
+							Search(child, instance)
+						end
+					end
+				end
+			end
+		end
+
+		Search(datamodel, tree)
+
+		print(repr(tree, reprSettings))
+	end
+end
+
+deepsearch.searchbutton = groupboxes.deepsearch:AddButton("Search", function()
+	local searchTerm = deepsearch.searchbox:GetValue()
+	if searchTerm then
+		lib_ui:Notify("Searching for '"..searchTerm.."'", 1)
+		DeepSearch(searchTerm)
+	end
+end):AddTooltip("Click To Start A Search")
+
 workspace = dx9.FindFirstChild(datamodel, "Workspace")
 services = {
 	players = dx9.FindFirstChild(datamodel, "Players");
@@ -203,6 +255,7 @@ my_player = dx9.FindFirstChild(services.players, local_player_name)
 
 if my_player ~= nil and my_player ~= 0 then
     --do stuff
+
 end
 
 local endTime = os.clock()
@@ -213,3 +266,5 @@ if _G.lastElapsedCycleTimesCache ~= nil then
 	end
 	table.insert(_G.lastElapsedCycleTimesCache, elapsedTime)
 end
+
+print("end")
