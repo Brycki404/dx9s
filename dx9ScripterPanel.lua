@@ -20,6 +20,19 @@ if _G.config == nil then
 	config = _G.config
 end
 
+if _G.countTableEntries == nil then
+	_G.countTableEntries = function(t)
+		local count = 0
+		if t then
+			for _ in pairs(t) do
+				count = count + 1
+			end
+		end
+		return count
+	end
+end
+countTableEntries = _G.countTableEntries
+
 if _G.averageHz == nil then
 	_G.averageHz = 0
 end
@@ -42,6 +55,8 @@ end
 
 if _G.deepSearchCache == nil then
 	_G.deepSearchCache = {
+		Searching = false;
+		InstancesSearched = 0;
 		Tree = {};
 		Hits = {};
 	}
@@ -175,6 +190,7 @@ if _G.Get_Index == nil then
 end
 
 datamodel = dx9.GetDatamodel()
+workspace = dx9.FindFirstChild(datamodel, "Workspace")
 
 local reprSettings = {
 	pretty = true;              -- print with \n and indentation?
@@ -187,41 +203,130 @@ local reprSettings = {
 	robloxClassName = false;      -- when printing Roblox objects, also print class name in parens?
 }
 
-function DeepSearch(name)
-	if datamodel then
-		local tree = {}
-		local hits = {}
+function shallowCopy(tbl)
+	local t = {}
+	for key, value in pairs(tbl) do
+		t[key] = value
+	end
+	return t
+end
 
-		function Search(instance, parent)
-			local children = dx9.GetChildren(instance)
-			if children then
-				if type(children) == "table" then
-					if #children == 0 then
-						parent[instance] = 0;
-					elseif #children > 0 then
-						for i, child in pairs(children) do
-							Search(child, instance)
+function findPath(tbl, targetIndex, currentPath)
+    currentPath = currentPath or {}
+
+    for key, value in pairs(tbl) do
+		local newPath = shallowCopy(currentPath)
+        table.insert(newPath, key)
+		
+        if key == targetIndex then
+            return newPath
+        elseif type(value) == "table" then
+            local result = findPath(value, targetIndex, newPath)
+            if result then
+                return result
+            end
+        end
+    end
+
+    return nil
+end
+
+-- Helper to format the path as a string
+function formatPath(path)
+    local str = ""
+    for i, key in ipairs(path) do
+        str = str .. "[" .. dx9.GetName(tonumber(key)) .. "]"
+    end
+    return str
+end
+
+local instanceNameBlacklist = {
+	"AnimSaves"
+}
+
+function DeepSearch(searchTerm)
+	if searchTerm ~= nil and type(searchTerm) == "string" then
+		if workspace ~= nil and workspace ~= 0 then
+			_G.deepSearchCache.Tree = {}
+			_G.deepSearchCache.Hits = {}
+			_G.deepSearchCache.InstancesSearched = 0
+			
+			function Search(instance, parent)
+				local address = tostring(instance)
+				local children = dx9.GetChildren(instance)
+				if children then
+					if type(children) == "table" then
+						local foundInBlacklist = false
+						local instanceName = dx9.GetName(instance)
+						for i, blacklist in pairs(instanceNameBlacklist) do
+							if instanceName == blacklist then
+								foundInBlacklist = true
+								break
+							end
+						end
+						if not foundInBlacklist then
+							if instance ~= workspace then
+								if instanceName ~= nil and type(instanceName) == "string" then
+									if deepsearch.exactmatch.Value then
+										if instanceName == searchTerm then
+											table.insert(_G.deepSearchCache.Hits, address)
+										end
+									else
+										if string.find(instanceName, searchTerm, 1, true) then
+											table.insert(_G.deepSearchCache.Hits, address)
+										end
+									end
+								end
+							end
+							_G.deepSearchCache.InstancesSearched = _G.deepSearchCache.InstancesSearched + 1
+							if #children == 0 then
+								parent[address] = 0;
+							elseif #children > 0 then
+								parent[address] = {};
+								for i, child in pairs(children) do
+									Search(child, parent[address])
+								end
+							end
 						end
 					end
 				end
 			end
+
+			Search(workspace, _G.deepSearchCache.Tree)
 		end
-
-		Search(datamodel, tree)
-
-		print(repr(tree, reprSettings))
 	end
 end
 
 deepsearch.searchbutton = groupboxes.deepsearch:AddButton("Search", function()
 	local searchTerm = deepsearch.searchbox:GetValue()
 	if searchTerm then
-		lib_ui:Notify("Searching for '"..searchTerm.."'", 1)
-		DeepSearch(searchTerm)
+		if not _G.deepSearchCache.Searching then
+			_G.deepSearchCache.Searching = true;
+			lib_ui:Notify("Searching for '"..searchTerm.."'", 1)
+			DeepSearch(searchTerm)
+			print(repr(_G.deepSearchCache.Tree, reprSettings))
+			print(repr(_G.deepSearchCache.Tree, reprSettings))
+			print("Hits:", countTableEntries(_G.deepSearchCache.Hits))
+			for i, instance in pairs(_G.deepSearchCache.Hits) do
+				local path = findPath(_G.deepSearchCache.Tree, instance)
+				if path then
+					print("\nPath to value:", formatPath(path))  --> Output: Path to value: ["user"]["settings"]["theme"]
+				else
+					print("\nValue not found.")
+				end
+			end
+			_G.deepSearchCache.Searching = false;
+		end
 	end
 end):AddTooltip("Click To Start A Search")
 
-workspace = dx9.FindFirstChild(datamodel, "Workspace")
+if _G.deepSearchCache.Searching then
+	groupboxes.deepsearch:AddLabel("Searching in progress...", {255, 255, 0})
+else
+	groupboxes.deepsearch:AddLabel("There is no currently running search in progress.", {100, 100, 100})
+end
+groupboxes.deepsearch:AddLabel(tostring(_G.deepSearchCache.InstancesSearched or 0).." instances searched")
+
 services = {
 	players = dx9.FindFirstChild(datamodel, "Players");
 }
