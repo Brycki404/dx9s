@@ -275,7 +275,6 @@ tabs = {
     missions = interface:AddTab("Missions");
 	routers = interface:AddTab("Routers");
 	antennas = interface:AddTab("Antennas");
-    npcs = interface:AddTab("NPCs");
     scrap = interface:AddTab("Scrap");
 }
 
@@ -290,7 +289,6 @@ groupboxes = {
     missions = tabs.missions:AddMiddleGroupbox("Missions");
     routers = tabs.routers:AddMiddleGroupbox("Routers");
 	antennas = tabs.antennas:AddMiddleGroupbox("Antennas");
-    npcs = tabs.npcs:AddMiddleGroupbox("NPCs");
 	scrap = tabs.scrap:AddMiddleGroupbox("Scrap ESP");
 	scrap_config = tabs.scrap:AddMiddleGroupbox("Scrap Config");
 }
