@@ -1,130 +1,6 @@
 --indent size 4
 local startTime = os.clock()
 
---If you don't want a super long list, feel free to set _G.scrapconfig to your own table before using loadstring on this script
-scrapconfig = _G.scrapconfig or {
-    {
-		name = "Other";
-		Enabled = false;
-	};
-	{
-		name = "Capacitor";
-		Enabled = false;
-	};
-    {
-		name = "PulseGenerator";
-		Enabled = false;
-	};
-    {
-		name = "RailTrigger";
-		Enabled = false;
-	};
-    {
-		name = "MagnetomotiveCalibrator";
-		Enabled = false;
-	};
-    {
-		name = "Battery";
-		Enabled = false;
-	};
-    {
-		name = "Scrap";
-		Enabled = false;
-	};
-    {
-		name = "BatteryLarge";
-		Enabled = false;
-	};
-    {
-		name = "DriveRare";
-		Enabled = false;
-	};
-    {
-		name = "Jewelry";
-		Enabled = false;
-	};
-    {
-		name = "JewelryRare";
-		Enabled = false;
-	};
-    {
-		name = "JewelryUncommon";
-		Enabled = false;
-	};
-    {
-		name = "Laptop";
-		Enabled = false;
-	};
-    {
-		name = "MobileDevice";
-		Enabled = false;
-	};
-    {
-		name = "Thumbdrive";
-		Enabled = false;
-	};
-    {
-		name = "ThumbdriveRare";
-		Enabled = false;
-	};
-    {
-		name = "Trash";
-		Enabled = false;
-	};
-    {
-		name = "DeliveryPackage";
-		Enabled = false;
-	};
-    {
-		name = "Cloth";
-		Enabled = false;
-	};
-    {
-		name = "DuctTape";
-		Enabled = false;
-	};
-    {
-		name = "YankMod1";
-		Enabled = false;
-	};
-    {
-		name = "GrapplerCore";
-		Enabled = false;
-	};
-    {
-		name = "GrapplerPart3";
-		Enabled = false;
-	};
-    {
-		name = "GrapplerPart4";
-		Enabled = false;
-	};
-    {
-		name = "YankMod2";
-		Enabled = false;
-	};
-    {
-		name = "GrapplerPart1";
-		Enabled = false;
-	};
-    {
-		name = "Roll";
-		Enabled = false;
-	};
-    {
-		name = "AluminumCasing";
-		Enabled = false;
-	};
-    {
-		name = "MagneticCoil";
-		Enabled = false;
-	};
-}
-if _G.scrapconfig == nil then
-	_G.scrapconfig = scrapconfig
-	scrapconfig = _G.scrapconfig
-end
-
 config = _G.config or {
 	urls = {
 		DXLibUI = "https://raw.githubusercontent.com/Brycki404/DXLibUI/refs/heads/main/main.lua";
@@ -141,53 +17,15 @@ config = _G.config or {
         maximum_Hz_Cache = 15;
 		Sec_precision = 4;
 		Hz_precision = 0;
-        cache_cleanup_timer = 3;
     };
-    players = {
-        enabled = true;
-        distance = true;
-        nametag = true;
-        tracer = false;
-        color = { 0, 225, 0 };
-		distance_limit = 10000;
-    };
-    missions = {
-		enabled = true;
-        distance = true;
-        nametag = true;
-        tracer = false;
-		color = { 255, 255, 100 };
-		distance_limit = 10000;
-	};
-    routers = {
-		enabled = false;
-        distance = true;
-        nametag = true;
-        tracer = false;
-		color = { 225, 0, 0 };
-		distance_limit = 10000;
-	};
-	antennas = {
-		enabled = false;
-        distance = true;
-        nametag = true;
-        tracer = false;
-		color = { 50, 255, 255 };
-		distance_limit = 10000;
-	};
-    scrap = {
-        enabled = fa    ;
-        distance = true;
-        nametag = true;
-        tracer = false;
-		color = { 255, 255, 255 };
-		distance_limit = 10000;
-		entries = scrapconfig;
-	};
 };
 if _G.config == nil then
 	_G.config = config
 	config = _G.config
+end
+
+if _G.waypoints == nil then
+    _G.waypoints = {}
 end
 
 if _G.averageHz == nil then
@@ -254,7 +92,7 @@ lib_ui = loadstring(dx9.Get(config.urls.DXLibUI))()
 lib_esp = loadstring(dx9.Get(config.urls.LibESP))()
 
 interface = lib_ui:CreateWindow({
-	Title = "Parkour Reborn | dx9ware | By @Brycki";
+	Title = "Waypoints | dx9ware | By @Brycki";
 	Size = { 500, 500 };
 	Resizable = true;
 
@@ -271,11 +109,7 @@ interface = lib_ui:CreateWindow({
 
 tabs = {
 	settings = interface:AddTab("Settings");
-	players = interface:AddTab("Players");
-    missions = interface:AddTab("Missions");
-	routers = interface:AddTab("Routers");
-	antennas = interface:AddTab("Antennas");
-    scrap = interface:AddTab("Scrap");
+	waypoints = interface:AddTab("Waypoints");
 }
 
 if lib_ui.FirstRun then
@@ -285,12 +119,7 @@ end
 groupboxes = {
     debug = tabs.settings:AddMiddleGroupbox("Debugging");
 	master_esp_settings = tabs.settings:AddMiddleGroupbox("Master ESP");
-	players = tabs.players:AddMiddleGroupbox("Player ESP");
-    missions = tabs.missions:AddMiddleGroupbox("Missions");
-    routers = tabs.routers:AddMiddleGroupbox("Routers");
-	antennas = tabs.antennas:AddMiddleGroupbox("Antennas");
-	scrap = tabs.scrap:AddMiddleGroupbox("Scrap ESP");
-	scrap_config = tabs.scrap:AddMiddleGroupbox("Scrap Config");
+	waypoints = tabs.players:AddMiddleGroupbox("Waypoints");
 }
 
 debugging = {}
@@ -316,14 +145,6 @@ debugging.resize = groupboxes.debug:AddButton("Resize Window", function()
     interface.Size = {500, 500}
     lib_ui:Notify("Reset Window Size to 500x500", 1)
 end)
-debugging.scrap_cache_cleanup_timer = groupboxes.debug:AddSlider({
-    Default = config.settings.cache_cleanup_timer;
-    Text = "ScrapCache Cleanup Timer";
-    Min = 0;
-    Max = 10;
-    Rounding = 1;
-});
-debugging.scrap_cache_size = groupboxes.debug:AddLabel("Scrap Cache Size: "..tostring(countTableEntries(_G.ScrapCache or {}) or 0))
 
 master_esp_settings = {
 	enabled = groupboxes.master_esp_settings
@@ -979,7 +800,7 @@ if _G.ScrapCache == nil then
     _G.ScrapCache = {}
 else
     for i, cached_tab in pairs(_G.ScrapCache) do
-        if not cached_tab.last_update or (os.clock() - cached_tab.last_update) > debugging.scrap_cache_cleanup_timer.Value then
+        if not cached_tab.last_update or (os.clock() - cached_tab.last_update) > config.settings.cache_cleanup_timer then
             _G.ScrapCache[i] = nil
         end
     end
