@@ -1,11 +1,12 @@
 --indent size 4
+dx9.ShowConsole(true)
 local startTime = os.clock()
 
-config = _G.config or {
+Config = _G.config or {
 	urls = {
-		DXLibUI = "https://raw.githubusercontent.com/Brycki404/DXLibUI/refs/heads/main/main.lua";
+		DXLibUI = "https://raw.githubusercontent.com/Brycki404/DXLibUI/refs/heads/personaldev/main.lua";
 		LibESP = "https://raw.githubusercontent.com/Brycki404/DXLibESP/refs/heads/main/main.lua";
-        repr = "https://raw.githubusercontent.com/Ozzypig/repr/refs/heads/master/repr.lua"
+        Repr = "https://raw.githubusercontent.com/Ozzypig/Repr/refs/heads/master/Repr.lua";
 	};
     settings = {
 		menu_toggle_keybind = "[F2]";
@@ -19,8 +20,12 @@ config = _G.config or {
     };
 };
 if _G.config == nil then
-	_G.config = config
-	config = _G.config
+	_G.config = Config
+	Config = _G.config
+end
+
+if _G.selectedWaypointIndex == nil then
+	_G.selectedWaypointIndex = 0
 end
 
 if _G.waypointlist == nil then
@@ -57,12 +62,12 @@ elseif _G.lastElapsedCycleTimesCache ~= nil then
 			sum = sum + elapsedCycleTime
 		end
 		local averageSeconds = sum / cache_entries
-		local Sec_precision = 10 ^ config.settings.Sec_precision
+		local Sec_precision = 10 ^ Config.settings.Sec_precision
 		local flooredSec = math.floor(averageSeconds * Sec_precision) / Sec_precision
 		_G.averageSec = flooredSec or 0
 		if averageSeconds > 0 and averageSeconds < math.huge then
 			local averageHertz = 1 / averageSeconds
-			local Hz_precision = 10 ^ config.settings.Hz_precision
+			local Hz_precision = 10 ^ Config.settings.Hz_precision
 			local flooredHertz = math.floor(averageHertz * Hz_precision) / Hz_precision
 			_G.averageHz = flooredHertz or 0
 		else
@@ -87,8 +92,10 @@ if _G.GetWaypointSelectionOptions == nil then
 	_G.GetWaypointSelectionOptions = function()
 		local list = {}
 
-		for index, data in ipairs(_G.waypointlist) do
-			list[index] = tostring(index) .. " - '" .. data.name .. "'"
+		if _G.waypointlist ~= nil and type(_G.waypointlist) == "table" and #_G.waypointlist > 0 then
+			for index, data in ipairs(_G.waypointlist) do
+				list[index] = tostring(index) .. " - '" .. data.name .. "'"
+			end
 		end
 
 		return list
@@ -98,10 +105,10 @@ end
 if _G.GetWaypointDropdownSelectionOptions == nil then
 	_G.GetWaypointDropdownSelectionOptions = function(waypointSelectionOptions)
 		local list = {
-			[1] = "0 - [Create a New Waypoint]";
+			"0 - [Create a New Waypoint]";
 		}
 
-		if type(waypointSelectionOptions) == "table" then
+		if waypointSelectionOptions ~= nil and type(waypointSelectionOptions) == "table" and #waypointSelectionOptions >= 1 then
 			for index, text in ipairs(waypointSelectionOptions) do
 				list[index + 1] = text
 			end
@@ -111,18 +118,28 @@ if _G.GetWaypointDropdownSelectionOptions == nil then
 	end
 end
 
-repr = loadstring(dx9.Get(config.urls.repr))()
+Lib_ui = loadstring(dx9.Get(Config.urls.DXLibUI))()
 
-lib_ui = loadstring(dx9.Get(config.urls.DXLibUI))()
+--Repr = loadstring(dx9.Get(Config.urls.Repr))()
+local ReprSettings = {
+	pretty = true;              -- print with \n and indentation?
+	semicolons = true;          -- when printing tables, use semicolons (;) instead of commas (,)?
+	sortKeys = false;             -- when printing dictionary tables, sort keys alphabetically?
+	spaces = 2;                  -- when pretty printing, use how many spaces to indent?
+	Tabs = false;                -- when pretty printing, use Tabs instead of spaces?
+	robloxFullName = false;      -- when printing Roblox objects, print full name or just name? 
+	robloxProperFullName = false; -- when printing Roblox objects, print a proper* full name?
+	robloxClassName = false;      -- when printing Roblox objects, also print class name in parens?
+}
 
-lib_esp = loadstring(dx9.Get(config.urls.LibESP))()
+Lib_esp = loadstring(dx9.Get(Config.urls.LibESP))()
 
-interface = lib_ui:CreateWindow({
+Interface = Lib_ui:CreateWindow({
 	Title = "Waypoints | dx9ware | By @Brycki";
 	Size = { 500, 500 };
 	Resizable = true;
 
-	ToggleKey = config.settings.menu_toggle_keybind;
+	ToggleKey = Config.settings.menu_toggle_keybind;
 
 	FooterToggle = true;
 	FooterRGB = true;
@@ -133,58 +150,59 @@ interface = lib_ui:CreateWindow({
 	OutlineColor = { 40, 40, 40 };
 })
 
-tabs = {
-	settings = interface:AddTab("Settings");
-	waypoints = interface:AddTab("Waypoints");
+Tabs = {
+	settings = Interface:AddTab("Settings");
+	waypoints = Interface:AddTab("Waypoints");
 }
 
-if lib_ui.FirstRun then
-    tabs.settings:Focus()
+if _G.FirstScriptLoopRan == nil then
+	_G.FirstScriptLoopRan = true
+    Tabs.settings:Focus()
 end
 
-groupboxes = {
-    debug = tabs.settings:AddMiddleGroupbox("Debugging");
-	master_esp_settings = tabs.settings:AddMiddleGroupbox("Master ESP");
-	waypoints = tabs.waypoints:AddMiddleGroupbox("Waypoints");
+Groupboxes = {
+    debug = Tabs.settings:AddMiddleGroupbox("Debugging");
+	master_esp_settings = Tabs.settings:AddMiddleGroupbox("Master ESP");
+	waypoints = Tabs.waypoints:AddMiddleGroupbox("Waypoints");
 }
 
-debugging = {}
-debugging.console = groupboxes.debug:AddToggle({
-		Default = false;
-		Text = "Console Enabled";
-	}):OnChanged(function(value)
-		lib_ui:Notify(value and "[Debug] Enabled Console" or "[Debug] Disabled Console", 1)
-		if value then
-			_G.consoleEnabled = true
-			dx9.ClearConsole()
-			dx9.ShowConsole(true)
-		else
-			_G.consoleEnabled = false
-			dx9.ClearConsole()
-			dx9.ShowConsole(false)
-		end
-	end)
-debugging.sec = groupboxes.debug:AddLabel("Avg. Program Cycle: ".._G.averageSec.." s")
-debugging.hz = groupboxes.debug:AddLabel("Avg. Program Cycle: ".._G.averageHz.." Hz")
-debugging.clock = groupboxes.debug:AddLabel("Clock: "..os.clock())
-debugging.resize = groupboxes.debug:AddButton("Resize Window", function()
-    interface.Size = {500, 500}
-    lib_ui:Notify("Reset Window Size to 500x500", 1)
+Debugging = {}
+Debugging.console = Groupboxes.debug:AddToggle({
+	Default = false;
+	Text = "Console Enabled";
+}):OnChanged(function(value)
+	Lib_ui:Notify(value and "[Debug] Enabled Console" or "[Debug] Disabled Console", 1)
+	if value then
+		_G.consoleEnabled = true
+		dx9.ClearConsole()
+		dx9.ShowConsole(true)
+	else
+		_G.consoleEnabled = false
+		dx9.ClearConsole()
+		dx9.ShowConsole(false)
+	end
+end)
+Debugging.sec = Groupboxes.debug:AddLabel("Avg. Program Cycle: ".._G.averageSec.." s")
+Debugging.hz = Groupboxes.debug:AddLabel("Avg. Program Cycle: ".._G.averageHz.." Hz")
+Debugging.clock = Groupboxes.debug:AddLabel("Clock: "..os.clock())
+Debugging.resize = Groupboxes.debug:AddButton("Resize Window", function()
+    Interface.Size = {500, 500}
+    Lib_ui:Notify("Reset Window Size to 500x500", 1)
 end)
 
-master_esp_settings = {}
-master_esp_settings.enabled = groupboxes.master_esp_settings:AddToggle({
-	Default = config.settings.master_esp_enabled;
+Master_esp_settings = {}
+Master_esp_settings.enabled = Groupboxes.master_esp_settings:AddToggle({
+	Default = Config.settings.master_esp_enabled;
 	Text = "Enabled";
 }):OnChanged(function(value)
-	lib_ui:Notify(value and "[settings] Enabled Master ESP" or "[settings] Disabled Master ESP", 1)
+	Lib_ui:Notify(value and "[settings] Enabled Master ESP" or "[settings] Disabled Master ESP", 1)
 end);
-master_esp_settings.tracer_type = groupboxes.master_esp_settings:AddDropdown({
+Master_esp_settings.tracer_type = Groupboxes.master_esp_settings:AddDropdown({
 	Text = "Tracer Type";
-	Default = config.settings.tracer_type;
+	Default = Config.settings.tracer_type;
 	Values = { "Near-Bottom", "Bottom", "Top", "Mouse" };
 }):OnChanged(function(value)
-	lib_ui:Notify("[settings] Tracer Type: " .. value, 1)
+	Lib_ui:Notify("[settings] Tracer Type: " .. value, 1)
 end)
 
 if _G.Get_Distance == nil then
@@ -197,29 +215,18 @@ if _G.Get_Distance == nil then
 	end
 end
 
-datamodel = dx9.GetDatamodel()
-workspace = dx9.FindFirstChild(datamodel, "Workspace")
-services = {
-	players = dx9.FindFirstChild(datamodel, "Players");
+Datamodel = dx9.GetDatamodel()
+Workspace = dx9.FindFirstChild(Datamodel, "Workspace")
+Services = {
+	players = dx9.FindFirstChild(Datamodel, "Players");
 }
 
-local reprSettings = {
-	pretty = true;              -- print with \n and indentation?
-	semicolons = true;          -- when printing tables, use semicolons (;) instead of commas (,)?
-	sortKeys = false;             -- when printing dictionary tables, sort keys alphabetically?
-	spaces = 2;                  -- when pretty printing, use how many spaces to indent?
-	tabs = false;                -- when pretty printing, use tabs instead of spaces?
-	robloxFullName = false;      -- when printing Roblox objects, print full name or just name? 
-	robloxProperFullName = false; -- when printing Roblox objects, print a proper* full name?
-	robloxClassName = false;      -- when printing Roblox objects, also print class name in parens?
-}
-
-local_player = nil
-mouse = nil
+Local_player = nil
+Mouse = nil
 
 if _G.Update_Mouse == nil then
 	_G.Update_Mouse = function()
-		mouse = dx9.GetMouse()
+		Mouse = dx9.GetMouse()
 	end
 end
 
@@ -228,247 +235,214 @@ _G.Update_Mouse()
 if _G.Get_Distance_From_Mouse == nil then
 	_G.Get_Distance_From_Mouse = function(pos)
 		_G.Update_Mouse()
-		local a = (mouse.x - pos.x) * (mouse.x - pos.x)
-		local b = (mouse.y - pos.y) * (mouse.y - pos.y)
+		local a = (Mouse.x - pos.x) * (Mouse.x - pos.x)
+		local b = (Mouse.y - pos.y) * (Mouse.y - pos.y)
 		
 		return math.floor(math.sqrt(a + b) + 0.5)
 	end
 end
 
-current_tracer_type = master_esp_settings.tracer_type.ValueIndex
+Local_player_table = dx9.get_localplayer()
 
-local_player_table = dx9.get_localplayer()
-
-if local_player == nil then
-	for _, player in pairs(dx9.GetChildren(services.players)) do
+if Local_player == nil then
+	for _, player in pairs(dx9.GetChildren(Services.players)) do
 		local pgui = dx9.FindFirstChild(player, "PlayerGui")
 		if pgui ~= nil and pgui ~= 0 then
-			local_player = player
+			Local_player = player
 			break
 		end
 	end
 end
 
-if local_player == nil or local_player == 0 then
-	local_player = local_player_table
+if Local_player == nil or Local_player == 0 then
+	Local_player = Local_player_table
 end
 
-function get_local_player_name()
-	if dx9.GetType(local_player) == "Player" then
-		return dx9.GetName(local_player)
+function Get_local_player_name()
+	if dx9.GetType(Local_player) == "Player" then
+		return dx9.GetName(Local_player)
 	else
-		return local_player.Info.Name or local_player_table.Info.Name
+		return Local_player.Info.Name or Local_player_table.Info.Name
 	end
 end
 
-local_player_name = get_local_player_name()
+Local_player_name = Get_local_player_name()
 
-my_player = dx9.FindFirstChild(services.players, local_player_name)
-my_character = nil
-my_head = nil
-my_root = nil
-my_humanoid = nil
+My_player = dx9.FindFirstChild(Services.players, Local_player_name)
+My_character = nil
+My_head = nil
+My_root = nil
+My_humanoid = nil
 
-if my_player ~= nil and my_player ~= 0 then
-    my_character = dx9.FindFirstChild(workspace, local_player_name)
+if My_player ~= nil and My_player ~= 0 then
+    My_character = dx9.FindFirstChild(Workspace, Local_player_name)
 end
 
-if my_character ~= nil and my_character ~= 0 then
-	my_head = dx9.FindFirstChild(my_character, "Head")
-	my_root = dx9.FindFirstChild(my_character, "HumanoidRootPart")
-	my_humanoid = dx9.FindFirstChild(my_character, "Humanoid")
+if My_character ~= nil and My_character ~= 0 then
+	My_head = dx9.FindFirstChild(My_character, "Head")
+	My_root = dx9.FindFirstChild(My_character, "HumanoidRootPart")
+	My_humanoid = dx9.FindFirstChild(My_character, "Humanoid")
 end
 
-function get_local_player_position()
-	if dx9.GetType(local_player) == "Player" then
-		if my_root then
-			local my_root_pos = dx9.GetPosition(my_root)
+function Get_local_player_position()
+	if dx9.GetType(Local_player) == "Player" then
+		if My_root then
+			local my_root_pos = dx9.GetPosition(My_root)
 			return my_root_pos
-		elseif local_player_table then
-			return local_player_table.Position
+		elseif Local_player_table then
+			return Local_player_table.Position
 		end
 	else
-		return local_player.Position or local_player_table.Position
+		return Local_player.Position or Local_player_table.Position
 	end
 end
 
-waypoints = {}
-waypoints.selector = groupboxes.waypoints:AddDropdown({
-	Text = "Select a Waypoint";
+Waypoints = {}
+Waypoints.selector = Groupboxes.waypoints:AddDropdown({
+	Index = "WaypointSelectorDropdown";
 	Default = 1;
-	Values = {"0 - [Create a New Waypoint]"};
-}):OnChanged(function(value)
-	lib_ui:Notify("[waypoints] Selected Waypoint: "..value, 1)
-end)
-local waypointlistindex = waypoints.selector.ValueIndex and waypoints.selector.ValueIndex - 1 or 1
-if waypoints.selector.ValueIndex and waypoints.selector.ValueIndex > 1 and waypointlistindex > 0 and waypointlistindex <= #_G.waypointlist then
-	local waypointdata = _G.waypointlist[waypointlistindex]
-
-	groupboxes.waypoints:AddLabel("Position: { x: "..tostring(math.floor(waypointdata.position.x)).." , y: "..tostring(math.floor(waypointdata.position.y).." , z: "..tostring(math.floor(waypointdata.position.z)).." }"))
-	
-	groupboxes.waypoints:AddTitle("Waypoint Settings")
-	waypoints.nametextbox = groupboxes.waypoints:AddTextBox({
-		Index = "WaypointNameTextBox";
-		Placeholder = "Name";
-		Default = waypointdata.name;
-	}):AddTooltip("The name of the waypoint")
-	waypoints.visible = groupboxes.waypoints:AddToggle({
-		Default = waypointdata.visible;
-		Text = "ESP Visible";
-	})
-	if waypoints.visible.Value then
-		waypoints.color = groupboxes.waypoints:AddColorPicker({
-			Default = waypointdata.color;
-			Text = "ESP Color";
-		}):AddTooltip("The color of the waypoint")
-		waypoints.tracer = groupboxes.waypoints:AddToggle({
-			Default = waypointdata.tracer;
-			Text = "Tracer";
-		}):AddTooltip("Whether or not this waypoint has a tracer showing you to it")
-		waypoints.distance_limit = groupboxes.waypoints:AddSlider({
-			Default = waypointdata.distance_limit;
-			Text = "ESP Distance Limit";
-			Min = 0;
-			Max = 10000;
-			Rounding = 0;
-		}):AddTooltip("How far away a waypoint must be for it to not show")
-		waypoints.nametag = groupboxes.waypoints:AddToggle({
-			Default = waypointdata.nametag;
-			Text = "ESP Nametag Visible";
-		}):AddTooltip("Whether or not the nametag is displayed on this waypoint")
-		if waypoints.nametag.Value then
-			waypoints.distance = groupboxes.waypoints:AddToggle({
-				Default = waypointdata.distance;
-				Text = "ESP Distance Visible";
-			}):AddTooltip("Whether or not the distance is displayed on this waypoint")
+	Text = "Waypoint";
+	Values = {"0 - [Create New Waypoint]"};
+})
+Waypoints.selector = Waypoints.selector:OnChanged(function(value)
+	_G.selectedWaypointIndex = Waypoints.selector.ValueIndex - 1
+	if _G.selectedWaypointIndex >= 1 and _G.selectedWaypointIndex <= #_G.waypointlist then
+		local waypointdata = _G.waypointlist[selectedWaypointIndex]
+		print(waypointdata or tostring(waypointdata))
+		if waypointdata ~= nil and type(waypointdata) == "table" then
+			local quickTools = Lib_ui.Windows["Waypoints | dx9ware | By @Brycki"].Tabs["Waypoints"].Groupboxes["Waypoints"].Tools
+			quickTools["WaypointNameTextBox"]:SetValue(waypointdata.name)
+			quickTools["WaypointVisibleToggle"]:SetValue(waypointdata.visible)
+			quickTools["WaypointColorPicker"]:SetValue(waypointdata.color)
+			quickTools["WaypointTracerToggle"]:SetValue(waypointdata.tracer)
+			quickTools["WaypointDistanceLimitSlider"]:SetValue(waypointdata.distance_limit)
+			quickTools["WaypointNametagToggle"]:SetValue(waypointdata.nametag)
+			quickTools["WaypointDistanceToggle"]:SetValue(waypointdata.distance)
+			Lib_ui:Notify("[Waypoints] Selected Waypoint: "..tostring(value).." - '"..waypointdata.name.."'", 1)
 		end
 	end
+end)
+_G.selectedWaypointIndex = Waypoints.selector.ValueIndex - 1
+
+if _G.selectedWaypointIndex >= 1 and _G.selectedWaypointIndex <= #_G.waypointlist then
+	local waypointdata = _G.waypointlist[_G.selectedWaypointIndex]
+	Groupboxes.waypoints:AddLabel("Position: { x: "..tostring(math.floor(waypointdata.position.x)).." , y: "..tostring(math.floor(waypointdata.position.y).." , z: "..tostring(math.floor(waypointdata.position.z)).." }"))
 else
-	local my_root_pos = get_local_player_position()
-	groupboxes.waypoints:AddLabel("Position: { x: "..tostring(math.floor(my_root_pos.x)).." , y: "..tostring(math.floor(my_root_pos.y).." , z: "..tostring(math.floor(my_root_pos.z)).." }"))
-	
-	groupboxes.waypoints:AddTitle("Waypoint Settings")
-	waypoints.nametextbox = groupboxes.waypoints:AddTextBox({
-		Index = "WaypointNameTextBox";
-		Placeholder = "Name";
-		Default = "New Waypoint";
-	}):AddTooltip("The name of the waypoint")
-	waypoints.visible = groupboxes.waypoints:AddToggle({
-		Default = true;
-		Text = "ESP Visible";
-	})
-	if waypoints.visible.Value then
-		waypoints.color = groupboxes.waypoints:AddColorPicker({
-			Default = {255, 255, 255};
-			Text = "ESP Color";
-		})
-		waypoints.tracer = groupboxes.waypoints:AddToggle({
-			Default = false;
-			Text = "Tracer";
-		}):AddTooltip("Whether or not this waypoint has a tracer showing you to it")
-		waypoints.distance_limit = groupboxes.waypoints:AddSlider({
-			Default = 10000;
-			Text = "ESP Distance Limit";
-			Min = 0;
-			Max = 10000;
-			Rounding = 0;
-		}):AddTooltip("How far away a waypoint must be for it to not show")
-		waypoints.nametag = groupboxes.waypoints:AddToggle({
-			Default = true;
-			Text = "ESP Nametag Visible";
-		}):AddTooltip("Whether or not the nametag is displayed on this waypoint")
-		if waypoints.nametag.Value then
-			waypoints.distance = groupboxes.waypoints:AddToggle({
-				Default = true;
-				Text = "ESP Distance Visible";
-			}):AddTooltip("Whether or not the distance is displayed on this waypoint")
-		end
+	local my_root_pos = Get_local_player_position()
+	if my_root_pos ~= nil and type(my_root_pos) == "table" and my_root_pos.x and my_root_pos.y and my_root_pos.z then
+		Groupboxes.waypoints:AddLabel("Position: { x: "..tostring(math.floor(my_root_pos.x)).." , y: "..tostring(math.floor(my_root_pos.y).." , z: "..tostring(math.floor(my_root_pos.z)).." }"))
 	end
 end
 
-groupboxes.waypoints:AddTitle("Functions")
-waypoints.savewaypoint = groupboxes.waypoints:AddButton("Save Waypoint Settings", function()
-	print(tostring(waypoints.selector.ValueIndex))
-	if waypoints.selector.ValueIndex and waypoints.selector.ValueIndex > 1 then
-		local waypointlistindex = waypoints.selector.ValueIndex - 1
-		local waypointdata = _G.waypointlist[waypointlistindex]
+Groupboxes.waypoints:AddTitle("Waypoint Settings")
+Waypoints.nametextbox = Groupboxes.waypoints:AddTextBox({
+	Index = "WaypointNameTextBox";
+	Placeholder = "Name";
+	Default = "New Waypoint";
+})
+Waypoints.visible = Groupboxes.waypoints:AddToggle({
+	Index = "WaypointVisibleToggle";
+	Default = true;
+	Text = "ESP Visible";
+})
+Waypoints.color = Groupboxes.waypoints:AddColorPicker({
+	Index = "WaypointColorPicker";
+	Default = {255, 255, 255};
+	Text = "ESP Color";
+})
+Waypoints.tracer = Groupboxes.waypoints:AddToggle({
+	Index = "WaypointTracerToggle";
+	Default = false;
+	Text = "Tracer";
+})
+Waypoints.distance_limit = Groupboxes.waypoints:AddSlider({
+	Index = "WaypointDistanceLimitSlider";
+	Default = 9999;
+	Text = "ESP Distance Limit";
+	Min = 1;
+	Max = 9999;
+	Rounding = 0;
+})
+Waypoints.nametag = Groupboxes.waypoints:AddToggle({
+	Index = "WaypointNametagToggle";
+	Default = true;
+	Text = "ESP Nametag Visible";
+})
+Waypoints.distance = Groupboxes.waypoints:AddToggle({
+	Index = "WaypointDistanceToggle";
+	Default = true;
+	Text = "ESP Distance Visible";
+})
+Groupboxes.waypoints:AddTitle("Functions")
+Waypoints.savewaypoint = Groupboxes.waypoints:AddButton("Save Waypoint Settings", function()
+	if _G.selectedWaypointIndex >= 1 and _G.selectedWaypointIndex <= #_G.waypointlist then
+		local waypointdata = _G.waypointlist[_G.selectedWaypointIndex]
 
-		waypointdata.name = waypoints.nametextbox:GetValue()
-		waypointdata.visible = waypoints.visible.Value
-		waypointdata.color = waypoints.color and waypoints.color.Value or nil
-		waypointdata.tracer = waypoints.tracer and waypoints.tracer.Value or nil
-		waypointdata.nametag = waypoints.nametag and waypoints.nametag.Value or nil
-		waypointdata.distance = waypoints.distance and waypoints.distance.Value or nil
+		waypointdata.name = Waypoints.nametextbox:GetValue()
+		waypointdata.visible = Waypoints.visible.Value
+		waypointdata.color = Waypoints.color ~= nil and Waypoints.color.Value or nil
+		waypointdata.tracer = Waypoints.tracer ~= nil and Waypoints.tracer.Value or nil
+		waypointdata.distance_limit = Waypoints.distance_limit ~= nil and Waypoints.distance_limit.Value or nil
+		waypointdata.nametag = Waypoints.nametag ~= nil and Waypoints.nametag.Value or nil
+		waypointdata.distance = Waypoints.distance ~= nil and Waypoints.distance.Value or nil
 
-		_G.waypointlist[waypointlistindex] = waypointdata
+		_G.waypointlist[_G.selectedWaypointIndex] = waypointdata
 	else
 		local newwaypointdata = {}
 
-		local my_root_pos = get_local_player_position()
+		local my_root_pos = Get_local_player_position()
 		newwaypointdata.position = my_root_pos
-		newwaypointdata.name = waypoints.nametextbox:GetValue()
-		newwaypointdata.visible = waypoints.visible.Value
-		newwaypointdata.color = waypoints.color and waypoints.color.Value or nil
-		newwaypointdata.tracer = waypoints.tracer and waypoints.tracer.Value or nil
-		newwaypointdata.nametag = waypoints.nametag and waypoints.nametag.Value or nil
-		newwaypointdata.distance = waypoints.distance and waypoints.distance.Value or nil
+		newwaypointdata.name = Waypoints.nametextbox:GetValue()
+		newwaypointdata.visible = Waypoints.visible.Value
+		newwaypointdata.color = Waypoints.color ~= nil and Waypoints.color.Value or nil
+		newwaypointdata.tracer = Waypoints.tracer ~= nil and Waypoints.tracer.Value or nil
+		newwaypointdata.distance_limit = Waypoints.distance_limit ~= nil and Waypoints.distance_limit.Value or nil
+		newwaypointdata.nametag = Waypoints.nametag ~= nil and Waypoints.nametag.Value or nil
+		newwaypointdata.distance = Waypoints.distance ~= nil and Waypoints.distance.Value or nil
 
 		table.insert(_G.waypointlist, newwaypointdata)
 	end
 
-	local newSelectionOptions = _G.GetWaypointSelectionOptions()
-	local newDropdownOptions = _G.GetWaypointDropdownSelectionOptions(newSelectionOptions)
+	local waypointSelectionOptions = _G.GetWaypointSelectionOptions()
+	local waypointDropdownSelectionOptions = _G.GetWaypointDropdownSelectionOptions(waypointSelectionOptions)
 
-	waypoints.selector:Hide()
-	waypoints.selector:SetValues(newDropdownOptions)
-
-	print(repr(waypoints.selector.Values, reprSettings))
+	Waypoints.selector:SetValues(waypointDropdownSelectionOptions)
 end)
-if waypoints.selector.ValueIndex then
-	if waypoints.selector.ValueIndex > 1 then
-		waypoints.teleporttowaypoint = groupboxes.waypoints:AddButton("Teleport to Waypoint", function()
-			if waypoints.selector.ValueIndex then
-				if waypoints.selector.ValueIndex > 1 then
-					local waypointlistindex = waypoints.selector.ValueIndex - 1
-					local waypointdata = _G.waypointlist[waypointlistindex]
-					local positiondata = waypointdata.position
-					waypoints.selector:Hide()
-					dx9.Teleport(my_character, {positiondata.x, positiondata.y, positiondata.z})
-				end
-			end
-		end)
-		waypoints.deletewaypoint = groupboxes.waypoints:AddButton("Delete Waypoint", function()
-			if waypoints.selector.ValueIndex then
-				if waypoints.selector.ValueIndex > 1 then
-					local waypointlistindex = waypoints.selector.ValueIndex - 1
-					table.remove(_G.waypointlist, waypointlistindex)
-
-					local newSelectionOptions = _G.GetWaypointSelectionOptions()
-					local newDropdownOptions = _G.GetWaypointDropdownSelectionOptions(newSelectionOptions)
-
-					waypoints.selector:Hide()
-					waypoints.selector:SetValue(1)
-					waypoints.selector:SetValues(newDropdownOptions)
-					waypoints.selector:SetValue(1)
-				end
-			end
-		end)
+Waypoints.teleporttowaypoint = Groupboxes.waypoints:AddButton("Teleport to Waypoint", function()
+	if _G.selectedWaypointIndex >= 1 and _G.selectedWaypointIndex <= #_G.waypointlist then
+		local waypointdata = _G.waypointlist[_G.selectedWaypointIndex]
+		local positiondata = waypointdata.position
+		dx9.Teleport(My_character, {positiondata.x, positiondata.y, positiondata.z})
 	end
-end
+end)
+Waypoints.deletewaypoint = Groupboxes.waypoints:AddButton("Delete Waypoint", function()
+	if _G.selectedWaypointIndex >= 1 and _G.selectedWaypointIndex <= #_G.waypointlist then
+		table.remove(_G.waypointlist, _G.selectedWaypointIndex)
 
-screen_size = nil
+		_G.selectedWaypointIndex = 1
+		Waypoints.selector:SetValue(1)
+		_G.selectedWaypointIndex = 1
+
+		local waypointSelectionOptions = _G.GetWaypointSelectionOptions()
+		local waypointDropdownSelectionOptions = _G.GetWaypointDropdownSelectionOptions(waypointSelectionOptions)
+
+		Waypoints.selector:SetValues(waypointDropdownSelectionOptions)
+	end
+end)
+
+Screen_size = nil
 
 if _G.IsOnScreen == nil then
 	_G.IsOnScreen = function(screen_pos)
-		screen_size = dx9.size()
-		if screen_pos and screen_pos ~= 0 and screen_pos.x > 0 and screen_pos.y > 0 and screen_pos.x < screen_size.width and screen_pos.y < screen_size.height then
+		Screen_size = dx9.size()
+		if screen_pos and screen_pos ~= 0 and screen_pos.x > 0 and screen_pos.y > 0 and screen_pos.x < Screen_size.width and screen_pos.y < Screen_size.height then
 			return true
 		end
 		return false
 	end
 end
 
-if not master_esp_settings.enabled.Value then
+if not Master_esp_settings.enabled.Value then
 	return
 end
 
@@ -476,33 +450,25 @@ if _G.WaypointTask == nil then
 	_G.WaypointTask = function()
 		for index, data in ipairs(_G.waypointlist) do
 			if data.visible then
-				local skipThis = true
-
-				if skipThis == true then
-					if data.visible then
-						skipThis = false
-					end
-				end
-
-				if not skipThis then
-					local my_root_pos = get_local_player_position()
-					local pos = data.position
-					local distance = _G.Get_Distance(my_root_pos, pos)
-					local screen_pos = dx9.WorldToScreen({pos.x, pos.y, pos.z})
-					
-					if _G.IsOnScreen(screen_pos) then
-						if distance < scrap.distance_limit.Value then
-							lib_esp.ground_circle({
-								position = {pos.x, pos.y, pos.z},
-								color = scrap.color.Value,
-								nametag = scrap.nametag.Value,
-								custom_nametag = data.name,
-								distance = scrap.distance.Value,
-								custom_distance = distance,
-								tracer = scrap.tracer.Value,
-								tracer_type = current_tracer_type
-							})
-						end
+				local my_root_pos = Get_local_player_position()
+				local pos = data.position
+				local distance = _G.Get_Distance(my_root_pos, pos) or 0
+				local screen_pos = dx9.WorldToScreen({pos.x, pos.y, pos.z})
+				
+				local isOnScreen = _G.IsOnScreen(screen_pos) and true or false
+				local isInRange = distance < data.distance_limit and true or false
+				if isOnScreen then
+					if isInRange then
+						Lib_esp.ground_circle({
+							position = pos,
+							color = data.color,
+							nametag = data.nametag,
+							custom_nametag = data.name,
+							distance = data.distance,
+							custom_distance = distance,
+							tracer = data.tracer,
+							tracer_type = Master_esp_settings.tracer_type.ValueIndex
+						})
 					end
 				end
 			end
@@ -516,7 +482,7 @@ end
 local endTime = os.clock()
 local elapsedTime = endTime - startTime
 if _G.lastElapsedCycleTimesCache ~= nil then
-	if #_G.lastElapsedCycleTimesCache >= config.settings.maximum_Hz_Cache then
+	if #_G.lastElapsedCycleTimesCache >= Config.settings.maximum_Hz_Cache then
 		table.remove(_G.lastElapsedCycleTimesCache, 1)
 	end
 	table.insert(_G.lastElapsedCycleTimesCache, elapsedTime)

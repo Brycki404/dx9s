@@ -176,7 +176,7 @@ config = _G.config or {
 		distance_limit = 10000;
 	};
     scrap = {
-        enabled = fa    ;
+        enabled = false;
         distance = true;
         nametag = true;
         tracer = false;
