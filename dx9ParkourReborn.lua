@@ -176,7 +176,7 @@ config = _G.config or {
 		distance_limit = 10000;
 	};
     scrap = {
-        enabled = fa    ;
+        enabled = false;
         distance = true;
         nametag = true;
         tracer = false;
@@ -979,7 +979,7 @@ if _G.ScrapCache == nil then
     _G.ScrapCache = {}
 else
     for i, cached_tab in pairs(_G.ScrapCache) do
-        if not cached_tab.last_update or (os.clock() - cached_tab.last_update) > config.settings.cache_cleanup_timer then
+        if not cached_tab.last_update or (os.clock() - cached_tab.last_update) > debugging.scrap_cache_cleanup_timer.Value then
             _G.ScrapCache[i] = nil
         end
     end
