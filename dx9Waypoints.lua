@@ -72,8 +72,8 @@ elseif _G.lastElapsedCycleTimesCache ~= nil then
 	end
 end
 
-if _G.countTableEntries == nil then
-	_G.countTableEntries = function(t)
+if _G.CountTableEntries == nil then
+	_G.CountTableEntries = function(t)
 		local count = 0
 		if t then
 			for _ in pairs(t) do
@@ -83,7 +83,20 @@ if _G.countTableEntries == nil then
 		return count
 	end
 end
-countTableEntries = _G.countTableEntries
+
+if _G.GetWaypointSelectionOptions == nil then
+	_G.GetWaypointSelectionOptions = function()
+		local list = {}
+
+		for index, data in pairs(_G.waypointlist) do
+			if data.name and type(data.name) == "string" then
+				list[index] = tostring(index) .. " - '" .. data.name .. "'"
+			end
+		end
+
+		return list
+	end
+end
 
 repr = loadstring(dx9.Get(config.urls.repr))()
 
@@ -177,76 +190,6 @@ master_esp_settings = {
 		end);
 }
 
-waypoints = {}
-waypoints.selector = groupboxes.waypoints:AddDropdown()
-waypoints.
-
-scrap = {
-	enabled = groupboxes.scrap
-		:AddToggle({
-			Default = config.scrap.enabled;
-			Text = "Enabled";
-		})
-		:OnChanged(function(value)
-			lib_ui:Notify(value and "[scrap] Enabled ESP" or "[scrap] Disabled ESP", 1)
-		end);
-
-	distance = groupboxes.scrap
-		:AddToggle({
-			Default = config.scrap.distance;
-			Text = "Distance";
-		})
-		:OnChanged(function(value)
-			lib_ui:Notify(value and "[scrap] Enabled Distance" or "[scrap] Disabled Distance", 1)
-		end);
-
-	nametag = groupboxes.scrap
-		:AddToggle({
-			Default = config.scrap.nametag;
-			Text = "Nametag";
-		})
-		:OnChanged(function(value)
-			lib_ui:Notify(value and "[scrap] Enabled Nametag" or "[scrap] Disabled Nametag", 1)
-		end);
-
-	tracer = groupboxes.scrap
-		:AddToggle({
-			Default = config.scrap.tracer;
-			Text = "Tracer";
-		})
-		:OnChanged(function(value)
-			lib_ui:Notify(value and "[scrap] Enabled Tracer" or "[scrap] Disabled Tracer", 1)
-		end);
-
-    color = groupboxes.scrap:AddColorPicker({
-		Default = config.scrap.color;
-		Text = "Color";
-	});
-
-	distance_limit = groupboxes.scrap:AddSlider({
-		Default = config.scrap.distance_limit;
-		Text = "ESP Distance Limit";
-		Min = 0;
-		Max = 10000;
-		Rounding = 0;
-	});
-}
-
-scrap_config = {}
-for _, tab in pairs(config.scrap.entries) do
-	local name = tab.name
-	local Enabled = tab.Enabled
-
-	scrap_config[name.."_enabled"] = groupboxes.scrap_config
-		:AddToggle({
-			Default = Enabled;
-			Text = name.." ESP Enabled";
-		})
-		:OnChanged(function(value)
-			lib_ui:Notify(value and "[scrap] Enabled "..name.." ESP" or "[scrap] Disabled "..name.." ESP", 1)
-		end)
-end
-
 if _G.Get_Distance == nil then
 	_G.Get_Distance = function(v1, v2)
 		local a = (v1.x - v2.x) * (v1.x - v2.x)
@@ -254,27 +197,6 @@ if _G.Get_Distance == nil then
 		local c = (v1.z - v2.z) * (v1.z - v2.z)
 
 		return math.floor(math.sqrt(a + b + c) + 0.5)
-	end
-end
-
-if _G.Get_Index == nil then
-	_G.Get_Index = function(type, value)
-		local table = nil
-		if type == "tracer" then
-			table = { "Near-Bottom", "Bottom", "Top", "Mouse" }
-		elseif type == "box" then
-			table = { "Corners", "2D Box", "3D Box", "Ground Circle" }
-		end
-
-		if table then
-			for index, item in pairs(table) do
-				if item == value then
-					return index
-				end
-			end
-		end
-
-		return nil
 	end
 end
 
@@ -316,8 +238,10 @@ if _G.Get_Distance_From_Mouse == nil then
 	end
 end
 
-current_tracer_type = _G.Get_Index("tracer", master_esp_settings.tracer_type.Value)
-current_shape_type = _G.Get_Index("shape", master_esp_settings.shape_type.Value)
+current_tracer_type = master_esp_settings.tracer_type.ValueIndex
+current_shape_type = master_esp_settings.shape_type.ValueIndex
+
+local_player_table = dx9.get_localplayer()
 
 if local_player == nil then
 	for _, player in pairs(dx9.GetChildren(services.players)) do
@@ -330,14 +254,14 @@ if local_player == nil then
 end
 
 if local_player == nil or local_player == 0 then
-	local_player = dx9.get_localplayer()
+	local_player = local_player_table
 end
 
 function get_local_player_name()
 	if dx9.GetType(local_player) == "Player" then
 		return dx9.GetName(local_player)
 	else
-		return local_player.Info.Name
+		return local_player.Info.Name or local_player_table.Info.Name
 	end
 end
 
@@ -349,26 +273,148 @@ my_head = nil
 my_root = nil
 my_humanoid = nil
 
-if my_player == nil or my_player == 0 then
-	return
-elseif my_player ~= nil and my_player ~= 0 then
+if my_player ~= nil and my_player ~= 0 then
     my_character = dx9.FindFirstChild(workspace, local_player_name)
 end
 
-if my_character == nil or my_character == 0 then
-	return
-elseif my_character ~= nil and my_character ~= 0 then
+if my_character ~= nil and my_character ~= 0 then
 	my_head = dx9.FindFirstChild(my_character, "Head")
 	my_root = dx9.FindFirstChild(my_character, "HumanoidRootPart")
 	my_humanoid = dx9.FindFirstChild(my_character, "Humanoid")
 end
 
-if my_root == nil or my_root == 0 then
-    return
+function get_local_player_position()
+	if dx9.GetType(local_player) == "Player" then
+		if my_root then
+			local my_root_pos = dx9.GetPosition(my_root)
+			return my_root_pos
+		elseif local_player_table then
+			return local_player_table.Position
+		end
+	else
+		return local_player.Position or local_player_table.Position
+	end
 end
 
-if my_head == nil or my_head == 0 then
-    return
+waypoints = {}
+waypoints.selector = groupboxes.waypoints:AddDropdown({
+	Text = "Select a Waypoint";
+	Default = "0 - [Create a New Waypoint]";
+	Values = table.pack("0 - [Create a New Waypoint]", table.unpack(_G.GetWaypointSelectionOptions()))
+}):OnChanged(function(value)
+	lib_ui:Notify("[waypoints] Selected Waypoint: "..value, 1)
+end)
+
+groupboxes.waypoints:AddTitle("Waypoint Settings")
+
+if waypoints.selector.ValueIndex > 1 then
+	local waypointlistindex = waypoints.selector.ValueIndex - 1
+	local waypointdata = _G.waypointlist[waypointlistindex]
+
+	groupboxes.waypoints:AddLabel("Position: {x: "..tostring(math.floor(waypointdata.position.x)).." , y: "..tostring(math.floor(waypointdata.position.y).." , z: "..tostring(math.floor(waypointdata.position.z)).." }"))
+	waypoints.nametextbox = groupboxes.waypoints:AddTextBox({
+		Index = "WaypointNameTextBox";
+		Placeholder = "Name";
+		Default = waypointdata.name;
+	}):AddTooltip("The name of the waypoint")
+	waypoints.visible = groupboxes.waypoints:AddToggle({
+		Default = waypointdata.visible;
+		Text = "ESP Visible";
+	})
+	if waypoints.visible.Value then
+		waypoints.color = groupboxes.waypoints:AddColorPicker({
+			Default = waypointdata.color;
+			Text = "ESP Color";
+		}):AddTooltip("The color of the waypoint")
+		waypoints.tracer = groupboxes.waypoints:AddToggle({
+			Default = waypointdata.tracer;
+			Text = "Tracer";
+		})
+		waypoints.distance_limit = groupboxes.waypoints:AddSlider({
+			Default = waypointdata.distance_limit;
+			Text = "ESP Distance Limit";
+			Min = 0;
+			Max = 10000;
+			Rounding = 0;
+		})
+		waypoints.nametag = groupboxes.waypoints:AddToggle({
+			Default = waypointdata.nametag;
+			Text = "ESP Nametag Visible";
+		}):AddTooltip("Whether or not the nametag is displayed on this waypoint")
+		if waypointlist.nametag.Value then
+			waypoints.distance = groupboxes.waypoints:AddToggle({
+				Default = waypointdata.distance;
+				Text = "ESP Distance Visible";
+			}):AddTooltip("Whether or not the distance is displayed on this waypoint")
+		end
+	end
+else
+	local my_root_pos = get_local_player_position()
+	groupboxes.waypoints:AddLabel("Position: {x: "..tostring(math.floor(my_root_pos.x)).." , y: "..tostring(math.floor(my_root_pos.y).." , z: "..tostring(math.floor(my_root_pos.z)).." }"))
+	waypoints.nametextbox = groupboxes.waypoints:AddTextBox({
+		Index = "WaypointNameTextBox";
+		Placeholder = "Name";
+		Default = "New Waypoint";
+	}):AddTooltip("The name of the waypoint")
+	waypoints.visible = groupboxes.waypoints:AddToggle({
+		Default = true;
+		Text = "ESP Visible";
+	})
+	if waypoints.visible.Value then
+		waypoints.color = groupboxes.waypoints:AddColorPicker({
+			Default = {255, 255, 255};
+			Text = "ESP Color";
+		}):AddTooltip("The color of the waypoint")
+		waypoints.tracer = groupboxes.waypoints:AddToggle({
+			Default = false;
+			Text = "Tracer";
+		})
+		waypoints.distance_limit = groupboxes.waypoints:AddSlider({
+			Default = 10000;
+			Text = "ESP Distance Limit";
+			Min = 0;
+			Max = 10000;
+			Rounding = 0;
+		})
+		waypoints.nametag = groupboxes.waypoints:AddToggle({
+			Default = true;
+			Text = "ESP Nametag Visible";
+		}):AddTooltip("Whether or not the nametag is displayed on this waypoint")
+		if waypointlist.nametag.Value then
+			waypoints.distance = groupboxes.waypoints:AddToggle({
+				Default = true;
+				Text = "ESP Distance Visible";
+			}):AddTooltip("Whether or not the distance is displayed on this waypoint")
+		end
+	end
+end
+
+groupboxes.waypoints:AddTitle("Functions")
+waypoints.savewaypoint = groupboxes.waypoints:AddButton("Save Waypoint", function()
+	if waypoints.selector.ValueIndex <= 1 then
+		local newwaypointdata = {}
+
+		table.insert(_G.waypointlist, newwaypointdata)
+	else
+		local waypointlistindex = waypoints.selector.ValueIndex - 1
+		local waypointdata = _G.waypointlist[waypointlistindex]
+
+		_G.waypointlist[waypointlistindex] = waypointdata
+	end
+end)
+if waypoints.selector.ValueIndex > 1 then
+	waypoints.teleporttowaypoint = groupboxes.waypoints:AddButton("Teleport to Waypoint", function()
+		if waypoints.selector.ValueIndex > 1 then
+			local waypointlistindex = waypoints.selector.ValueIndex - 1
+			local waypointdata = _G.waypointlist[waypointlistindex]
+		end
+	end)
+	waypoints.deletewaypoint = groupboxes.waypoints:AddButton("Delete Waypoint", function()
+		if waypoints.selector.ValueIndex > 1 then
+			local waypointlistindex = waypoints.selector.ValueIndex - 1
+			table.remove(_G.waypointlist, waypointlistindex)
+		end
+	end)
 end
 
 screen_size = nil
@@ -387,110 +433,62 @@ if not master_esp_settings.enabled.Value then
 	return
 end
 
-if scrap.enabled.Value then
-    raycastignore_folder = dx9.FindFirstChild(workspace, "RaycastIgnore")
-    if raycastignore_folder ~= nil and raycastignore_folder ~= 0 then
-        if _G.RaycastIgnoreTask == nil then
-            _G.RaycastIgnoreTask = function()
-                raycastignore_children = dx9.GetChildren(raycastignore_folder)
-                if raycastignore_children then
-                    if type(raycastignore_children) == "table" then
-                        for i,v in pairs(raycastignore_children) do
-                            if dx9.GetType(v) == "Model" then                    
-                                local part = dx9.FindFirstChild(v, "Part")
-                                if part == nil or part == 0 then
-                                    part = dx9.FindFirstChild(v, "Main")
-                                end
-                                if part ~= nil and part ~= 0 then
-                                    if dx9.GetType(part) == "Part" then
-                                        local cached_tab = _G.ScrapCache[tostring(v)]
-                                        local name = (cached_tab and cached_tab.name) or _G.GetScrapNameFromModel(v) or "Other"
-                                        if not cached_tab then
-                                            _G.ScrapCache[tostring(v)] = {
-                                                name = name;
-                                                last_update = os.clock();
-                                            }
-                                        elseif cached_tab then
-                                            _G.ScrapCache[tostring(v)].last_update = os.clock()
-                                        end
-                                        
-                                        local skipThis = true
-                                        local isType = 0
+if _G.WaypointTask == nil then
+	_G.WaypointTask = function()
+		for index, data in pairs(_G.waypointlist) do
+			if data.visible then
+				--data.name
+				local skipThis = true
 
-                                        if skipThis == true then
-                                            local scrap_config_tab = scrap_config[name.."_enabled"]
-                                            if scrap_config_tab then
-                                                isType = 1
-                                                if scrap_config_tab.Value then
-                                                    skipThis = false
-                                                end
-                                            end
-                                        end
+				if skipThis == true then
+					if data.Visible then
+						skipThis = false
+					end
+				end
 
-                                        local typeTab = nil
-                                        local typeConfigSettings = nil
-                                        local typeConfig = nil
-                                        if isType == 1 then
-                                            typeTab = scrap
-                                            typeConfigSettings = config.scrap
-                                            typeConfig = scrap_config
-                                        elseif isType == 0 then
-                                            if _G.consoleEnabled == true then
-                                                print("Unknown Scrap Found: '"..name.."'")
-                                            end
-                                            typeTab = scrap
-                                            typeConfigSettings = config.scrap
-                                            typeConfig = scrap_config
-                                            skipThis = false
-                                        end
-
-                                        if not skipThis and typeTab and typeConfigSettings and typeConfig then
-                                            local my_root_pos = dx9.GetPosition(my_root)
-                                            local pos = dx9.GetPosition(part)
-                                            local distance = _G.Get_Distance(my_root_pos, pos)
-                                            local screen_pos = dx9.WorldToScreen({pos.x, pos.y, pos.z})
-                                            
-                                            if _G.IsOnScreen(screen_pos) then
-                                                if distance < scrap.distance_limit.Value then
-													if current_shape_type == 4 then
-														lib_esp.ground_circle({
-															position = {my_root_pos.x, my_root_pos.y, my_root_pos.z},
-															color = scrap.color.Value,
-															nametag = scrap.nametag.Value,
-															custom_nametag = name,
-															distance = scrap.distance.Value,
-															custom_distance = distance
-														})
-													else
- 														lib_esp.draw({
-															esp_type = "misc",
-															target = part,
-															color = scrap.color.Value,
-															healthbar = false,
-															nametag = scrap.nametag.Value,
-															custom_nametag = name,
-															distance = scrap.distance.Value,
-															custom_distance = ""..distance,
-															tracer = scrap.tracer.Value,
-															tracer_type = current_tracer_type,
-															box_type = current_shape_type
-														})
-													end
-                                                end
-                                            end
-                                        end
-                                    end
-                                end
-                            end
-                        end
-                    end
-                end
-            end
-        end
-        if _G.RaycastIgnoreTask then
-            _G.RaycastIgnoreTask()
-        end
-    end
+				if not skipThis then
+					local my_root_pos = get_local_player_position()
+					local pos = dx9.GetPosition(part)
+					local distance = _G.Get_Distance(my_root_pos, pos)
+					local screen_pos = dx9.WorldToScreen({pos.x, pos.y, pos.z})
+					
+					if _G.IsOnScreen(screen_pos) then
+						if distance < scrap.distance_limit.Value then
+							if current_shape_type == 4 then
+								lib_esp.ground_circle({
+									position = {my_root_pos.x, my_root_pos.y, my_root_pos.z},
+									color = scrap.color.Value,
+									nametag = scrap.nametag.Value,
+									custom_nametag = name,
+									distance = scrap.distance.Value,
+									custom_distance = distance,
+									tracer = scrap.tracer.Value,
+									tracer_type = current_tracer_type
+								})
+							else
+								lib_esp.draw({
+									esp_type = "misc",
+									target = part,
+									color = scrap.color.Value,
+									healthbar = false,
+									nametag = scrap.nametag.Value,
+									custom_nametag = name,
+									distance = scrap.distance.Value,
+									custom_distance = ""..distance,
+									tracer = scrap.tracer.Value,
+									tracer_type = current_tracer_type,
+									box_type = current_shape_type
+								})
+							end
+						end
+					end
+				end
+			end
+		end
+	end
+end
+if _G.WaypointTask then
+	_G.WaypointTask()
 end
 
 local endTime = os.clock()
