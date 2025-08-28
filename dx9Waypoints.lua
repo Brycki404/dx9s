@@ -4,7 +4,7 @@ local startTime = os.clock()
 
 Config = _G.config or {
 	urls = {
-		DXLibUI = "https://raw.githubusercontent.com/Brycki404/DXLibUI/refs/heads/personaldev/main.lua";
+		DXLibUI = "https://raw.githubusercontent.com/Brycki404/DXLibUI/refs/heads/main/main.lua";
 		LibESP = "https://raw.githubusercontent.com/Brycki404/DXLibESP/refs/heads/main/main.lua";
         Repr = "https://raw.githubusercontent.com/Ozzypig/Repr/refs/heads/master/Repr.lua";
 	};
