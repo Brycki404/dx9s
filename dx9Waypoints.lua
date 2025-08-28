@@ -11,7 +11,6 @@ config = _G.config or {
 		menu_toggle_keybind = "[F2]";
 		
 		master_esp_enabled = true;
-    	shape_type = 1; -- 1 = "Corners", 2 = "2D Box", 3 = "3D Box", 4 = "Ground Circle"
     	tracer_type = 1; -- 1= "Near-Bottom", 2 = "Bottom", 3 = "Top", 4 = "Mouse"
 
         maximum_Hz_Cache = 15;
@@ -88,9 +87,23 @@ if _G.GetWaypointSelectionOptions == nil then
 	_G.GetWaypointSelectionOptions = function()
 		local list = {}
 
-		for index, data in pairs(_G.waypointlist) do
-			if data.name and type(data.name) == "string" then
-				list[index] = tostring(index) .. " - '" .. data.name .. "'"
+		for index, data in ipairs(_G.waypointlist) do
+			list[index] = tostring(index) .. " - '" .. data.name .. "'"
+		end
+
+		return list
+	end
+end
+
+if _G.GetWaypointDropdownSelectionOptions == nil then
+	_G.GetWaypointDropdownSelectionOptions = function(waypointSelectionOptions)
+		local list = {
+			[1] = "0 - [Create a New Waypoint]";
+		}
+
+		if type(waypointSelectionOptions) == "table" then
+			for index, text in ipairs(waypointSelectionOptions) do
+				list[index + 1] = text
 			end
 		end
 
@@ -166,13 +179,6 @@ master_esp_settings.enabled = groupboxes.master_esp_settings:AddToggle({
 }):OnChanged(function(value)
 	lib_ui:Notify(value and "[settings] Enabled Master ESP" or "[settings] Disabled Master ESP", 1)
 end);
-master_esp_settings.shape_type = groupboxes.master_esp_settings:AddDropdown({
-	Text = "Shape Type";
-	Default = config.settings.shape_type;
-	Values = { "Corners", "2D Box", "3D Box", "Ground Circle" };
-}):OnChanged(function(value)
-	lib_ui:Notify("[settings] Shape Type: " .. value, 1)
-end)
 master_esp_settings.tracer_type = groupboxes.master_esp_settings:AddDropdown({
 	Text = "Tracer Type";
 	Default = config.settings.tracer_type;
@@ -230,7 +236,6 @@ if _G.Get_Distance_From_Mouse == nil then
 end
 
 current_tracer_type = master_esp_settings.tracer_type.ValueIndex
-current_shape_type = master_esp_settings.shape_type.ValueIndex
 
 local_player_table = dx9.get_localplayer()
 
@@ -288,22 +293,20 @@ function get_local_player_position()
 end
 
 waypoints = {}
-local selectionOptions = _G.GetWaypointSelectionOptions()
 waypoints.selector = groupboxes.waypoints:AddDropdown({
 	Text = "Select a Waypoint";
 	Default = 1;
-	Values = #selectionOptions < 1 and { "0 - [Create a New Waypoint]" } or table.pack("0 - [Create a New Waypoint]", table.unpack(selectionOptions))
+	Values = {"0 - [Create a New Waypoint]"};
 }):OnChanged(function(value)
 	lib_ui:Notify("[waypoints] Selected Waypoint: "..value, 1)
 end)
-
-groupboxes.waypoints:AddTitle("Waypoint Settings")
-
-if waypoints.selector.ValueIndex > 1 then
-	local waypointlistindex = waypoints.selector.ValueIndex - 1
+local waypointlistindex = waypoints.selector.ValueIndex and waypoints.selector.ValueIndex - 1 or 1
+if waypoints.selector.ValueIndex and waypoints.selector.ValueIndex > 1 and waypointlistindex > 0 and waypointlistindex <= #_G.waypointlist then
 	local waypointdata = _G.waypointlist[waypointlistindex]
 
-	groupboxes.waypoints:AddLabel("Position: {x: "..tostring(math.floor(waypointdata.position.x)).." , y: "..tostring(math.floor(waypointdata.position.y).." , z: "..tostring(math.floor(waypointdata.position.z)).." }"))
+	groupboxes.waypoints:AddLabel("Position: { x: "..tostring(math.floor(waypointdata.position.x)).." , y: "..tostring(math.floor(waypointdata.position.y).." , z: "..tostring(math.floor(waypointdata.position.z)).." }"))
+	
+	groupboxes.waypoints:AddTitle("Waypoint Settings")
 	waypoints.nametextbox = groupboxes.waypoints:AddTextBox({
 		Index = "WaypointNameTextBox";
 		Placeholder = "Name";
@@ -321,19 +324,19 @@ if waypoints.selector.ValueIndex > 1 then
 		waypoints.tracer = groupboxes.waypoints:AddToggle({
 			Default = waypointdata.tracer;
 			Text = "Tracer";
-		})
+		}):AddTooltip("Whether or not this waypoint has a tracer showing you to it")
 		waypoints.distance_limit = groupboxes.waypoints:AddSlider({
 			Default = waypointdata.distance_limit;
 			Text = "ESP Distance Limit";
 			Min = 0;
 			Max = 10000;
 			Rounding = 0;
-		})
+		}):AddTooltip("How far away a waypoint must be for it to not show")
 		waypoints.nametag = groupboxes.waypoints:AddToggle({
 			Default = waypointdata.nametag;
 			Text = "ESP Nametag Visible";
 		}):AddTooltip("Whether or not the nametag is displayed on this waypoint")
-		if waypointlist.nametag.Value then
+		if waypoints.nametag.Value then
 			waypoints.distance = groupboxes.waypoints:AddToggle({
 				Default = waypointdata.distance;
 				Text = "ESP Distance Visible";
@@ -342,7 +345,9 @@ if waypoints.selector.ValueIndex > 1 then
 	end
 else
 	local my_root_pos = get_local_player_position()
-	groupboxes.waypoints:AddLabel("Position: {x: "..tostring(math.floor(my_root_pos.x)).." , y: "..tostring(math.floor(my_root_pos.y).." , z: "..tostring(math.floor(my_root_pos.z)).." }"))
+	groupboxes.waypoints:AddLabel("Position: { x: "..tostring(math.floor(my_root_pos.x)).." , y: "..tostring(math.floor(my_root_pos.y).." , z: "..tostring(math.floor(my_root_pos.z)).." }"))
+	
+	groupboxes.waypoints:AddTitle("Waypoint Settings")
 	waypoints.nametextbox = groupboxes.waypoints:AddTextBox({
 		Index = "WaypointNameTextBox";
 		Placeholder = "Name";
@@ -356,23 +361,23 @@ else
 		waypoints.color = groupboxes.waypoints:AddColorPicker({
 			Default = {255, 255, 255};
 			Text = "ESP Color";
-		}):AddTooltip("The color of the waypoint")
+		})
 		waypoints.tracer = groupboxes.waypoints:AddToggle({
 			Default = false;
 			Text = "Tracer";
-		})
+		}):AddTooltip("Whether or not this waypoint has a tracer showing you to it")
 		waypoints.distance_limit = groupboxes.waypoints:AddSlider({
 			Default = 10000;
 			Text = "ESP Distance Limit";
 			Min = 0;
 			Max = 10000;
 			Rounding = 0;
-		})
+		}):AddTooltip("How far away a waypoint must be for it to not show")
 		waypoints.nametag = groupboxes.waypoints:AddToggle({
 			Default = true;
 			Text = "ESP Nametag Visible";
 		}):AddTooltip("Whether or not the nametag is displayed on this waypoint")
-		if waypointlist.nametag.Value then
+		if waypoints.nametag.Value then
 			waypoints.distance = groupboxes.waypoints:AddToggle({
 				Default = true;
 				Text = "ESP Distance Visible";
@@ -382,31 +387,73 @@ else
 end
 
 groupboxes.waypoints:AddTitle("Functions")
-waypoints.savewaypoint = groupboxes.waypoints:AddButton("Save Waypoint", function()
-	if waypoints.selector.ValueIndex <= 1 then
-		local newwaypointdata = {}
-
-		table.insert(_G.waypointlist, newwaypointdata)
-	else
+waypoints.savewaypoint = groupboxes.waypoints:AddButton("Save Waypoint Settings", function()
+	print(tostring(waypoints.selector.ValueIndex))
+	if waypoints.selector.ValueIndex and waypoints.selector.ValueIndex > 1 then
 		local waypointlistindex = waypoints.selector.ValueIndex - 1
 		local waypointdata = _G.waypointlist[waypointlistindex]
 
+		waypointdata.name = waypoints.nametextbox:GetValue()
+		waypointdata.visible = waypoints.visible.Value
+		waypointdata.color = waypoints.color and waypoints.color.Value or nil
+		waypointdata.tracer = waypoints.tracer and waypoints.tracer.Value or nil
+		waypointdata.nametag = waypoints.nametag and waypoints.nametag.Value or nil
+		waypointdata.distance = waypoints.distance and waypoints.distance.Value or nil
+
 		_G.waypointlist[waypointlistindex] = waypointdata
+	else
+		local newwaypointdata = {}
+
+		local my_root_pos = get_local_player_position()
+		newwaypointdata.position = my_root_pos
+		newwaypointdata.name = waypoints.nametextbox:GetValue()
+		newwaypointdata.visible = waypoints.visible.Value
+		newwaypointdata.color = waypoints.color and waypoints.color.Value or nil
+		newwaypointdata.tracer = waypoints.tracer and waypoints.tracer.Value or nil
+		newwaypointdata.nametag = waypoints.nametag and waypoints.nametag.Value or nil
+		newwaypointdata.distance = waypoints.distance and waypoints.distance.Value or nil
+
+		table.insert(_G.waypointlist, newwaypointdata)
 	end
+
+	local newSelectionOptions = _G.GetWaypointSelectionOptions()
+	local newDropdownOptions = _G.GetWaypointDropdownSelectionOptions(newSelectionOptions)
+
+	waypoints.selector:Hide()
+	waypoints.selector:SetValues(newDropdownOptions)
+
+	print(repr(waypoints.selector.Values, reprSettings))
 end)
-if waypoints.selector.ValueIndex > 1 then
-	waypoints.teleporttowaypoint = groupboxes.waypoints:AddButton("Teleport to Waypoint", function()
-		if waypoints.selector.ValueIndex > 1 then
-			local waypointlistindex = waypoints.selector.ValueIndex - 1
-			local waypointdata = _G.waypointlist[waypointlistindex]
-		end
-	end)
-	waypoints.deletewaypoint = groupboxes.waypoints:AddButton("Delete Waypoint", function()
-		if waypoints.selector.ValueIndex > 1 then
-			local waypointlistindex = waypoints.selector.ValueIndex - 1
-			table.remove(_G.waypointlist, waypointlistindex)
-		end
-	end)
+if waypoints.selector.ValueIndex then
+	if waypoints.selector.ValueIndex > 1 then
+		waypoints.teleporttowaypoint = groupboxes.waypoints:AddButton("Teleport to Waypoint", function()
+			if waypoints.selector.ValueIndex then
+				if waypoints.selector.ValueIndex > 1 then
+					local waypointlistindex = waypoints.selector.ValueIndex - 1
+					local waypointdata = _G.waypointlist[waypointlistindex]
+					local positiondata = waypointdata.position
+					waypoints.selector:Hide()
+					dx9.Teleport(my_character, {positiondata.x, positiondata.y, positiondata.z})
+				end
+			end
+		end)
+		waypoints.deletewaypoint = groupboxes.waypoints:AddButton("Delete Waypoint", function()
+			if waypoints.selector.ValueIndex then
+				if waypoints.selector.ValueIndex > 1 then
+					local waypointlistindex = waypoints.selector.ValueIndex - 1
+					table.remove(_G.waypointlist, waypointlistindex)
+
+					local newSelectionOptions = _G.GetWaypointSelectionOptions()
+					local newDropdownOptions = _G.GetWaypointDropdownSelectionOptions(newSelectionOptions)
+
+					waypoints.selector:Hide()
+					waypoints.selector:SetValue(1)
+					waypoints.selector:SetValues(newDropdownOptions)
+					waypoints.selector:SetValue(1)
+				end
+			end
+		end)
+	end
 end
 
 screen_size = nil
@@ -427,51 +474,34 @@ end
 
 if _G.WaypointTask == nil then
 	_G.WaypointTask = function()
-		for index, data in pairs(_G.waypointlist) do
+		for index, data in ipairs(_G.waypointlist) do
 			if data.visible then
-				--data.name
 				local skipThis = true
 
 				if skipThis == true then
-					if data.Visible then
+					if data.visible then
 						skipThis = false
 					end
 				end
 
 				if not skipThis then
 					local my_root_pos = get_local_player_position()
-					local pos = dx9.GetPosition(part)
+					local pos = data.position
 					local distance = _G.Get_Distance(my_root_pos, pos)
 					local screen_pos = dx9.WorldToScreen({pos.x, pos.y, pos.z})
 					
 					if _G.IsOnScreen(screen_pos) then
 						if distance < scrap.distance_limit.Value then
-							if current_shape_type == 4 then
-								lib_esp.ground_circle({
-									position = {my_root_pos.x, my_root_pos.y, my_root_pos.z},
-									color = scrap.color.Value,
-									nametag = scrap.nametag.Value,
-									custom_nametag = name,
-									distance = scrap.distance.Value,
-									custom_distance = distance,
-									tracer = scrap.tracer.Value,
-									tracer_type = current_tracer_type
-								})
-							else
-								lib_esp.draw({
-									esp_type = "misc",
-									target = part,
-									color = scrap.color.Value,
-									healthbar = false,
-									nametag = scrap.nametag.Value,
-									custom_nametag = name,
-									distance = scrap.distance.Value,
-									custom_distance = ""..distance,
-									tracer = scrap.tracer.Value,
-									tracer_type = current_tracer_type,
-									box_type = current_shape_type
-								})
-							end
+							lib_esp.ground_circle({
+								position = {pos.x, pos.y, pos.z},
+								color = scrap.color.Value,
+								nametag = scrap.nametag.Value,
+								custom_nametag = data.name,
+								distance = scrap.distance.Value,
+								custom_distance = distance,
+								tracer = scrap.tracer.Value,
+								tracer_type = current_tracer_type
+							})
 						end
 					end
 				end
