@@ -1,5 +1,4 @@
 --indent size 4
-dx9.ShowConsole(true)
 local startTime = os.clock()
 
 Config = _G.config or {
