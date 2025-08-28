@@ -132,7 +132,7 @@ end
 groupboxes = {
     debug = tabs.settings:AddMiddleGroupbox("Debugging");
 	master_esp_settings = tabs.settings:AddMiddleGroupbox("Master ESP");
-	waypoints = tabs.players:AddMiddleGroupbox("Waypoints");
+	waypoints = tabs.waypoints:AddMiddleGroupbox("Waypoints");
 }
 
 debugging = {}
@@ -159,36 +159,27 @@ debugging.resize = groupboxes.debug:AddButton("Resize Window", function()
     lib_ui:Notify("Reset Window Size to 500x500", 1)
 end)
 
-master_esp_settings = {
-	enabled = groupboxes.master_esp_settings
-		:AddToggle({
-			Default = config.settings.master_esp_enabled;
-			Text = "Enabled";
-		})
-		:OnChanged(function(value)
-			lib_ui:Notify(value and "[settings] Enabled Master ESP" or "[settings] Disabled Master ESP", 1)
-		end);
-
-	shape_type = groupboxes.master_esp_settings
-		:AddDropdown({
-			Text = "Shape Type";
-			Default = config.settings.shape_type;
-			Values = { "Corners", "2D Box", "3D Box", "Ground Circle" };
-		})
-		:OnChanged(function(value)
-			lib_ui:Notify("[settings] Shape Type: " .. value, 1)
-		end);
-
-	tracer_type = groupboxes.master_esp_settings
-		:AddDropdown({
-			Text = "Tracer Type";
-			Default = config.settings.tracer_type;
-			Values = { "Near-Bottom", "Bottom", "Top", "Mouse" };
-		})
-		:OnChanged(function(value)
-			lib_ui:Notify("[settings] Tracer Type: " .. value, 1)
-		end);
-}
+master_esp_settings = {}
+master_esp_settings.enabled = groupboxes.master_esp_settings:AddToggle({
+	Default = config.settings.master_esp_enabled;
+	Text = "Enabled";
+}):OnChanged(function(value)
+	lib_ui:Notify(value and "[settings] Enabled Master ESP" or "[settings] Disabled Master ESP", 1)
+end);
+master_esp_settings.shape_type = groupboxes.master_esp_settings:AddDropdown({
+	Text = "Shape Type";
+	Default = config.settings.shape_type;
+	Values = { "Corners", "2D Box", "3D Box", "Ground Circle" };
+}):OnChanged(function(value)
+	lib_ui:Notify("[settings] Shape Type: " .. value, 1)
+end)
+master_esp_settings.tracer_type = groupboxes.master_esp_settings:AddDropdown({
+	Text = "Tracer Type";
+	Default = config.settings.tracer_type;
+	Values = { "Near-Bottom", "Bottom", "Top", "Mouse" };
+}):OnChanged(function(value)
+	lib_ui:Notify("[settings] Tracer Type: " .. value, 1)
+end)
 
 if _G.Get_Distance == nil then
 	_G.Get_Distance = function(v1, v2)
@@ -297,10 +288,11 @@ function get_local_player_position()
 end
 
 waypoints = {}
+local selectionOptions = _G.GetWaypointSelectionOptions()
 waypoints.selector = groupboxes.waypoints:AddDropdown({
 	Text = "Select a Waypoint";
-	Default = "0 - [Create a New Waypoint]";
-	Values = table.pack("0 - [Create a New Waypoint]", table.unpack(_G.GetWaypointSelectionOptions()))
+	Default = 1;
+	Values = #selectionOptions < 1 and { "0 - [Create a New Waypoint]" } or table.pack("0 - [Create a New Waypoint]", table.unpack(selectionOptions))
 }):OnChanged(function(value)
 	lib_ui:Notify("[waypoints] Selected Waypoint: "..value, 1)
 end)
