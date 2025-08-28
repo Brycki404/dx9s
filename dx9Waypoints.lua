@@ -134,7 +134,7 @@ local ReprSettings = {
 Lib_esp = loadstring(dx9.Get(Config.urls.LibESP))()
 
 Interface = Lib_ui:CreateWindow({
-	Title = "Waypoints | dx9ware | By @Brycki";
+	Title = "Universal Waypoints | dx9ware | By @Brycki";
 	Size = { 500, 500 };
 	Resizable = true;
 
@@ -309,7 +309,7 @@ Waypoints.selector = Waypoints.selector:OnChanged(function(value)
 		local waypointdata = _G.waypointlist[selectedWaypointIndex]
 		print(waypointdata or tostring(waypointdata))
 		if waypointdata ~= nil and type(waypointdata) == "table" then
-			local quickTools = Lib_ui.Windows["Waypoints | dx9ware | By @Brycki"].Tabs["Waypoints"].Groupboxes["Waypoints"].Tools
+			local quickTools = Lib_ui.Windows["Universal Waypoints | dx9ware | By @Brycki"].Tabs["Waypoints"].Groupboxes["Waypoints"].Tools
 			quickTools["WaypointNameTextBox"]:SetValue(waypointdata.name)
 			quickTools["WaypointVisibleToggle"]:SetValue(waypointdata.visible)
 			quickTools["WaypointColorPicker"]:SetValue(waypointdata.color)
