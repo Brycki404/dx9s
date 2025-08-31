@@ -253,6 +253,7 @@ function DeepSearch(searchTerm)
 			
 			function Search(instance, parent)
 				local address = tostring(instance)
+				local hexaddress = string.format("%x", instance)
 				local children = dx9.GetChildren(instance)
 				if children then
 					if type(children) == "table" then
@@ -280,7 +281,7 @@ function DeepSearch(searchTerm)
 							end
 							_G.deepSearchCache.InstancesSearched = _G.deepSearchCache.InstancesSearched + 1
 							if #children == 0 then
-								parent[address] = 0;
+								parent[address] = instanceName..", "..tostring(dx9.GetType(instance));
 							elseif #children > 0 then
 								parent[address] = {};
 								for i, child in pairs(children) do
