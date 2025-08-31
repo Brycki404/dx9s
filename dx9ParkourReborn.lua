@@ -363,7 +363,7 @@ tabs = {
     checkpoints = interface:AddTab("Checkpoints");
 	xp_multipliers = interface:AddTab("XP Multipliers");
     races = interface:AddTab("Races");
-    other = interface:AddTab("Other");
+    --other = interface:AddTab("Other");
     --item_spawns = interface:AddTab("Item Spawns");
     scrap = interface:AddTab("Scrap");
 }
