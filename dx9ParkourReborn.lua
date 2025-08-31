@@ -163,15 +163,38 @@ if _G.Loiterspotsconfig == nil then
 end
 
 Hiddentabsconfig = _G.Hiddentabsconfig or {
-    settings = false;
-    players = false;
-    missions = false;
-    checkpoints = false;
-    xp_multipliers = false;
-    races = false;
-    other = false;
-    item_spawns = false;
-    scrap = false;
+    {
+        tab = "players";
+        hidden = false;
+    };
+    {
+        tab = "missions";
+        hidden = false;
+    };
+    {
+        tab = "checkpoints";
+        hidden = false;
+    };
+    {
+        tab = "xp_multipliers";
+        hidden = false;
+    };
+    {
+        tab = "races";
+        hidden = true;
+    };
+    {
+        tab = "other";
+        hidden = true;
+    };
+    {
+        tab = "item_spawns";
+        hidden = true;
+    };
+    {
+        tab = "scrap";
+        hidden = false;
+    };
 }
 if _G.Hiddentabsconfig == nil then
     _G.Hiddentabsconfig = Hiddentabsconfig
@@ -410,10 +433,21 @@ Debugging.console = Groupboxes.debug:AddToggle({
 Debugging.sec = Groupboxes.debug:AddLabel("Avg. Program Cycle: ".._G.averageSec.." s")
 Debugging.hz = Groupboxes.debug:AddLabel("Avg. Program Cycle: ".._G.averageHz.." Hz")
 Debugging.clock = Groupboxes.debug:AddLabel("Clock: "..os.clock())
-Debugging.resize = Groupboxes.debug:AddButton("Resize Window", function()
-    Interface.Size = {500, 500}
-    Lib_ui:Notify("Reset Window Size to 500x500", 1)
+Debugging.resize_keybind = Groupboxes.debug:AddKeybindButton({
+    Index = "ResizeWindowKeybindButton";
+    Text = "Resize Window Keybind: [F3]";
+    Default = "[F3]";
+})
+Debugging.resize_keybind = Debugging.resize_keybind:OnChanged(function(newKey)
+    local oldKey = Debugging.resize_keybind.Key
+	Debugging.resize_keybind:SetText("Resize Window Keybind: "..tostring(newKey))
+	lib_ui:Notify("Resize Window Keybind changed from '"..tostring(oldKey).."' to '"..tostring(newKey).."'", 1)
 end)
+Debugging.resize = Groupboxes.debug:AddButton("Resize Window", function()
+    Interface.Size = {100, 100}
+    Lib_ui:Notify("Reset Window Size to the minimum", 1)
+end)
+Debugging.resize:ConnectKeybindButton(Debugging.resize_keybind)
 Debugging.scrap_cache_cleanup_timer = Groupboxes.debug:AddSlider({
     Default = Config.settings.cache_cleanup_timer;
     Text = "ScrapCache Cleanup Timer";
@@ -421,7 +455,7 @@ Debugging.scrap_cache_cleanup_timer = Groupboxes.debug:AddSlider({
     Max = 10;
     Rounding = 1;
 });
-Debugging.scrap_cache_size = Groupboxes.debug:AddLabel("Scrap Cache Size: "..tostring(countTableEntries(_G.ScrapCache or {}) or 0))
+Debugging.scrap_cache_size = Groupboxes.debug:AddLabel("Scrap Cache Size: "..tostring(CountTableEntries(_G.ScrapCache or {}) or 0))
 
 Master_esp_settings = {
 	enabled = Groupboxes.master_esp_settings
@@ -455,10 +489,12 @@ Master_esp_settings = {
 }
 
 Hidden_tabs = {}
-for name, hidden in pairs(Hiddentabsconfig) do
+for index, data in pairs(Hiddentabsconfig) do
+    local name = data.tab
+    local defaultHidden = data.hidden
 	Hidden_tabs[name] = Groupboxes.hidden_tabs
 		:AddToggle({
-			Default = Config.settings.hidden_tabs[name];
+			Default = defaultHidden;
 			Text = name.." Tab Hidden";
 		})
 		:OnChanged(function(value)
@@ -1001,7 +1037,7 @@ if Hidden_tabs.missions.Value == false then
     end
 end
 
-local world_folder = nil
+World_folder = nil
 if Hidden_tabs.checkpoints.Value == false then
     Tabs.checkpoints = Interface:AddTab("Checkpoints")
     Groupboxes.antennas = Tabs.checkpoints:AddMiddleGroupbox("Respawn Antennas");
@@ -1162,12 +1198,12 @@ if Hidden_tabs.checkpoints.Value == false then
             end
         end
         if Checkpoints.enabled.Value then
-            if world_folder == nil then
-                world_folder = dx9.FindFirstChild(Workspace, "World")
+            if World_folder == nil then
+                World_folder = dx9.FindFirstChild(Workspace, "World")
             end
-            if world_folder ~= nil and world_folder ~= 0 then
+            if World_folder ~= nil and World_folder ~= 0 then
                 --Workspace.World.Checkpoints.NAME.Model.Blinky
-                Checkpoints_folder = dx9.FindFirstChild(world_folder, "Checkpoints")
+                Checkpoints_folder = dx9.FindFirstChild(World_folder, "Checkpoints")
                 if Checkpoints_folder ~= nil and Checkpoints_folder ~= 0 then
                     if _G.BlinkyCheckpointsTask == nil then
                         _G.BlinkyCheckpointsTask = function()
@@ -1222,9 +1258,9 @@ if Hidden_tabs.checkpoints.Value == false then
     end
 end
 
-if Hidden_tabs.routers.Value == false then
+if Hidden_tabs.xp_multipliers.Value == false then
     Tabs.xp_multipliers = Interface:AddTab("XP Multipliers")
-    Groupboxes.routers = Tabs.xp_multipliers:AddMiddleGroupbox("Routers");
+    Groupboxes.routers = Tabs.xp_multipliers:AddMiddleGroupbox("Routers")
     Routers = {
         enabled = Groupboxes.routers
             :AddToggle({
