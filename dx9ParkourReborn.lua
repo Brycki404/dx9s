@@ -450,7 +450,7 @@ Debugging.resize_keybind = Debugging.resize_keybind:OnChanged(function(newKey)
 end)
 Debugging.resize = Groupboxes.debug:AddButton("Resize Window", function()
     if Interface.Active then
-        Interface.Size = {100, 100}
+        Interface.Size = {300, 300}
         Lib_ui:Notify("Reset Window Size to the minimum", 1)
     end
 end)
@@ -1334,7 +1334,7 @@ end
 if Hidden_tabs.checkpoints.Value == false then
     Tabs.checkpoints = Interface:AddTab("Checkpoints")
     Groupboxes.antennas = Tabs.checkpoints:AddMiddleGroupbox("Respawn Antennas");
-    Groupboxes.checkpoints = Tabs.checkpoints:AddMiddleGroupbox("Blinky Checkpoints");
+    --Groupboxes.checkpoints = Tabs.checkpoints:AddMiddleGroupbox("Blinky Checkpoints");
     Antennas = {
         enabled = Groupboxes.antennas
             :AddToggle({
@@ -1385,7 +1385,7 @@ if Hidden_tabs.checkpoints.Value == false then
             Rounding = 0;
         });
     }
-    Checkpoints = {
+    --[[Checkpoints = {
         enabled = Groupboxes.checkpoints
             :AddToggle({
                 Default = Config.checkpoints.enabled;
@@ -1434,7 +1434,7 @@ if Hidden_tabs.checkpoints.Value == false then
             Max = 10000;
             Rounding = 0;
         });
-    }
+    }]]
     if Master_esp_settings.enabled.Value then
         if Antennas.enabled.Value then
             if _G.RespawnAntennasTask == nil then
@@ -1476,7 +1476,7 @@ if Hidden_tabs.checkpoints.Value == false then
                 _G.RespawnAntennasTask()
             end
         end
-
+        --[[
         if Checkpoints.enabled.Value then
             if _G.BlinkyCheckpointsTask == nil then
                 _G.BlinkyCheckpointsTask = function()
@@ -1491,8 +1491,8 @@ if Hidden_tabs.checkpoints.Value == false then
                                 local distance = _G.Get_Distance(my_root_pos, pos)
                                 local screen_pos = dx9.WorldToScreen({pos.x, pos.y, pos.z})
                                 
-                                if _G.IsOnScreen(screen_pos) then
-                                    if distance < Checkpoints.distance_limit.Value then
+                                if distance < Checkpoints.distance_limit.Value then
+                                    if _G.IsOnScreen(screen_pos) then
                                         Lib_esp.draw({
                                             esp_type = "misc",
                                             target = part,
@@ -1517,6 +1517,7 @@ if Hidden_tabs.checkpoints.Value == false then
                 _G.BlinkyCheckpointsTask()
             end
         end
+        ]]
     end
 end
 
