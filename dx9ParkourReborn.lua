@@ -433,21 +433,6 @@ Debugging.console = Groupboxes.debug:AddToggle({
 Debugging.sec = Groupboxes.debug:AddLabel("Avg. Program Cycle: ".._G.averageSec.." s")
 Debugging.hz = Groupboxes.debug:AddLabel("Avg. Program Cycle: ".._G.averageHz.." Hz")
 Debugging.clock = Groupboxes.debug:AddLabel("Clock: "..os.clock())
-Debugging.resize_keybind = Groupboxes.debug:AddKeybindButton({
-    Index = "ResizeWindowKeybindButton";
-    Text = "Resize Window Keybind: [F3]";
-    Default = "[F3]";
-})
-Debugging.resize_keybind = Debugging.resize_keybind:OnChanged(function(newKey)
-    local oldKey = Debugging.resize_keybind.Key
-	Debugging.resize_keybind:SetText("Resize Window Keybind: "..tostring(newKey))
-	lib_ui:Notify("Resize Window Keybind changed from '"..tostring(oldKey).."' to '"..tostring(newKey).."'", 1)
-end)
-Debugging.resize = Groupboxes.debug:AddButton("Resize Window", function()
-    Interface.Size = {100, 100}
-    Lib_ui:Notify("Reset Window Size to the minimum", 1)
-end)
-Debugging.resize:ConnectKeybindButton(Debugging.resize_keybind)
 Debugging.scrap_cache_cleanup_timer = Groupboxes.debug:AddSlider({
     Default = Config.settings.cache_cleanup_timer;
     Text = "ScrapCache Cleanup Timer";
@@ -456,6 +441,23 @@ Debugging.scrap_cache_cleanup_timer = Groupboxes.debug:AddSlider({
     Rounding = 1;
 });
 Debugging.scrap_cache_size = Groupboxes.debug:AddLabel("Scrap Cache Size: "..tostring(CountTableEntries(_G.ScrapCache or {}) or 0))
+Debugging.resize_keybind = Groupboxes.debug:AddKeybindButton({
+    Index = "ResizeWindowKeybindButton";
+    Text = "Resize Window Keybind: [F3]";
+    Default = "[F3]";
+})
+Debugging.resize_keybind = Debugging.resize_keybind:OnChanged(function(newKey)
+    local oldKey = Debugging.resize_keybind.Key
+    Debugging.resize_keybind:SetText("Resize Window Keybind: "..tostring(newKey))
+    lib_ui:Notify("Resize Window Keybind changed from '"..tostring(oldKey).."' to '"..tostring(newKey).."'", 1)
+end)
+Debugging.resize = Groupboxes.debug:AddButton("Resize Window", function()
+    if Interface.Active then
+        Interface.Size = {100, 100}
+        Lib_ui:Notify("Reset Window Size to the minimum", 1)
+    end
+end)
+Debugging.resize:ConnectKeybindButton(Debugging.resize_keybind)
 
 Master_esp_settings = {
 	enabled = Groupboxes.master_esp_settings
@@ -489,7 +491,7 @@ Master_esp_settings = {
 }
 
 Hidden_tabs = {}
-for index, data in pairs(Hiddentabsconfig) do
+for index, data in ipairs(Hiddentabsconfig) do
     local name = data.tab
     local defaultHidden = data.hidden
 	Hidden_tabs[name] = Groupboxes.hidden_tabs
@@ -579,7 +581,7 @@ Current_tracer_type = _G.Get_Index("tracer", Master_esp_settings.tracer_type.Val
 Current_box_type = _G.Get_Index("box", Master_esp_settings.box_type.Value)
 
 if Local_player == nil then
-	for _, player in pairs(dx9.GetChildren(Services.players)) do
+	for _, player in ipairs(dx9.GetChildren(Services.players)) do
 		local pgui = dx9.FindFirstChild(player, "PlayerGui")
 		if pgui ~= nil and pgui ~= 0 then
 			Local_player = player
@@ -699,7 +701,7 @@ if Hidden_tabs.players.Value == false then
         if Players.enabled.Value then
             if _G.PlayerTask == nil then
                 _G.PlayerTask = function()
-                    for _, player in pairs(dx9.GetChildren(Services.players)) do
+                    for _, player in ipairs(dx9.GetChildren(Services.players)) do
                         local playerName = dx9.GetName(player)
                         if playerName and playerName ~= Local_player_name then
                             local playerColor = Players.color.Value
@@ -747,6 +749,306 @@ if Hidden_tabs.players.Value == false then
         end
     end
 end
+
+if _G.Rescanning == nil then
+    _G.Rescanning = false
+end
+if _G.Rescan == nil then
+    _G.Rescan = function()
+        if _G.Rescanning == false then
+            _G.Rescanning = true
+
+            if _G.PersistentCache == nil then
+                _G.PersistentCache = {
+                    Missionmarkers = {};
+                    Respawnantennas = {};
+                    Blinkycheckpoints = {};
+                    Routers = {};
+                    Timetrials = {};
+                    Challenges = {};
+                }
+            else
+                for categoryk,categoryv in pairs(_G.PersistentCache) do
+                    for k,v in ipairs(categoryv) do
+                        categoryv[k] = nil
+                    end
+                    _G.PersistentCache[categoryk] = categoryv
+                end
+            end
+            
+            if _G.PersistentCache ~= nil then
+                if type(_G.PersistentCache) == "table" then
+                    Missionmarkers_folder = dx9.FindFirstChild(Workspace, "MissionMarkers")
+                    if Missionmarkers_folder ~= nil and Missionmarkers_folder ~= 0 then
+                        Missionmarkers_children = dx9.GetChildren(Missionmarkers_folder)
+                        if Missionmarkers_children then
+                            if type(Missionmarkers_children) == "table" then
+                                for i,v in ipairs(Missionmarkers_children) do
+                                    if dx9.GetType(v) == "Part" then
+                                        local vaddress = tostring(v)
+                                        local vname = dx9.GetName(v)
+                                        local vpos = dx9.GetPosition(v)
+                                        local data = {
+                                            name = vname;
+                                            pos = vpos;
+                                        }
+                                        _G.PersistentCache.Missionmarkers[vaddress] = data
+                                    end
+                                end
+                            end
+                        end
+                    end
+
+                    Respawnantennas_folder = dx9.FindFirstChild(Workspace, "RespawnAntennas")
+                    if Respawnantennas_folder ~= nil and Respawnantennas_folder ~= 0 then
+                        Respawnantennas_children = dx9.GetChildren(Respawnantennas_folder)
+                        if Respawnantennas_children then
+                            if type(Respawnantennas_children) == "table" then
+                                for i,v in ipairs(Respawnantennas_children) do
+                                    if dx9.GetType(v) == "Model" then
+                                        local model = dx9.FindFirstChild(v, "Model")
+                                        if model ~= nil and model ~= 0 then
+                                            if dx9.GetType(model) == "Model" then
+                                                local part = dx9.FindFirstChild(model, "Part")
+                                                if part ~= nil and part ~= 0 then
+                                                    if dx9.GetType(part) == "Part" then
+                                                        local vaddress = tostring(v)
+                                                        local vname = dx9.GetName(v)
+                                                        local partpos = dx9.GetPosition(part)
+                                                        local data = {
+                                                            name = vname;
+                                                            part = part;
+                                                            pos = partpos;
+                                                        }
+                                                        _G.PersistentCache.Respawnantennas[vaddress] = data
+                                                    end
+                                                end
+                                            end
+                                        end
+                                    end
+                                end
+                            end
+                        end
+                    end
+
+                    World_folder = dx9.FindFirstChild(Workspace, "World")
+                    if World_folder ~= nil and World_folder ~= 0 then
+                        --Workspace.World.Checkpoints.NAME.Model.Blinky
+                        Checkpoints_folder = dx9.FindFirstChild(World_folder, "Checkpoints")
+                        if Checkpoints_folder ~= nil and Checkpoints_folder ~= 0 then
+                            Checkpoints_children = dx9.GetChildren(Checkpoints_folder)
+                            if Checkpoints_children then
+                                if type(Checkpoints_children) == "table" then
+                                    for i,v in ipairs(Checkpoints_children) do
+                                        local model = dx9.FindFirstChild(v, "Model")
+                                        if model ~= nil and model ~= 0 then
+                                            if dx9.GetType(model) == "Model" then
+                                                local part = dx9.FindFirstChild(model, "Blinky")
+                                                if part ~= nil and part ~= 0 then
+                                                    if dx9.GetType(part) == "Part" then
+                                                        local vaddress = tostring(v)
+                                                        local vname = dx9.GetName(v)
+                                                        local partpos = dx9.GetPosition(part)
+                                                        local data = {
+                                                            name = vname;
+                                                            part = part;
+                                                            pos = partpos;
+                                                        }
+                                                        _G.PersistentCache.Blinkycheckpoints[vaddress] = data
+                                                    end
+                                                end
+                                            end
+                                        end
+                                    end
+                                end
+                            end
+                        end
+                    end
+
+                    Routers_folder = dx9.FindFirstChild(Workspace, "Routers")
+                    if Routers_folder ~= nil and Routers_folder ~= 0 then
+                        Routers_children = dx9.GetChildren(Routers_folder)
+                        if Routers_children then
+                            if type(Routers_children) == "table" then
+                                for i,v in ipairs(Routers_children) do
+                                    if dx9.GetType(v) == "Configuration" then
+                                        local router_model = dx9.FindFirstChild(v, "RouterModel")
+                                        if router_model ~= nil and router_model ~= 0 then
+                                            if dx9.GetType(router_model) == "Model" then
+                                                local main_part = dx9.FindFirstChild(router_model, "Main")
+                                                if main_part ~= nil and main_part ~= 0 then
+                                                    if dx9.GetType(main_part) == "Part" then
+                                                        local vaddress = tostring(v)
+                                                        local vname = dx9.GetName(v)
+                                                        local partpos = dx9.GetPosition(main_part)
+                                                        local data = {
+                                                            name = vname;
+                                                            mainpart = main_part;
+                                                            pos = partpos;
+                                                        }
+                                                        _G.PersistentCache.Routers[vaddress] = data
+                                                    end
+                                                end
+                                            end
+                                        end
+                                    end
+                                end
+                            end
+                        end
+                    end
+
+                    Races_folder = dx9.FindFirstChild(Workspace, "Races")
+                    if Races_folder ~= nil and Races_folder ~= 0 then
+                        --Workspace.Races.TimeTrials.FOLDER.Start_MODEL.Part
+                        --Workspace.Races.TimeTrials.FOLDER.Finish_PART
+                        Timetrials_folder = dx9.FindFirstChild(Races_folder, "TimeTrials")
+                        if Timetrials_folder ~= nil and Timetrials_folder ~= 0 then
+                            Timetrials_children = dx9.GetChildren(Timetrials_folder)
+                            if Timetrials_children then
+                                if type(Timetrials_children) == "table" then
+                                    for i,v in ipairs(Timetrials_children) do
+                                        local vaddress = nil
+                                        local data = nil
+
+                                        local finishpart = dx9.FindFirstChild(v, "Finish")
+                                        if finishpart ~= nil and finishpart ~= 0 then
+                                            if dx9.GetType(finishpart) == "Part" then
+                                                if data == nil then
+                                                    data = {}
+                                                end
+                                                if data.name == nil then
+                                                    local vname = dx9.GetName(v)
+                                                    data.name = vname
+                                                end
+                                                if vaddress == nil then
+                                                    vaddress = tostring(v)
+                                                end
+                                                local pos = dx9.GetPosition(finishpart)
+                                                data.finishpos = pos
+                                                data.finishpart = finishpart
+                                            end
+                                        end
+                                        local startmodel = dx9.FindFirstChild(v, "Start")
+                                        if startmodel ~= nil and startmodel ~= 0 then
+                                            if dx9.GetType(startmodel) == "Model" then
+                                                local startpart = dx9.FindFirstChild(startmodel, "Part")
+                                                if startpart ~= nil and startpart ~= 0 then
+                                                    if dx9.GetType(startpart) == "Part" then
+                                                        if data == nil then
+                                                            data = {}
+                                                        end
+                                                        if data.name == nil then
+                                                            local vname = dx9.GetName(v)
+                                                            data.name = vname
+                                                        end
+                                                        if vaddress == nil then
+                                                            vaddress = tostring(v)
+                                                        end
+                                                        local pos = dx9.GetPosition(startpart)
+                                                        data.startpos = pos
+                                                        data.startpart = startpart
+                                                    end
+                                                end
+                                            end
+                                        end
+                                        if vaddress then
+                                            _G.PersistentCache.Timetrials[vaddress] = data
+                                        end
+                                    end
+                                end
+                            end
+                        end
+                        Challenges_folder = dx9.FindFirstChild(Races_folder, "Challenges")
+                        if Challenges_folder ~= nil and Challenges_folder ~= 0 then
+                            Challenges_children = dx9.GetChildren(Challenges_folder)
+                            if Challenges_children then
+                                if type(Challenges_children) == "table" then
+                                    for i,v in ipairs(Challenges_children) do
+                                        local vaddress = nil
+                                        local data = nil
+
+                                        local finishpart = dx9.FindFirstChild(v, "Finish")
+                                        if finishpart ~= nil and finishpart ~= 0 then
+                                            if dx9.GetType(finishpart) == "Part" then
+                                                if data == nil then
+                                                    data = {}
+                                                end
+                                                if data.name == nil then
+                                                    local vname = dx9.GetName(v)
+                                                    data.name = vname
+                                                end
+                                                if vaddress == nil then
+                                                    vaddress = tostring(v)
+                                                end
+                                                local pos = dx9.GetPosition(finishpart)
+                                                data.finishpos = pos
+                                                data.finishpart = finishpart
+                                            end
+                                        end
+                                        local startmodel = dx9.FindFirstChild(v, "Start")
+                                        if startmodel ~= nil and startmodel ~= 0 then
+                                            if dx9.GetType(startmodel) == "Model" then
+                                                local startpart = dx9.FindFirstChild(startmodel, "Part")
+                                                if startpart ~= nil and startpart ~= 0 then
+                                                    if dx9.GetType(startpart) == "Part" then
+                                                        if data == nil then
+                                                            data = {}
+                                                        end
+                                                        if data.name == nil then
+                                                            local vname = dx9.GetName(v)
+                                                            data.name = vname
+                                                        end
+                                                        if vaddress == nil then
+                                                            vaddress = tostring(v)
+                                                        end
+                                                        local pos = dx9.GetPosition(startpart)
+                                                        data.startpos = pos
+                                                        data.startpart = startpart
+                                                    end
+                                                end
+                                            end
+                                        end
+                                        if vaddress then
+                                            _G.PersistentCache.Challenges[vaddress] = data
+                                        end
+                                    end
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+
+            if _G.consoleEnabled then
+                print(repr(_G.PersistentCache, reprSettings))
+            end
+
+            _G.Rescanning = false
+        end
+    end
+    _G.Rescan()
+end
+
+Debugging.rescan_keybind = Groupboxes.debug:AddKeybindButton({
+    Index = "RescanKeybindButton";
+    Text = "Rescan Keybind: [F4]";
+    Default = "[F4]";
+})
+Debugging.rescan_keybind = Debugging.rescan_keybind:OnChanged(function(newKey)
+    local oldKey = Debugging.rescan_keybind.Key
+	Debugging.rescan_keybind:SetText("Rescan Keybind: "..tostring(newKey))
+	lib_ui:Notify("Rescan Keybind changed from '"..tostring(oldKey).."' to '"..tostring(newKey).."'", 1)
+end)
+Debugging.rescan = Groupboxes.debug:AddButton("Rescan", function()
+    if _G.Rescanning == false then
+        Lib_ui:Notify("Rescanning...", 1)
+        _G.Rescan()
+        Lib_ui:Notify("Rescanning completed!", 1)
+    else
+        Lib_ui:Notify("Rescanning in progress! Please be patient!", 1)
+    end
+end)
+Debugging.rescan:ConnectKeybindButton(Debugging.rescan_keybind)
 
 --Tabs.other = Interface:AddTab("Other")
 --Tabs.item_spawns = Interface:AddTab("Item Spawns")
@@ -991,53 +1293,47 @@ if Hidden_tabs.missions.Value == false then
     }
     if Master_esp_settings.enabled.Value then
         if Missions.enabled.Value then
-            Missionmarkers_folder = dx9.FindFirstChild(Workspace, "MissionMarkers")
-            if Missionmarkers_folder ~= nil and Missionmarkers_folder ~= 0 then
-                if _G.MissionMarkersTask == nil then
-                    _G.MissionMarkersTask = function()
-                        Missionmarkers_children = dx9.GetChildren(Missionmarkers_folder)
-                        if Missionmarkers_children then
-                            if type(Missionmarkers_children) == "table" then
-                                for i,v in pairs(Missionmarkers_children) do
-                                    if dx9.GetType(v) == "Part" then
-                                        local my_root_pos = dx9.GetPosition(My_root)
-                                        local name = dx9.GetName(v)
-                                        local pos = dx9.GetPosition(v)
-                                        local distance = _G.Get_Distance(my_root_pos, pos)
-                                        local screen_pos = dx9.WorldToScreen({pos.x, pos.y, pos.z})
+            if _G.MissionMarkersTask == nil then
+                _G.MissionMarkersTask = function()
+                    if _G.PersistentCache.Missionmarkers then
+                        if type(_G.PersistentCache.Missionmarkers) == "table" then
+                            for v, vdata in pairs(_G.PersistentCache.Missionmarkers) do
+                                local name = vdata.name
+                                local pos = vdata.pos
                                         
-                                        if _G.IsOnScreen(screen_pos) then
-                                            if distance < Missions.distance_limit.Value then
-                                                Lib_esp.draw({
-                                                    esp_type = "misc",
-                                                    target = v,
-                                                    color = Missions.color.Value,
-                                                    healthbar = false,
-                                                    nametag = Missions.nametag.Value,
-                                                    custom_nametag = name,
-                                                    distance = Missions.distance.Value,
-                                                    custom_distance = ""..distance,
-                                                    tracer = Missions.tracer.Value,
-                                                    tracer_type = Current_tracer_type,
-                                                    box_type = Current_box_type
-                                                })
-                                            end
-                                        end
+                                local my_root_pos = dx9.GetPosition(My_root)
+                                local distance = _G.Get_Distance(my_root_pos, pos)
+                                local screen_pos = dx9.WorldToScreen({pos.x, pos.y, pos.z})
+                                
+                                if distance < Missions.distance_limit.Value then
+                                    if _G.IsOnScreen(screen_pos) then
+                                        Lib_esp.draw({
+                                            esp_type = "misc",
+                                            target = tonumber(v),
+                                            color = Missions.color.Value,
+                                            healthbar = false,
+                                            nametag = Missions.nametag.Value,
+                                            custom_nametag = name,
+                                            distance = Missions.distance.Value,
+                                            custom_distance = ""..distance,
+                                            tracer = Missions.tracer.Value,
+                                            tracer_type = Current_tracer_type,
+                                            box_type = Current_box_type
+                                        })
                                     end
                                 end
                             end
                         end
                     end
                 end
-                if _G.MissionMarkersTask then
-                    _G.MissionMarkersTask()
-                end
+            end
+            if _G.MissionMarkersTask then
+                _G.MissionMarkersTask()
             end
         end
     end
 end
 
-World_folder = nil
 if Hidden_tabs.checkpoints.Value == false then
     Tabs.checkpoints = Interface:AddTab("Checkpoints")
     Groupboxes.antennas = Tabs.checkpoints:AddMiddleGroupbox("Respawn Antennas");
@@ -1144,115 +1440,84 @@ if Hidden_tabs.checkpoints.Value == false then
     }
     if Master_esp_settings.enabled.Value then
         if Antennas.enabled.Value then
-            Respawnantennas_folder = dx9.FindFirstChild(Workspace, "RespawnAntennas")
-            if Respawnantennas_folder ~= nil and Respawnantennas_folder ~= 0 then
-                if _G.RespawnAntennasTask == nil then
-                    _G.RespawnAntennasTask = function()
-                        Respawnantennas_children = dx9.GetChildren(Respawnantennas_folder)
-                        if Respawnantennas_children then
-                            if type(Respawnantennas_children) == "table" then
-                                for i,v in pairs(Respawnantennas_children) do
-                                    if dx9.GetType(v) == "Model" then
-                                        local model = dx9.FindFirstChild(v, "Model")
-                                        if model ~= nil and model ~= 0 then
-                                            if dx9.GetType(model) == "Model" then
-                                                local part = dx9.FindFirstChild(model, "Part")
-                                                if part ~= nil and part ~= 0 then
-                                                    if dx9.GetType(part) == "Part" then
-                                                        local my_root_pos = dx9.GetPosition(My_root)
-                                                        local name = dx9.GetName(v)
-                                                        local pos = dx9.GetPosition(part)
-                                                        local distance = _G.Get_Distance(my_root_pos, pos)
-                                                        local screen_pos = dx9.WorldToScreen({pos.x, pos.y, pos.z})
+            if _G.RespawnAntennasTask == nil then
+                _G.RespawnAntennasTask = function()
+                    if _G.PersistentCache.Respawnantennas then
+                        if type(_G.PersistentCache.Respawnantennas) == "table" then
+                            for v, vdata in pairs(_G.PersistentCache.Respawnantennas) do
+                                local name = vdata.name
+                                local part = vdata.part
+                                local pos = vdata.pos
+
+                                local my_root_pos = dx9.GetPosition(My_root)
+                                local distance = _G.Get_Distance(my_root_pos, pos)
+                                local screen_pos = dx9.WorldToScreen({pos.x, pos.y, pos.z})
                                                         
-                                                        if _G.IsOnScreen(screen_pos) then
-                                                            if distance < Antennas.distance_limit.Value then
-                                                                Lib_esp.draw({
-                                                                    esp_type = "misc",
-                                                                    target = part,
-                                                                    color = Antennas.color.Value,
-                                                                    healthbar = false,
-                                                                    nametag = Antennas.nametag.Value,
-                                                                    custom_nametag = name,
-                                                                    distance = Antennas.distance.Value,
-                                                                    custom_distance = ""..distance,
-                                                                    tracer = Antennas.tracer.Value,
-                                                                    tracer_type = Current_tracer_type,
-                                                                    box_type = Current_box_type
-                                                                })
-                                                            end
-                                                        end
-                                                    end
-                                                end
-                                            end
-                                        end
+                                if _G.IsOnScreen(screen_pos) then
+                                    if distance < Antennas.distance_limit.Value then
+                                        Lib_esp.draw({
+                                            esp_type = "misc",
+                                            target = part,
+                                            color = Antennas.color.Value,
+                                            healthbar = false,
+                                            nametag = Antennas.nametag.Value,
+                                            custom_nametag = name,
+                                            distance = Antennas.distance.Value,
+                                            custom_distance = ""..distance,
+                                            tracer = Antennas.tracer.Value,
+                                            tracer_type = Current_tracer_type,
+                                            box_type = Current_box_type
+                                        })
                                     end
                                 end
                             end
                         end
                     end
                 end
-                if _G.RespawnAntennasTask then
-                    _G.RespawnAntennasTask()
-                end
+            end
+            if _G.RespawnAntennasTask then
+                _G.RespawnAntennasTask()
             end
         end
+
         if Checkpoints.enabled.Value then
-            if World_folder == nil then
-                World_folder = dx9.FindFirstChild(Workspace, "World")
-            end
-            if World_folder ~= nil and World_folder ~= 0 then
-                --Workspace.World.Checkpoints.NAME.Model.Blinky
-                Checkpoints_folder = dx9.FindFirstChild(World_folder, "Checkpoints")
-                if Checkpoints_folder ~= nil and Checkpoints_folder ~= 0 then
-                    if _G.BlinkyCheckpointsTask == nil then
-                        _G.BlinkyCheckpointsTask = function()
-                            Checkpoints_children = dx9.GetChildren(Checkpoints_folder)
-                            if Checkpoints_children then
-                                if type(Checkpoints_children) == "table" then
-                                    for i,v in pairs(Checkpoints_children) do
-                                        local model = dx9.FindFirstChild(v, "Model")
-                                        if model ~= nil and model ~= 0 then
-                                            if dx9.GetType(model) == "Model" then
-                                                local part = dx9.FindFirstChild(model, "Blinky")
-                                                if part ~= nil and part ~= 0 then
-                                                    if dx9.GetType(part) == "Part" then
-                                                        local my_root_pos = dx9.GetPosition(My_root)
-                                                        local name = dx9.GetName(v)
-                                                        local pos = dx9.GetPosition(part)
-                                                        local distance = _G.Get_Distance(my_root_pos, pos)
-                                                        local screen_pos = dx9.WorldToScreen({pos.x, pos.y, pos.z})
-                                                        
-                                                        if _G.IsOnScreen(screen_pos) then
-                                                            if distance < Checkpoints.distance_limit.Value then
-                                                                Lib_esp.draw({
-                                                                    esp_type = "misc",
-                                                                    target = part,
-                                                                    color = Checkpoints.color.Value,
-                                                                    healthbar = false,
-                                                                    nametag = Checkpoints.nametag.Value,
-                                                                    custom_nametag = name,
-                                                                    distance = Checkpoints.distance.Value,
-                                                                    custom_distance = ""..distance,
-                                                                    tracer = Checkpoints.tracer.Value,
-                                                                    tracer_type = Current_tracer_type,
-                                                                    box_type = Current_box_type
-                                                                })
-                                                            end
-                                                        end
-                                                    end
-                                                end
-                                            end
-                                        end
+            if _G.BlinkyCheckpointsTask == nil then
+                _G.BlinkyCheckpointsTask = function()
+                    if _G.PersistentCache.Blinkycheckpoints then
+                        if type(_G.PersistentCache.Blinkycheckpoints) == "table" then
+                            for v, vdata in pairs(_G.PersistentCache.Blinkycheckpoints) do
+                                local name = vdata.name
+                                local part = vdata.part
+                                local pos = vdata.pos
+
+                                local my_root_pos = dx9.GetPosition(My_root)
+                                local distance = _G.Get_Distance(my_root_pos, pos)
+                                local screen_pos = dx9.WorldToScreen({pos.x, pos.y, pos.z})
+                                
+                                if _G.IsOnScreen(screen_pos) then
+                                    if distance < Checkpoints.distance_limit.Value then
+                                        Lib_esp.draw({
+                                            esp_type = "misc",
+                                            target = part,
+                                            color = Checkpoints.color.Value,
+                                            healthbar = false,
+                                            nametag = Checkpoints.nametag.Value,
+                                            custom_nametag = name,
+                                            distance = Checkpoints.distance.Value,
+                                            custom_distance = ""..distance,
+                                            tracer = Checkpoints.tracer.Value,
+                                            tracer_type = Current_tracer_type,
+                                            box_type = Current_box_type
+                                        })
                                     end
                                 end
                             end
                         end
                     end
-                    if _G.BlinkyCheckpointsTask then
-                        _G.BlinkyCheckpointsTask()
-                    end
                 end
+            end
+            if _G.BlinkyCheckpointsTask then
+                _G.BlinkyCheckpointsTask()
             end
         end
     end
@@ -1313,57 +1578,43 @@ if Hidden_tabs.xp_multipliers.Value == false then
     }
     if Master_esp_settings.enabled.Value then
         if Routers.enabled.Value then
-            Routers_folder = dx9.FindFirstChild(Workspace, "Routers")
-            if Routers_folder ~= nil and Routers_folder ~= 0 then
-                if _G.RoutersTask == nil then
-                    _G.RoutersTask = function()
-                        Routers_children = dx9.GetChildren(Routers_folder)
-                        if Routers_children then
-                            if type(Routers_children) == "table" then
-                                for i,v in pairs(Routers_children) do
-                                    if dx9.GetType(v) == "Configuration" then
-                                        local router_model = dx9.FindFirstChild(v, "RouterModel")
-                                        if router_model ~= nil and router_model ~= 0 then
-                                            if dx9.GetType(router_model) == "Model" then
-                                                local main_part = dx9.FindFirstChild(router_model, "Main")
-                                                if main_part ~= nil and main_part ~= 0 then
-                                                    if dx9.GetType(main_part) == "Part" then
-                                                        local my_root_pos = dx9.GetPosition(My_root)
-                                                        local name = dx9.GetName(v)
-                                                        local pos = dx9.GetPosition(main_part)
-                                                        local distance = _G.Get_Distance(my_root_pos, pos)
-                                                        local screen_pos = dx9.WorldToScreen({pos.x, pos.y, pos.z})
-                                                        
-                                                        if _G.IsOnScreen(screen_pos) then
-                                                            if distance < Routers.distance_limit.Value then
-                                                                Lib_esp.draw({
-                                                                    esp_type = "misc",
-                                                                    target = main_part,
-                                                                    color = Routers.color.Value,
-                                                                    healthbar = false,
-                                                                    nametag = Routers.nametag.Value,
-                                                                    custom_nametag = name,
-                                                                    distance = Routers.distance.Value,
-                                                                    custom_distance = ""..distance,
-                                                                    tracer = Routers.tracer.Value,
-                                                                    tracer_type = Current_tracer_type,
-                                                                    box_type = Current_box_type
-                                                                })
-                                                            end
-                                                        end
-                                                    end
-                                                end
-                                            end
-                                        end
+            if _G.RoutersTask == nil then
+                _G.RoutersTask = function()
+                    if _G.PersistentCache.Routers then
+                        if type(_G.PersistentCache.Routers) == "table" then
+                            for v, vdata in pairs(_G.PersistentCache.Routers) do
+                                local name = vdata.name
+                                local main_part = vdata.mainpart
+                                local pos = vdata.pos
+
+                                local my_root_pos = dx9.GetPosition(My_root)
+                                local distance = _G.Get_Distance(my_root_pos, pos)
+                                local screen_pos = dx9.WorldToScreen({pos.x, pos.y, pos.z})
+                                
+                                if _G.IsOnScreen(screen_pos) then
+                                    if distance < Routers.distance_limit.Value then
+                                        Lib_esp.draw({
+                                            esp_type = "misc",
+                                            target = main_part,
+                                            color = Routers.color.Value,
+                                            healthbar = false,
+                                            nametag = Routers.nametag.Value,
+                                            custom_nametag = name,
+                                            distance = Routers.distance.Value,
+                                            custom_distance = ""..distance,
+                                            tracer = Routers.tracer.Value,
+                                            tracer_type = Current_tracer_type,
+                                            box_type = Current_box_type
+                                        })
                                     end
                                 end
                             end
                         end
                     end
                 end
-                if _G.RoutersTask then
-                    _G.RoutersTask()
-                end
+            end
+            if _G.RoutersTask then
+                _G.RoutersTask()
             end
         end
     end
@@ -1483,187 +1734,128 @@ if Hidden_tabs.races.Value == false then
             Rounding = 0;
         });
     }
-    Races_folder = nil
     if Timetrials.enabled.Value then
-        if Races_folder == nil then
-            Races_folder = dx9.FindFirstChild(Workspace, "Races")
-        end
-        if Races_folder ~= nil and Races_folder ~= 0 then
-            --Workspace.Races.TimeTrials.FOLDER.Start_MODEL.Part
-            --Workspace.Races.TimeTrials.FOLDER.Finish_PART
-            Timetrials_folder = dx9.FindFirstChild(Races_folder, "TimeTrials")
-            if Timetrials_folder ~= nil and Timetrials_folder ~= 0 then
-                if _G.TimeTrialsTask == nil then
-                    _G.TimeTrialsTask = function()
-                        Timetrials_children = dx9.GetChildren(Timetrials_folder)
-                        if Timetrials_children then
-                            if type(Timetrials_children) == "table" then
-                                for i,v in pairs(Timetrials_children) do
-                                    local vname = nil
-                                    local finishpart = dx9.FindFirstChild(v, "Finish")
-                                    if finishpart ~= nil and finishpart ~= 0 then
-                                        if dx9.GetType(finishpart) == "Part" then
-                                            local my_root_pos = dx9.GetPosition(My_root)
-                                            if vname == nil then
-                                                vname = dx9.GetName(v)
-                                            end
-                                            local pos = dx9.GetPosition(finishpart)
-                                            local distance = _G.Get_Distance(my_root_pos, pos)
-                                            local screen_pos = dx9.WorldToScreen({pos.x, pos.y, pos.z})
-                                            
-                                            if _G.IsOnScreen(screen_pos) then
-                                                if distance < Timetrials.distance_limit.Value then
-                                                    Lib_esp.draw({
-                                                        esp_type = "misc",
-                                                        target = finishpart,
-                                                        color = Timetrials.finish_color.Value,
-                                                        healthbar = false,
-                                                        nametag = Timetrials.nametag.Value,
-                                                        custom_nametag = vname.." Finish",
-                                                        distance = Timetrials.distance.Value,
-                                                        custom_distance = ""..distance,
-                                                        tracer = Timetrials.tracer.Value,
-                                                        tracer_type = Current_tracer_type,
-                                                        box_type = Current_box_type
-                                                    })
-                                                end
-                                            end
-                                        end
-                                    end
-                                    local startmodel = dx9.FindFirstChild(v, "Start")
-                                    if startmodel ~= nil and startmodel ~= 0 then
-                                        if dx9.GetType(startmodel) == "Model" then
-                                            local startpart = dx9.FindFirstChild(startmodel, "Part")
-                                            if startpart ~= nil and startpart ~= 0 then
-                                                if dx9.GetType(startpart) == "Part" then
-                                                    local my_root_pos = dx9.GetPosition(My_root)
-                                                    if vname == nil then
-                                                        vname = dx9.GetName(v)
-                                                    end
-                                                    local pos = dx9.GetPosition(startpart)
-                                                    local distance = _G.Get_Distance(my_root_pos, pos)
-                                                    local screen_pos = dx9.WorldToScreen({pos.x, pos.y, pos.z})
-                                                    
-                                                    if _G.IsOnScreen(screen_pos) then
-                                                        if distance < Timetrials.distance_limit.Value then
-                                                            Lib_esp.draw({
-                                                                esp_type = "misc",
-                                                                target = startpart,
-                                                                color = Timetrials.start_color.Value,
-                                                                healthbar = false,
-                                                                nametag = Timetrials.nametag.Value,
-                                                                custom_nametag = vname.." Start",
-                                                                distance = Timetrials.distance.Value,
-                                                                custom_distance = ""..distance,
-                                                                tracer = Timetrials.tracer.Value,
-                                                                tracer_type = Current_tracer_type,
-                                                                box_type = Current_box_type
-                                                            })
-                                                        end
-                                                    end
-                                                end
-                                            end
-                                        end
-                                    end
+        if _G.TimeTrialsTask == nil then
+            _G.TimeTrialsTask = function()
+                if _G.PersistentCache.Timetrials then
+                    if type(_G.PersistentCache.Timetrials) == "table" then
+                        for v, vdata in pairs(_G.PersistentCache.Timetrials) do
+                            local vname = vdata.name
+                            local finishpos = vdata.finishpos
+                            local finishpart = vdata.finishpart
+                            local startpos = vdata.startpos
+                            local startpart = vdata.startpart
+
+                            local my_root_pos = dx9.GetPosition(My_root)
+                            local finishpart_distance = _G.Get_Distance(my_root_pos, finishpos)
+                            local finishpart_screen_pos = dx9.WorldToScreen({finishpos.x, finishpos.y, finishpos.z})
+                            local startpart_distance = _G.Get_Distance(my_root_pos, startpos)
+                            local startpart_screen_pos = dx9.WorldToScreen({startpos.x, startpos.y, startpos.z})
+                            
+                            if finishpart_distance < Timetrials.distance_limit.Value then
+                                if _G.IsOnScreen(finishpart_screen_pos) then
+                                    Lib_esp.draw({
+                                        esp_type = "misc",
+                                        target = finishpart,
+                                        color = Timetrials.finish_color.Value,
+                                        healthbar = false,
+                                        nametag = Timetrials.nametag.Value,
+                                        custom_nametag = vname.." Finish",
+                                        distance = Timetrials.distance.Value,
+                                        custom_distance = ""..finishpart_distance,
+                                        tracer = Timetrials.tracer.Value,
+                                        tracer_type = Current_tracer_type,
+                                        box_type = Current_box_type
+                                    })
+                                end
+                            end
+                            
+                            if startpart_distance < Timetrials.distance_limit.Value then
+                                if _G.IsOnScreen(startpart_screen_pos) then
+                                    Lib_esp.draw({
+                                        esp_type = "misc",
+                                        target = startpart,
+                                        color = Timetrials.start_color.Value,
+                                        healthbar = false,
+                                        nametag = Timetrials.nametag.Value,
+                                        custom_nametag = vname.." Start",
+                                        distance = Timetrials.distance.Value,
+                                        custom_distance = ""..startpart_distance,
+                                        tracer = Timetrials.tracer.Value,
+                                        tracer_type = Current_tracer_type,
+                                        box_type = Current_box_type
+                                    })
                                 end
                             end
                         end
                     end
                 end
-                if _G.TimeTrialsTask then
-                    _G.TimeTrialsTask()
-                end
             end
+        end
+        if _G.TimeTrialsTask then
+            _G.TimeTrialsTask()
         end
     end
     if Challenges.enabled.Value then
-        if Races_folder == nil then
-            Races_folder = dx9.FindFirstChild(Workspace, "Races")
-        end
-        if Races_folder ~= nil and Races_folder ~= 0 then
-            Challenges_folder = dx9.FindFirstChild(Races_folder, "Challenges")
-            if Challenges_folder ~= nil and Challenges_folder ~= 0 then
-                if _G.ChallengesTask == nil then
-                    _G.ChallengesTask = function()
-                        Challenges_children = dx9.GetChildren(Challenges_folder)
-                        if Challenges_children then
-                            if type(Challenges_children) == "table" then
-                                for i,v in pairs(Challenges_children) do
-                                    local vname = nil
-                                    local finishpart = dx9.FindFirstChild(v, "Finish")
-                                    if finishpart ~= nil and finishpart ~= 0 then
-                                        if dx9.GetType(finishpart) == "Part" then
-                                            local my_root_pos = dx9.GetPosition(My_root)
-                                            if vname == nil then
-                                                vname = dx9.GetName(v)
-                                            end
-                                            local pos = dx9.GetPosition(finishpart)
-                                            local distance = _G.Get_Distance(my_root_pos, pos)
-                                            local screen_pos = dx9.WorldToScreen({pos.x, pos.y, pos.z})
-                                            
-                                            if _G.IsOnScreen(screen_pos) then
-                                                if distance < Challenges.distance_limit.Value then
-                                                    Lib_esp.draw({
-                                                        esp_type = "misc",
-                                                        target = finishpart,
-                                                        color = Challenges.finish_color.Value,
-                                                        healthbar = false,
-                                                        nametag = Challenges.nametag.Value,
-                                                        custom_nametag = vname.." Finish",
-                                                        distance = Challenges.distance.Value,
-                                                        custom_distance = ""..distance,
-                                                        tracer = Challenges.tracer.Value,
-                                                        tracer_type = Current_tracer_type,
-                                                        box_type = Current_box_type
-                                                    })
-                                                end
-                                            end
-                                        end
-                                    end
-                                    local startmodel = dx9.FindFirstChild(v, "Start")
-                                    if startmodel ~= nil and startmodel ~= 0 then
-                                        if dx9.GetType(startmodel) == "Model" then
-                                            local startpart = dx9.FindFirstChild(startmodel, "Part")
-                                            if startpart ~= nil and startpart ~= 0 then
-                                                if dx9.GetType(startpart) == "Part" then
-                                                    local my_root_pos = dx9.GetPosition(My_root)
-                                                    if vname == nil then
-                                                        vname = dx9.GetName(v)
-                                                    end
-                                                    local pos = dx9.GetPosition(startpart)
-                                                    local distance = _G.Get_Distance(my_root_pos, pos)
-                                                    local screen_pos = dx9.WorldToScreen({pos.x, pos.y, pos.z})
-                                                    
-                                                    if _G.IsOnScreen(screen_pos) then
-                                                        if distance < Challenges.distance_limit.Value then
-                                                            Lib_esp.draw({
-                                                                esp_type = "misc",
-                                                                target = startpart,
-                                                                color = Challenges.start_color.Value,
-                                                                healthbar = false,
-                                                                nametag = Challenges.nametag.Value,
-                                                                custom_nametag = vname.." Start",
-                                                                distance = Challenges.distance.Value,
-                                                                custom_distance = ""..distance,
-                                                                tracer = Challenges.tracer.Value,
-                                                                tracer_type = Current_tracer_type,
-                                                                box_type = Current_box_type
-                                                            })
-                                                        end
-                                                    end
-                                                end
-                                            end
-                                        end
-                                    end
+        if _G.ChallengesTask == nil then
+            _G.ChallengesTask = function()
+                if _G.PersistentCache.Challenges then
+                    if type(_G.PersistentCache.Challenges) == "table" then
+                        for v, vdata in pairs(_G.PersistentCache.Challenges) do
+                            local vname = vdata.name
+                            local finishpos = vdata.finishpos
+                            local finishpart = vdata.finishpart
+                            local startpos = vdata.startpos
+                            local startpart = vdata.startpart
+
+                            local my_root_pos = dx9.GetPosition(My_root)
+                            local finishpart_distance = _G.Get_Distance(my_root_pos, finishpos)
+                            local finishpart_screen_pos = dx9.WorldToScreen({finishpos.x, finishpos.y, finishpos.z})
+                            local startpart_distance = _G.Get_Distance(my_root_pos, startpos)
+                            local startpart_screen_pos = dx9.WorldToScreen({startpos.x, startpos.y, startpos.z})
+                            
+                            if finishpart_distance < Challenges.distance_limit.Value then
+                                if _G.IsOnScreen(finishpart_screen_pos) then
+                                    Lib_esp.draw({
+                                        esp_type = "misc",
+                                        target = finishpart,
+                                        color = Challenges.finish_color.Value,
+                                        healthbar = false,
+                                        nametag = Challenges.nametag.Value,
+                                        custom_nametag = vname.." Finish",
+                                        distance = Challenges.distance.Value,
+                                        custom_distance = ""..finishpart_distance,
+                                        tracer = Challenges.tracer.Value,
+                                        tracer_type = Current_tracer_type,
+                                        box_type = Current_box_type
+                                    })
+                                end
+                            end
+                            
+                            if startpart_distance < Challenges.distance_limit.Value then
+                                if _G.IsOnScreen(startpart_screen_pos) then
+                                    Lib_esp.draw({
+                                        esp_type = "misc",
+                                        target = startpart,
+                                        color = Challenges.start_color.Value,
+                                        healthbar = false,
+                                        nametag = Challenges.nametag.Value,
+                                        custom_nametag = vname.." Start",
+                                        distance = Challenges.distance.Value,
+                                        custom_distance = ""..startpart_distance,
+                                        tracer = Challenges.tracer.Value,
+                                        tracer_type = Current_tracer_type,
+                                        box_type = Current_box_type
+                                    })
                                 end
                             end
                         end
                     end
                 end
-                if _G.ChallengesTask then
-                    _G.ChallengesTask()
-                end
             end
+        end
+        if _G.ChallengesTask then
+            _G.ChallengesTask()
         end
     end
 end
@@ -1723,7 +1915,7 @@ if Hidden_tabs.scrap.Value == false then
         });
     }
     Scrap_config = {}
-    for _, tab in pairs(Config.scrap.entries) do
+    for _, tab in ipairs(Config.scrap.entries) do
         local name = tab.name
         local Enabled = tab.Enabled
 
@@ -2087,7 +2279,7 @@ if Hidden_tabs.scrap.Value == false then
                     Raycastignore_children = dx9.GetChildren(Raycastignore_folder)
                     if Raycastignore_children then
                         if type(Raycastignore_children) == "table" then
-                            for i,v in pairs(Raycastignore_children) do
+                            for i,v in ipairs(Raycastignore_children) do
                                 local cached_tab = _G.ScrapCache[tostring(v)]
                                 if not cached_tab then
                                     if dx9.GetType(v) == "Model" then                    
