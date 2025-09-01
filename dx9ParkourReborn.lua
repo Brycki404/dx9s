@@ -3,11 +3,8 @@ dx9 = dx9 --in VS Code, this gets rid of a ton of problem underlines
 local startTime = os.clock()
 
 --TODO:
---  add hiding tabs support (Toggles in Master settings to hide tabs that you want hidden)
---  split timetrials and challenges into starts and finishes
 --  finish adding the Other category
 --  add teleport support (a Toggle in the Master settings that then shows the teleport panels in each tab)
---  CACHE ALL FOLDERS AND CHILDREN TABLES THAT ARE PERMANENT AND DON'T CHANGE FOR SPEED OPTIMIZATION
 --  ItemSpawns MAYBE... but I really don't think that is at all necessary if we have Scrap ESP
     
 --If you don't want a super long list, feel free to set _G.Scrapconfig to your own table before using loadstring on this script
@@ -2289,8 +2286,7 @@ if Hidden_tabs.scrap.Value == false then
                                         end
                                         if part ~= nil and part ~= 0 then
                                             if dx9.GetType(part) == "Part" then
-                                                local cached_tab = _G.ScrapCache[tostring(v)]
-                                                local name = (cached_tab and cached_tab.name) or _G.GetScrapNameFromModel(v) or "Other"
+                                                local name = _G.GetScrapNameFromModel(v) or "Other"
                                                 _G.ScrapCache[tostring(v)] = {
                                                     part = part;
                                                     name = name;
