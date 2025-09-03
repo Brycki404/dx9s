@@ -512,7 +512,7 @@ if _G.PlayerTask == nil then
 	_G.PlayerTask = function()
         for _, player in pairs(dx9.GetChildren(Services.players)) do
             local playerName = dx9.GetName(player)
-            if playerName and playerName ~= Local_player_name then
+            if playerName then
                 local backpack = dx9.FindFirstChild(player, "Backpack")
                 local gun = nil
                 local knife = nil
@@ -540,41 +540,43 @@ if _G.PlayerTask == nil then
                             knife = nil
                         end
                     end
-                    local root = dx9.FindFirstChild(character, "HumanoidRootPart")
-                    local head = dx9.FindFirstChild(character, "Head")
-                    local humanoid = dx9.FindFirstChild(character, "Humanoid")
+                    if playerName ~= Local_player_name then
+                        local root = dx9.FindFirstChild(character, "HumanoidRootPart")
+                        local head = dx9.FindFirstChild(character, "Head")
+                        local humanoid = dx9.FindFirstChild(character, "Humanoid")
 
-                    if root and root ~= 0 and humanoid and humanoid ~= 0 and head and head ~= 0 then
-                        local health = dx9.GetHealth(humanoid) or nil
-                        if health ~= nil then
-                            health = math.floor(health)
-                        end
-                        if health ~= nil and health > 0 then
-                            local My_root_pos = dx9.GetPosition(My_root)
-                            local root_pos = dx9.GetPosition(root)
-                            local head_pos = dx9.GetPosition(head)
-                            local root_distance = _G.Get_Distance(My_root_pos, root_pos)
-                            local root_screen_pos = dx9.WorldToScreen({root_pos.x, root_pos.y, root_pos.z})
-                            local head_screen_pos = dx9.WorldToScreen({head_pos.x, head_pos.y, head_pos.z})
+                        if root and root ~= 0 and humanoid and humanoid ~= 0 and head and head ~= 0 then
+                            local health = dx9.GetHealth(humanoid) or nil
+                            if health ~= nil then
+                                health = math.floor(health)
+                            end
+                            if health ~= nil and health > 0 then
+                                local My_root_pos = dx9.GetPosition(My_root)
+                                local root_pos = dx9.GetPosition(root)
+                                local head_pos = dx9.GetPosition(head)
+                                local root_distance = _G.Get_Distance(My_root_pos, root_pos)
+                                local root_screen_pos = dx9.WorldToScreen({root_pos.x, root_pos.y, root_pos.z})
+                                local head_screen_pos = dx9.WorldToScreen({head_pos.x, head_pos.y, head_pos.z})
 
-                            local team_color = (knife and {255, 0, 0}) or (gun and {0, 0, 255}) or {255, 255, 255}
-                            local team = (knife and Murderer_esp) or (gun and Sheriff_esp) or Everyone_else_esp
+                                local team_color = (knife and {255, 0, 0}) or (gun and {0, 0, 255}) or {255, 255, 255}
+                                local team = (knife and Murderer_esp) or (gun and Sheriff_esp) or Everyone_else_esp
 
-                            if Master_esp.enabled.Value and team.enabled.Value then
-                                if _G.IsOnScreen(head_screen_pos) or _G.IsOnScreen(root_screen_pos) then
-                                    if root_distance < Master_esp.player_distance_limit.Value then
-                                        Lib_esp.draw({
-                                            target = character;
-                                            color = team_color;
-                                            healthbar = false;
-                                            nametag = Master_esp.player_nametag.Value;
-                                            distance = Master_esp.player_distance.Value;
-                                            custom_nametag = playerName;
-                                            custom_distance = tostring(root_distance);
-                                            tracer = team.tracer.Value;
-                                            tracer_type = Current_tracer_type;
-                                            box_type = Current_box_type;
-                                        })
+                                if Master_esp.enabled.Value and team.enabled.Value then
+                                    if _G.IsOnScreen(head_screen_pos) or _G.IsOnScreen(root_screen_pos) then
+                                        if root_distance < Master_esp.player_distance_limit.Value then
+                                            Lib_esp.draw({
+                                                target = character;
+                                                color = team_color;
+                                                healthbar = false;
+                                                nametag = Master_esp.player_nametag.Value;
+                                                distance = Master_esp.player_distance.Value;
+                                                custom_nametag = playerName;
+                                                custom_distance = tostring(root_distance);
+                                                tracer = team.tracer.Value;
+                                                tracer_type = Current_tracer_type;
+                                                box_type = Current_box_type;
+                                            })
+                                        end
                                     end
                                 end
                             end
@@ -629,26 +631,24 @@ if _G.AimbotTask == nil then
                                 end
 
                                 if _G.IsOnScreen(head_screen_pos) or _G.IsOnScreen(root_screen_pos) then
-                                    aimbot_target_screen_pos = screen_pos
-
                                     local Mouse_distance = _G.Get_Distance_From_Mouse(screen_pos)
                                     local aimbot_range = 9999 --dx9.GetAimbotValue("range")
                                     local aimbot_fov = dx9.GetAimbotValue("fov")
                                     if Mouse_distance and Mouse_distance <= aimbot_fov and root_distance <= aimbot_range then
                                         local Mouse_moved = false
                                         if Mouse_moved == false then
-                                            dx9.DrawCircle({aimbot_target_screen_pos.x, aimbot_target_screen_pos.y}, {255, 255, 255}, 15)
+                                            dx9.DrawCircle({screen_pos.x, screen_pos.y}, {255, 255, 255}, 15)
                                             dx9.SetAimbotValue("x", 0)
                                             dx9.SetAimbotValue("y", 0)
                                             dx9.SetAimbotValue("z", 0)
                                             dx9.FirstPersonAim({
-                                                aimbot_target_screen_pos.x + Screen_size.width/2,
-                                                aimbot_target_screen_pos.y + Screen_size.height/2
+                                                screen_pos.x + Screen_size.width/2,
+                                                screen_pos.y + Screen_size.height/2
                                             }, Aimbot.first_person_smoothness.Value, Aimbot.first_person_sensitivity.Value)
                                             if not dx9.isRightClickHeld() then
                                                 dx9.ThirdPersonAim({
-                                                    aimbot_target_screen_pos.x,
-                                                    aimbot_target_screen_pos.y
+                                                    screen_pos.x,
+                                                    screen_pos.y
                                                 }, Aimbot.third_person_horizontal_smoothness.Value, Aimbot.third_person_vertical_smoothness.Value)
                                             end
                                             Mouse_moved = true
@@ -660,10 +660,7 @@ if _G.AimbotTask == nil then
                     end
                 end
             end
-        else
-            aimbot_target_screen_pos = nil
-		end
-        _G.aimbot_target_screen_pos = aimbot_target_screen_pos
+        end
     end
 end
 if _G.AimbotTask then
