@@ -2,19 +2,10 @@
 dx9 = dx9 --in VS Code, this gets rid of a ton of problem underlines
 local startTime = os.clock()
 
---[[
-Backpack.Knife, Tool
-Character.Knife, Tool
-Handle, Part
-Gun, Tool
-Workspace.GunDrop, Part
-]]
-
 Config = _G.Config or {
 	urls = {
 		DXLibUI = "https://raw.githubusercontent.com/Brycki404/DXLibUI/refs/heads/main/main.lua";
 		LibESP = "https://raw.githubusercontent.com/Brycki404/DXLibESP/refs/heads/main/main.lua";
-        repr = "https://raw.githubusercontent.com/Ozzypig/repr/refs/heads/master/repr.lua"
 	};
     settings = {
 		menu_toggle_keybind = "[F2]";
@@ -45,11 +36,11 @@ Config = _G.Config or {
         --esp
         distance = true;
         nametag = true;
+        enabled = true;
+        tracer = false;
         distance_limit = 9999;
         rainbow = false;
         color = {50, 255, 255};
-        enabled = true;
-        tracer = false;
         --notify
         notify = true;
         --auto tp
@@ -113,21 +104,6 @@ elseif _G.lastElapsedCycleTimesCache ~= nil then
 	end
 end
 
-if _G.CountTableEntries == nil then
-	_G.CountTableEntries = function(t)
-		local count = 0
-		if t then
-			for _ in pairs(t) do
-				count = count + 1
-			end
-		end
-		return count
-	end
-end
-CountTableEntries = _G.CountTableEntries
-
-repr = loadstring(dx9.Get(Config.urls.repr))()
-
 Lib_ui = loadstring(dx9.Get(Config.urls.DXLibUI))()
 
 Lib_esp = loadstring(dx9.Get(Config.urls.LibESP))()
@@ -162,19 +138,9 @@ Groupboxes.debug = Tabs.debug:AddMiddleGroupbox("Debug")
 Groupboxes.dropped_guns = Tabs.guns:AddMiddleGroupbox("Dropped Guns")
 Groupboxes.aimbot = Tabs.guns:AddMiddleGroupbox("Aimbot")
 Groupboxes.master_esp = Tabs.esps:AddMiddleGroupbox("Master")
-Groupboxes.murderer_esp = Tabs.esp:AddMiddleGroupbox("Murderer")
-Groupboxes.sheriff_esp = Tabs.esp:AddMiddleGroupbox("Sheriff")
-Groupboxes.everyone_else_esp = Tabs.esp:AddMiddleGroupbox("Everyone Else")
-
-if _G.WorkspaceCache == nil then
-    _G.WorkspaceCache = {}
-else
-    for i, cached_tab in pairs(_G.WorkspaceCache) do
-        if not cached_tab.last_update or (os.clock() - cached_tab.last_update) > Debugging.Workspace_cache_cleanup_timer.Value then
-            _G.WorkspaceCache[i] = nil
-        end
-    end
-end
+Groupboxes.murderer_esp = Tabs.esps:AddMiddleGroupbox("Murderer")
+Groupboxes.sheriff_esp = Tabs.esps:AddMiddleGroupbox("Sheriff")
+Groupboxes.everyone_else_esp = Tabs.esps:AddMiddleGroupbox("Everyone Else")
 
 Debugging = {}
 Debugging.console = Groupboxes.debug:AddToggle({
@@ -195,14 +161,6 @@ end)
 Debugging.sec = Groupboxes.debug:AddLabel("Avg. Program Cycle: ".._G.averageSec.." s")
 Debugging.hz = Groupboxes.debug:AddLabel("Avg. Program Cycle: ".._G.averageHz.." Hz")
 Debugging.clock = Groupboxes.debug:AddLabel("Clock: "..os.clock())
-Debugging.Workspace_cache_cleanup_timer = Groupboxes.debug:AddSlider({
-    Default = Config.settings.cache_cleanup_timer;
-    Text = "Workspace Cleanup Timer";
-    Min = 0;
-    Max = 10;
-    Rounding = 1;
-});
-Debugging.Workspace_cache_size = Groupboxes.debug:AddLabel("Workspace Cache Size: "..tostring(CountTableEntries(_G.WorkspaceCache or {}) or 0))
 Debugging.resize_keybind = Groupboxes.debug:AddKeybindButton({
     Index = "ResizeWindowKeybindButton";
     Text = "Resize Window Keybind: [F3]";
@@ -222,6 +180,20 @@ end)
 Debugging.resize:ConnectKeybindButton(Debugging.resize_keybind)
 
 Dropped_guns = {}
+----UNFINISHED
+Dropped_guns.notify = Groupboxes.dropped_guns:AddToggle({
+    Default = Config.dropped_guns.tracer;
+    Text = "Notify";
+}):OnChanged(function(value)
+    Lib_ui:Notify(value and "[Dropped Gun Notify] Enabled" or "[Dropped Gun Notify] Disabled", 1)
+end)
+Dropped_guns.auto_tp = Groupboxes.dropped_guns:AddToggle({
+    Default = Config.dropped_guns.tracer;
+    Text = "Auto Pickup";
+}):OnChanged(function(value)
+    Lib_ui:Notify(value and "[Dropped Gun Auto Pickup] Enabled" or "[Dropped Gun Auto Pickup] Disabled", 1)
+end)
+----FINISHED
 Dropped_guns.enabled = Groupboxes.dropped_guns:AddToggle({
     Default = Config.dropped_guns.enabled;
     Text = "ESP";
@@ -234,6 +206,25 @@ Dropped_guns.tracer = Groupboxes.dropped_guns:AddToggle({
 }):OnChanged(function(value)
     Lib_ui:Notify(value and "[Dropped Gun Tracer] Enabled" or "[Dropped Gun Tracer] Disabled", 1)
 end)
+Dropped_guns.distance = Groupboxes.dropped_guns:AddToggle({
+    Default = Config.dropped_guns.distance;
+    Text = "Distance";
+}):OnChanged(function(value)
+    Lib_ui:Notify(value and "[Dropped Gun ESP] Shown Distance" or "[Dropped Gun ESP] Hid Distance", 1)
+end)
+Dropped_guns.nametag = Groupboxes.dropped_guns:AddToggle({
+    Default = Config.dropped_guns.nametag;
+    Text = "Nametag";
+}):OnChanged(function(value)
+    Lib_ui:Notify(value and "[Dropped Gun ESP] Shown Nametag" or "[Dropped Gun ESP] Hid Nametag", 1)
+end)
+Dropped_guns.distance_limit = Groupboxes.dropped_guns:AddSlider({
+    Default = Config.dropped_guns.distance_limit;
+    Text = "Dropped Gun ESP Distance Limit";
+    Min = 0;
+    Max = 1999;
+    Rounding = 0;
+})
 Dropped_guns.rainbow = Groupboxes.dropped_guns:AddToggle({
     Default = Config.dropped_guns.rainbow;
     Text = "Rainbow Dropped Gun";
@@ -538,13 +529,13 @@ if _G.PlayerTask == nil then
                 local character = dx9.FindFirstChild(Workspace, playerName)
                 if character and character ~= 0 then
                     if not gun then
-                        gun = dx9.FindFirstChild(backpack, "Gun")
+                        gun = dx9.FindFirstChild(character, "Gun")
                         if gun == 0 then
                             gun = nil
                         end
                     end
                     if not knife then
-                       knife = dx9.FindFirstChild(backpack, "Knife")
+                       knife = dx9.FindFirstChild(character, "Knife")
                         if knife == 0 then
                             knife = nil
                         end
@@ -566,7 +557,7 @@ if _G.PlayerTask == nil then
                             local root_screen_pos = dx9.WorldToScreen({root_pos.x, root_pos.y, root_pos.z})
                             local head_screen_pos = dx9.WorldToScreen({head_pos.x, head_pos.y, head_pos.z})
 
-                            local team_color = (knife and {255, 0, 0}) or (gun and {0, 255, 0}) or {255, 255, 255}
+                            local team_color = (knife and {255, 0, 0}) or (gun and {0, 0, 255}) or {255, 255, 255}
                             local team = (knife and Murderer_esp) or (gun and Sheriff_esp) or Everyone_else_esp
 
                             if Master_esp.enabled.Value and team.enabled.Value then
@@ -581,8 +572,8 @@ if _G.PlayerTask == nil then
                                             custom_nametag = playerName;
                                             custom_distance = tostring(root_distance);
                                             tracer = team.tracer.Value;
-                                            tracer_type = current_tracer_type;
-                                            box_type = current_box_type;
+                                            tracer_type = Current_tracer_type;
+                                            box_type = Current_box_type;
                                         })
                                     end
                                 end
@@ -610,82 +601,138 @@ end
 if _G.AimbotTask == nil then
     _G.AimbotTask = function()
         if Aimbot.enabled.Value then
-            if Murderer_Character ~= nil and Murderer_Character ~= 0 then
-                local root = dx9.FindFirstChild(Murderer_Character, "HumanoidRootPart")
-                local head = dx9.FindFirstChild(Murderer_Character, "Head")
-                local humanoid = dx9.FindFirstChild(Murderer_Character, "Humanoid")
-                if root and root ~= 0 and humanoid and humanoid ~= 0 and head and head ~= 0 then
-                    local health = dx9.GetHealth(humanoid) or nil
-                    if health ~= nil then
-                        health = math.floor(health)
-                    end
-                    if health ~= nil and health > 0 then
-                        local My_root_pos = dx9.GetPosition(My_root)
-                        local root_pos = dx9.GetPosition(root)
-                        local head_pos = dx9.GetPosition(head)
-                        local root_distance = _G.Get_Distance(My_root_pos, root_pos)
-                        local root_screen_pos = dx9.WorldToScreen({root_pos.x, root_pos.y, root_pos.z})
-                        local head_screen_pos = dx9.WorldToScreen({head_pos.x, head_pos.y, head_pos.z})
-
-                        local screen_pos = nil
-                        if Current_target_part == 1 then
-                            screen_pos = head_screen_pos
-                        elseif Current_target_part == 2 then
-                            screen_pos = root_screen_pos
+            if Sheriff_Player ~= nil and Sheriff_Player ~= 0 and Sheriff_Player == Local_player and Sheriff_Character ~= nil and Sheriff_Character ~= 0 and Sheriff_Character == My_character then
+                if Murderer_Character ~= nil and Murderer_Character ~= 0 then
+                    local root = dx9.FindFirstChild(Murderer_Character, "HumanoidRootPart")
+                    local head = dx9.FindFirstChild(Murderer_Character, "Head")
+                    local humanoid = dx9.FindFirstChild(Murderer_Character, "Humanoid")
+                    if root and root ~= 0 and humanoid and humanoid ~= 0 and head and head ~= 0 then
+                        local health = dx9.GetHealth(humanoid) or nil
+                        if health ~= nil then
+                            health = math.floor(health)
                         end
+                        if health ~= nil and health > 0 then
+                            local guntool = dx9.FindFirstChild(My_character, "Gun")
+                            if guntool ~= nil and guntool ~= 0 then
+                                local My_root_pos = dx9.GetPosition(My_root)
+                                local root_pos = dx9.GetPosition(root)
+                                local head_pos = dx9.GetPosition(head)
+                                local root_distance = _G.Get_Distance(My_root_pos, root_pos)
+                                local root_screen_pos = dx9.WorldToScreen({root_pos.x, root_pos.y, root_pos.z})
+                                local head_screen_pos = dx9.WorldToScreen({head_pos.x, head_pos.y, head_pos.z})
 
-                        if _G.IsOnScreen(head_screen_pos) or _G.IsOnScreen(root_screen_pos) then
-                            aimbot_target_screen_pos = screen_pos
+                                local screen_pos = nil
+                                if Current_target_part == 1 then
+                                    screen_pos = head_screen_pos
+                                elseif Current_target_part == 2 then
+                                    screen_pos = root_screen_pos
+                                end
 
-                            local Mouse_distance = _G.Get_Distance_From_Mouse(screen_pos)
-                            local aimbot_range = 9999 --dx9.GetAimbotValue("range")
-                            local aimbot_fov = dx9.GetAimbotValue("fov")
-                            if Mouse_distance and Mouse_distance <= aimbot_fov and root_distance <= aimbot_range then
-                                local Mouse_moved = false
-                                if Mouse_moved == false then
-                                    dx9.DrawCircle({aimbot_target_screen_pos.x, aimbot_target_screen_pos.y}, {255, 255, 255}, 15)
-                                    dx9.SetAimbotValue("x", 0)
-                                    dx9.SetAimbotValue("y", 0)
-                                    dx9.SetAimbotValue("z", 0)
-                                    dx9.FirstPersonAim({
-                                        aimbot_target_screen_pos.x + Screen_size.width/2,
-                                        aimbot_target_screen_pos.y + Screen_size.height/2
-                                    }, Aimbot.first_person_smoothness.Value, Aimbot.first_person_sensitivity.Value)
-                                    if not dx9.isRightClickHeld() then
-                                        dx9.ThirdPersonAim({
-                                            aimbot_target_screen_pos.x,
-                                            aimbot_target_screen_pos.y
-                                        }, Aimbot.third_person_horizontal_smoothness.Value, Aimbot.third_person_vertical_smoothness.Value)
+                                if _G.IsOnScreen(head_screen_pos) or _G.IsOnScreen(root_screen_pos) then
+                                    aimbot_target_screen_pos = screen_pos
+
+                                    local Mouse_distance = _G.Get_Distance_From_Mouse(screen_pos)
+                                    local aimbot_range = 9999 --dx9.GetAimbotValue("range")
+                                    local aimbot_fov = dx9.GetAimbotValue("fov")
+                                    if Mouse_distance and Mouse_distance <= aimbot_fov and root_distance <= aimbot_range then
+                                        local Mouse_moved = false
+                                        if Mouse_moved == false then
+                                            dx9.DrawCircle({aimbot_target_screen_pos.x, aimbot_target_screen_pos.y}, {255, 255, 255}, 15)
+                                            dx9.SetAimbotValue("x", 0)
+                                            dx9.SetAimbotValue("y", 0)
+                                            dx9.SetAimbotValue("z", 0)
+                                            dx9.FirstPersonAim({
+                                                aimbot_target_screen_pos.x + Screen_size.width/2,
+                                                aimbot_target_screen_pos.y + Screen_size.height/2
+                                            }, Aimbot.first_person_smoothness.Value, Aimbot.first_person_sensitivity.Value)
+                                            if not dx9.isRightClickHeld() then
+                                                dx9.ThirdPersonAim({
+                                                    aimbot_target_screen_pos.x,
+                                                    aimbot_target_screen_pos.y
+                                                }, Aimbot.third_person_horizontal_smoothness.Value, Aimbot.third_person_vertical_smoothness.Value)
+                                            end
+                                            Mouse_moved = true
+                                        end
                                     end
-                                    Mouse_moved = true
                                 end
                             end
                         end
                     end
                 end
-
-                if not Aimbot.enabled.Value then
-                    aimbot_target_screen_pos = nil
-                end
-                _G.aimbot_target_screen_pos = aimbot_target_screen_pos
             end
+        else
+            aimbot_target_screen_pos = nil
 		end
+        _G.aimbot_target_screen_pos = aimbot_target_screen_pos
     end
 end
 if _G.AimbotTask then
     _G.AimbotTask()
 end
 
+if _G.GunDroppedFlip == nil then
+    _G.GunDroppedFlip = false
+end
 if _G.DroppedGunTask == nil then
 	_G.DroppedGunTask = function()
-		
+        local gundrop = nil
+        if Workspace ~= nil and Workspace ~= 0 then
+            local Workspace_children = dx9.GetChildren(Workspace)
+            for i,v in ipairs(Workspace_children) do
+                if dx9.GetType(v) == "Model" or dx9.GetType(v) == "Folder" then
+                    local possible_gun_drop = dx9.FindFirstChild(v, "GunDrop")
+                    if possible_gun_drop ~= nil and possible_gun_drop ~= 0 then
+                        if dx9.GetType(possible_gun_drop) == "Part" then
+                            gundrop = possible_gun_drop
+                            break
+                        end
+                    end
+                end
+            end
+        end
+        if gundrop ~= nil then
+            if _G.GunDroppedFlip == false then
+                _G.GunDroppedFlip = true
+                if Dropped_guns.notify.Value then
+                    Lib_ui:Notify("Gun Dropped!", 1)
+                end
+            end
+            local gunpos = dx9.GetPosition(gundrop)
+
+            if Dropped_guns.auto_tp.Value then
+                dx9.Teleport(My_character, {gunpos.x, gunpos.y, gunpos.z})
+            end
+
+            local My_root_pos = dx9.GetPosition(My_root)
+            local root_distance = _G.Get_Distance(My_root_pos, gunpos)
+            local screen_pos = dx9.WorldToScreen({gunpos.x, gunpos.y, gunpos.z})
+            if Master_esp.enabled.Value and Dropped_guns.enabled.Value then
+                if root_distance < Dropped_guns.distance_limit.Value then
+                    if _G.IsOnScreen(screen_pos) then
+                        Lib_esp.draw({
+                            esp_type = "misc";
+                            target = gundrop;
+                            color = Dropped_guns.rainbow.Value and Lib_ui.CurrentRainbowColor or Dropped_guns.color.Value;
+                            healthbar = false;
+                            nametag = Dropped_guns.nametag.Value;
+                            custom_nametag = "GunDrop";
+                            distance = Dropped_guns.distance.Value;
+                            custom_distance = ""..root_distance;
+                            tracer = Dropped_guns.tracer.Value;
+                            tracer_type = Current_tracer_type;
+                            box_type = Current_box_type;
+                        })
+                    end
+                end
+            end
+        else
+            _G.GunDroppedFlip = false
+        end
 	end
 end
 if _G.DroppedGunTask then
 	_G.DroppedGunTask()
 end
-
-
 
 local endTime = os.clock()
 local elapsedTime = endTime - startTime
