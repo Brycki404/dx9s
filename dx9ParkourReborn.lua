@@ -159,7 +159,7 @@ if _G.Loiterspotsconfig == nil then
 	Loiterspotsconfig = _G.Loiterspotsconfig
 end
 
-Hiddentabsconfig = _G.Hiddentabsconfig or {
+HiddenTabsconfig = _G.HiddenTabsconfig or {
     {
         tab = "players";
         hidden = false;
@@ -193,9 +193,9 @@ Hiddentabsconfig = _G.Hiddentabsconfig or {
         hidden = false;
     };
 }
-if _G.Hiddentabsconfig == nil then
-    _G.Hiddentabsconfig = Hiddentabsconfig
-    Hiddentabsconfig = _G.Hiddentabsconfig
+if _G.HiddenTabsconfig == nil then
+    _G.HiddenTabsconfig = HiddenTabsconfig
+    HiddenTabsconfig = _G.HiddenTabsconfig
 end
 
 Config = _G.Config or {
@@ -216,7 +216,7 @@ Config = _G.Config or {
 		Hz_precision = 0;
         cache_cleanup_timer = 3;
 
-        hidden_tabs = Hiddentabsconfig;
+        hidden_Tabs = HiddenTabsconfig;
     };
     players = {
         enabled = true;
@@ -405,7 +405,7 @@ end
 Groupboxes = {}
 Groupboxes.debug = Tabs.settings:AddMiddleGroupbox("Debugging");
 Groupboxes.master_esp_settings = Tabs.settings:AddMiddleGroupbox("Master ESP");
-Groupboxes.hidden_tabs = Tabs.settings:AddMiddleGroupbox("Hidden Tabs");
+Groupboxes.hidden_Tabs = Tabs.settings:AddMiddleGroupbox("Hidden Tabs");
 
 --Workspace.World.Props.Dynamics
 --Workspace.World.Props.Animated
@@ -446,7 +446,7 @@ Debugging.resize_keybind = Groupboxes.debug:AddKeybindButton({
 Debugging.resize_keybind = Debugging.resize_keybind:OnChanged(function(newKey)
     local oldKey = Debugging.resize_keybind.Key
     Debugging.resize_keybind:SetText("Resize Window Keybind: "..tostring(newKey))
-    lib_ui:Notify("Resize Window Keybind changed from '"..tostring(oldKey).."' to '"..tostring(newKey).."'", 1)
+    Lib_ui:Notify("Resize Window Keybind changed from '"..tostring(oldKey).."' to '"..tostring(newKey).."'", 1)
 end)
 Debugging.resize = Groupboxes.debug:AddButton("Resize Window", function()
     if Interface.Active then
@@ -487,11 +487,11 @@ Master_esp_settings = {
 		end);
 }
 
-Hidden_tabs = {}
-for index, data in ipairs(Hiddentabsconfig) do
+Hidden_Tabs = {}
+for index, data in ipairs(HiddenTabsconfig) do
     local name = data.tab
     local defaultHidden = data.hidden
-	Hidden_tabs[name] = Groupboxes.hidden_tabs
+	Hidden_Tabs[name] = Groupboxes.hidden_Tabs
 		:AddToggle({
 			Default = defaultHidden;
 			Text = name.." Tab Hidden";
@@ -518,10 +518,6 @@ if _G.Get_Index == nil then
 			table = { "Near-Bottom", "Bottom", "Top", "Mouse" }
 		elseif type == "box" then
 			table = { "Corners", "2D Box", "3D Box" }
-		elseif type == "aimbot_type" then
-			table = { "Closest to mouse", "Distance" }
-		elseif type == "aimbot_part" then
-			table = { "Head", "HumanoidRootPart" }
 		end
 
 		if table then
@@ -547,7 +543,7 @@ local reprSettings = {
 	semicolons = true;          -- when printing tables, use semicolons (;) instead of commas (,)?
 	sortKeys = false;             -- when printing dictionary tables, sort keys alphabetically?
 	spaces = 2;                  -- when pretty printing, use how many spaces to indent?
-	tabs = false;                -- when pretty printing, use tabs instead of spaces?
+	Tabs = false;                -- when pretty printing, use Tabs instead of spaces?
 	robloxFullName = false;      -- when printing Roblox objects, print full name or just name? 
 	robloxProperFullName = false; -- when printing Roblox objects, print a proper* full name?
 	robloxClassName = false;      -- when printing Roblox objects, also print class name in parens?
@@ -641,7 +637,7 @@ if _G.IsOnScreen == nil then
 	end
 end
 
-if Hidden_tabs.players.Value == false then
+if Hidden_Tabs.players.Value == false then
     Tabs.players = Interface:AddTab("Players")
     Groupboxes.players = Tabs.players:AddMiddleGroupbox("Players");
     Players = {
@@ -1034,7 +1030,7 @@ Debugging.rescan_keybind = Groupboxes.debug:AddKeybindButton({
 Debugging.rescan_keybind = Debugging.rescan_keybind:OnChanged(function(newKey)
     local oldKey = Debugging.rescan_keybind.Key
 	Debugging.rescan_keybind:SetText("Rescan Keybind: "..tostring(newKey))
-	lib_ui:Notify("Rescan Keybind changed from '"..tostring(oldKey).."' to '"..tostring(newKey).."'", 1)
+	Lib_ui:Notify("Rescan Keybind changed from '"..tostring(oldKey).."' to '"..tostring(newKey).."'", 1)
 end)
 Debugging.rescan = Groupboxes.debug:AddButton("Rescan", function()
     if _G.Rescanning == false then
@@ -1235,7 +1231,7 @@ for _, tab in pairs(Config.loiter_spots.entries) do
 end
 ]]
 
-if Hidden_tabs.missions.Value == false then
+if Hidden_Tabs.missions.Value == false then
     Tabs.missions = Interface:AddTab("Missions")
     Groupboxes.missions = Tabs.missions:AddMiddleGroupbox("Missions");
     Missions = {
@@ -1331,7 +1327,7 @@ if Hidden_tabs.missions.Value == false then
     end
 end
 
-if Hidden_tabs.checkpoints.Value == false then
+if Hidden_Tabs.checkpoints.Value == false then
     Tabs.checkpoints = Interface:AddTab("Checkpoints")
     Groupboxes.antennas = Tabs.checkpoints:AddMiddleGroupbox("Respawn Antennas");
     --Groupboxes.checkpoints = Tabs.checkpoints:AddMiddleGroupbox("Blinky Checkpoints");
@@ -1521,7 +1517,7 @@ if Hidden_tabs.checkpoints.Value == false then
     end
 end
 
-if Hidden_tabs.xp_multipliers.Value == false then
+if Hidden_Tabs.xp_multipliers.Value == false then
     Tabs.xp_multipliers = Interface:AddTab("XP Multipliers")
     Groupboxes.routers = Tabs.xp_multipliers:AddMiddleGroupbox("Routers")
     Routers = {
@@ -1618,7 +1614,7 @@ if Hidden_tabs.xp_multipliers.Value == false then
     end
 end
 
-if Hidden_tabs.races.Value == false then
+if Hidden_Tabs.races.Value == false then
     Tabs.races = Interface:AddTab("Races")
     Groupboxes.timetrials = Tabs.races:AddLeftGroupbox("Time Trials");
     Groupboxes.challenges = Tabs.races:AddRightGroupbox("Challenges");
@@ -1858,7 +1854,7 @@ if Hidden_tabs.races.Value == false then
     end
 end
 
-if Hidden_tabs.scrap.Value == false then
+if Hidden_Tabs.scrap.Value == false then
     Tabs.scrap = Interface:AddTab("Scrap")
     Groupboxes.scrap = Tabs.scrap:AddMiddleGroupbox("Scrap");
     Groupboxes.scrap_config = Tabs.scrap:AddMiddleGroupbox("Scrap Config");

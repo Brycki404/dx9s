@@ -1,7 +1,8 @@
 --indent size 4
+dx9 = dx9 --in VS Code, this gets rid of a ton of problem underlines
 local startTime = os.clock()
 
-Config = _G.config or {
+Config = _G.Config or {
 	urls = {
 		DXLibUI = "https://raw.githubusercontent.com/Brycki404/DXLibUI/refs/heads/main/main.lua";
 		LibESP = "https://raw.githubusercontent.com/Brycki404/DXLibESP/refs/heads/main/main.lua";
@@ -18,9 +19,9 @@ Config = _G.config or {
 		Hz_precision = 0;
     };
 };
-if _G.config == nil then
-	_G.config = Config
-	Config = _G.config
+if _G.Config == nil then
+	_G.Config = Config
+	Config = _G.Config
 end
 
 if _G.selectedWaypointIndex == nil then

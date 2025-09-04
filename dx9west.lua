@@ -36,7 +36,7 @@ Config = _G.Config or {
         tracer = false;
 		color = { 255, 255, 255 };
 		distance_limit = 5000;
-	entries = {
+		entries = {
 			{
 				AnimalType = "Deer";
 				Enabled = true;
@@ -205,8 +205,8 @@ Aimbot_settings = {
 		:OnChanged(function(value)
 			Lib_ui:Notify(value and "[settings] Enabled Aimbot" or "[settings] Disabled Aimbot", 1)
 			if not value then
-				_G.aimbot_target_name = nil
-				_G.aimbot_target_screen_pos = nil
+				_G.Aimbot_target_name = nil
+				_G.Aimbot_target_screen_pos = nil
 			end
 		end);
 
@@ -238,8 +238,8 @@ Aimbot_settings = {
 	});
 }
 
-local aimbot_target_name = _G.aimbot_target_name or nil
-local aimbot_target_screen_pos = _G.aimbot_target_screen_pos or nil
+local Aimbot_target_name = _G.Aimbot_target_name or nil
+local Aimbot_target_screen_pos = _G.Aimbot_target_screen_pos or nil
 
 Players = {
 	enabled = Groupboxes.players
@@ -683,8 +683,6 @@ if _G.IsOnScreen == nil then
 	end
 end
 
-dx9.ShowConsole(true)
-
 CleanCacheTimeout = 3
 
 if _G.PlayerCache == nil then
@@ -748,11 +746,11 @@ if _G.PlayerTask == nil then
 
 								if _G.IsOnScreen(screen_pos) then
 									if Aimbot_settings.enabled.Value then
-										if cached_tab.playerName == aimbot_target_name then
-											aimbot_target_screen_pos = screen_pos
+										if cached_tab.playerName == Aimbot_target_name then
+											Aimbot_target_screen_pos = screen_pos
 										end
 
-										--if not Aimbot_settings.sticky_aim.Value or Aimbot_settings.sticky_aim.Value and not aimbot_target_name then
+										--if not Aimbot_settings.sticky_aim.Value or Aimbot_settings.sticky_aim.Value and not Aimbot_target_name then
 											local mouse_distance = _G.Get_Distance_From_Mouse(screen_pos)
 											local aimbot_range = 9999 --dx9.GetAimbotValue("range")
 											local aimbot_fov = dx9.GetAimbotValue("fov")
@@ -802,38 +800,38 @@ if _G.PlayerTask == nil then
 				--swapping targets
 				if Aimbot_settings.sticky_aim.Value then
 					if dx9.isRightClickHeld() then
-						aimbot_target_name = nil
-						aimbot_target_screen_pos = nil
+						Aimbot_target_name = nil
+						Aimbot_target_screen_pos = nil
 					end
-					if not aimbot_target_name or aimbot_target_name and aimbot_target_name == 0 then
-						aimbot_target_name = closest_player_name
-						aimbot_target_screen_pos = closest_player_screen_pos
+					if not Aimbot_target_name or Aimbot_target_name and Aimbot_target_name == 0 then
+						Aimbot_target_name = closest_player_name
+						Aimbot_target_screen_pos = closest_player_screen_pos
 					end
 				else
-					aimbot_target_name = closest_player_name
-					aimbot_target_screen_pos = closest_player_screen_pos
+					Aimbot_target_name = closest_player_name
+					Aimbot_target_screen_pos = closest_player_screen_pos
 				end
 
-				if aimbot_target_name and _G.IsOnScreen(aimbot_target_screen_pos) then
-					--print(aimbot_target_name.." | x: "..aimbot_target_screen_pos.x.." | y: "..aimbot_target_screen_pos.y)
+				if Aimbot_target_name and _G.IsOnScreen(Aimbot_target_screen_pos) then
+					--print(Aimbot_target_name.." | x: "..Aimbot_target_screen_pos.x.." | y: "..Aimbot_target_screen_pos.y)
 					local mouse_moved = false
 					if mouse_moved == false then
 						dx9.SetAimbotValue("x", 0)
 						dx9.SetAimbotValue("y", 0)
 						dx9.SetAimbotValue("z", 0)
 						dx9.FirstPersonAim({
-							aimbot_target_screen_pos.x + Screen_size.width/2,
-							aimbot_target_screen_pos.y + Screen_size.height/2
+							Aimbot_target_screen_pos.x + Screen_size.width/2,
+							Aimbot_target_screen_pos.y + Screen_size.height/2
 						}, Aimbot_settings.smoothness.Value, 1)
 						mouse_moved = true
 					end
 				end
 			else
-				aimbot_target_name = nil
-				aimbot_target_screen_pos = nil
+				Aimbot_target_name = nil
+				Aimbot_target_screen_pos = nil
 			end
-			_G.aimbot_target_name = aimbot_target_name
-			_G.aimbot_target_screen_pos = aimbot_target_screen_pos
+			_G.Aimbot_target_name = Aimbot_target_name
+			_G.Aimbot_target_screen_pos = Aimbot_target_screen_pos
 		end
 	end
 end

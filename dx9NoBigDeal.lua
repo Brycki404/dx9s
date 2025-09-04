@@ -1,6 +1,7 @@
 --indent size 4
+dx9 = dx9 --in VS Code, this gets rid of a ton of problem underlines
 
-config = _G.config or {
+Config = _G.Config or {
 	urls = {
 		DXLibUI = "https://raw.githubusercontent.com/Brycki404/DXLibUI/refs/heads/main/main.lua";
 		LibESP = "https://raw.githubusercontent.com/Brycki404/DXLibESP/refs/heads/main/main.lua";
@@ -314,117 +315,117 @@ config = _G.config or {
 		};
 	};
 };
-if _G.config == nil then
-	_G.config = config
-	config = _G.config
+if _G.Config == nil then
+	_G.Config = Config
+	Config = _G.Config
 end
 
-lib_ui = loadstring(dx9.Get(config.urls.DXLibUI))()
+Lib_ui = loadstring(dx9.Get(Config.urls.DXLibUI))()
 
-lib_esp = loadstring(dx9.Get(config.urls.LibESP))()
+Lib_esp = loadstring(dx9.Get(Config.urls.LibESP))()
 
-interface = lib_ui:CreateWindow({
+Interface = Lib_ui:CreateWindow({
 	Title = "No Big Deal | dx9ware | By @Brycki";
 	Size = { 500, 500 };
 	Resizable = true;
 
-	ToggleKey = config.settings.menu_toggle_keybind;
+	ToggleKey = Config.settings.menu_toggle_keybind;
 
 	FooterToggle = true;
 	FooterRGB = true;
 	FontColor = { 255, 255, 255 };
-	MainColor = { 32, 26, 68 };
-	BackgroundColor = { 26, 21, 55 };
-	AccentColor = { 81, 37, 112 };
-	OutlineColor = { 54, 47, 90 };
+	MainColor = { 25, 25, 25 };
+	BackgroundColor = { 20, 20, 20 };
+	AccentColor = { 255, 50, 255 };
+	OutlineColor = { 40, 40, 40 };
 })
 
-tabs = {
-	settings = interface:AddTab("Settings");
-	players = interface:AddTab("Players");
-	items = interface:AddTab("Items");
-	ammo = interface:AddTab("Ammo");
-	weapons = interface:AddTab("Weapons");
+Tabs = {
+	settings = Interface:AddTab("Settings");
+	players = Interface:AddTab("Players");
+	items = Interface:AddTab("Items");
+	ammo = Interface:AddTab("Ammo");
+	weapons = Interface:AddTab("Weapons");
 }
 
-groupboxes = {
-	esp_settings = tabs.settings:AddLeftGroupbox("ESP");
-	aimbot_settings = tabs.settings:AddRightGroupbox("Aimbot");
-	players = tabs.players:AddMiddleGroupbox("Player ESP");
-	items = tabs.items:AddLeftGroupbox("Item ESP");
-	items_config = tabs.items:AddRightGroupbox("Item Config");
-	ammo = tabs.ammo:AddLeftGroupbox("Ammo ESP");
-	ammo_config = tabs.ammo:AddRightGroupbox("Ammo Config");
-	weapons = tabs.weapons:AddLeftGroupbox("Weapon ESP");
-	weapons_config = tabs.weapons:AddRightGroupbox("Weapon Config");
+Groupboxes = {
+	esp_settings = Tabs.settings:AddLeftGroupbox("ESP");
+	aimbot_settings = Tabs.settings:AddRightGroupbox("Aimbot");
+	players = Tabs.players:AddMiddleGroupbox("Player ESP");
+	items = Tabs.items:AddLeftGroupbox("Item ESP");
+	items_config = Tabs.items:AddRightGroupbox("Item Config");
+	ammo = Tabs.ammo:AddLeftGroupbox("Ammo ESP");
+	ammo_config = Tabs.ammo:AddRightGroupbox("Ammo Config");
+	weapons = Tabs.weapons:AddLeftGroupbox("Weapon ESP");
+	weapons_config = Tabs.weapons:AddRightGroupbox("Weapon Config");
 }
 
-esp_settings = {
-	enabled = groupboxes.esp_settings
+Esp_settings = {
+	enabled = Groupboxes.esp_settings
 		:AddToggle({
-			Default = config.settings.esp_enabled;
+			Default = Config.settings.esp_enabled;
 			Text = "ESP Enabled";
 		})
 		:OnChanged(function(value)
-			lib_ui:Notify(value and "[settings] Enabled Global ESP" or "[settings] Disabled Global ESP", 1)
+			Lib_ui:Notify(value and "[settings] Enabled Global ESP" or "[settings] Disabled Global ESP", 1)
 		end);
 
-	box_type = groupboxes.esp_settings
+	box_type = Groupboxes.esp_settings
 		:AddDropdown({
 			Text = "Box Type";
-			Default = config.settings.box_type;
+			Default = Config.settings.box_type;
 			Values = { "Corners", "2D Box", "3D Box" };
 		})
 		:OnChanged(function(value)
-			lib_ui:Notify("[settings] Box Type: " .. value, 1)
+			Lib_ui:Notify("[settings] Box Type: " .. value, 1)
 		end);
 
-	tracer_type = groupboxes.esp_settings
+	tracer_type = Groupboxes.esp_settings
 		:AddDropdown({
 			Text = "Tracer Type";
-			Default = config.settings.tracer_type;
+			Default = Config.settings.tracer_type;
 			Values = { "Near-Bottom", "Bottom", "Top", "Mouse" };
 		})
 		:OnChanged(function(value)
-			lib_ui:Notify("[settings] Tracer Type: " .. value, 1)
+			Lib_ui:Notify("[settings] Tracer Type: " .. value, 1)
 		end);
 }
 
-aimbot_settings = {
-	enabled = groupboxes.aimbot_settings
+Aimbot_settings = {
+	enabled = Groupboxes.aimbot_settings
 		:AddToggle({
-			Default = config.settings.aimbot_enabled;
+			Default = Config.settings.aimbot_enabled;
 			Text = "Aimbot Enabled";
 		})
 		:OnChanged(function(value)
-			lib_ui:Notify(value and "[settings] Enabled Aimbot" or "[settings] Disabled Aimbot", 1)
+			Lib_ui:Notify(value and "[settings] Enabled Aimbot" or "[settings] Disabled Aimbot", 1)
 			if not value then
-				_G.aimbot_target_name = nil
-				_G.aimbot_target_screen_pos = nil
+				_G.Aimbot_target_name = nil
+				_G.Aimbot_target_screen_pos = nil
 			end
 		end);
 
-	sticky_aim = groupboxes.aimbot_settings
+	sticky_aim = Groupboxes.aimbot_settings
 		:AddToggle({
-			Default = config.settings.sticky_aim;
+			Default = Config.settings.sticky_aim;
 			Text = "Sticky Aim Enabled";
 		})
 		:OnChanged(function(value)
-			lib_ui:Notify(value and "[settings] Enabled Sticky Aim" or "[settings] Disabled Sticky Aim", 1)
+			Lib_ui:Notify(value and "[settings] Enabled Sticky Aim" or "[settings] Disabled Sticky Aim", 1)
 		end);
 
-	part = groupboxes.aimbot_settings
+	part = Groupboxes.aimbot_settings
 		:AddDropdown({
 			Text = "Aimbot Part";
-			Default = config.settings.aimbot_part;
+			Default = Config.settings.aimbot_part;
 			Values = { "Head", "HumanoidRootPart" };
 		})
 		:OnChanged(function(value)
-			lib_ui:Notify("[settings] Aimbot Part: " .. value, 1)
+			Lib_ui:Notify("[settings] Aimbot Part: " .. value, 1)
 		end);
 
-	smoothness = groupboxes.aimbot_settings:AddSlider({
-		Default = config.settings.aimbot_smoothness;
+	smoothness = Groupboxes.aimbot_settings:AddSlider({
+		Default = Config.settings.aimbot_smoothness;
 		Text = "Aimbot Smoothness";
 		Min = 1;
 		Max = 50;
@@ -432,53 +433,53 @@ aimbot_settings = {
 	});
 }
 
-local aimbot_target_name = _G.aimbot_target_name or nil
-local aimbot_target_screen_pos = _G.aimbot_target_screen_pos or nil
+local Aimbot_target_name = _G.Aimbot_target_name or nil
+local Aimbot_target_screen_pos = _G.Aimbot_target_screen_pos or nil
 
-players = {
-	enabled = groupboxes.players
+Players = {
+	enabled = Groupboxes.players
 		:AddToggle({
-			Default = config.players.enabled;
+			Default = Config.players.enabled;
 			Text = "Enabled";
 		})
 		:OnChanged(function(value)
-			lib_ui:Notify(value and "[players] Enabled ESP" or "[players] Disabled ESP", 1)
+			Lib_ui:Notify(value and "[players] Enabled ESP" or "[players] Disabled ESP", 1)
 		end);
 
-	distance = groupboxes.players
+	distance = Groupboxes.players
 		:AddToggle({
-			Default = config.players.distance;
+			Default = Config.players.distance;
 			Text = "Distance";
 		})
 		:OnChanged(function(value)
-			lib_ui:Notify(value and "[players] Enabled Distance" or "[players] Disabled Distance", 1)
+			Lib_ui:Notify(value and "[players] Enabled Distance" or "[players] Disabled Distance", 1)
 		end);
     
-	nametag = groupboxes.players
+	nametag = Groupboxes.players
 		:AddToggle({
-			Default = config.players.nametag;
+			Default = Config.players.nametag;
 			Text = "Nametag";
 		})
 		:OnChanged(function(value)
-			lib_ui:Notify(value and "[players] Enabled Nametag" or "[players] Disabled Nametag", 1)
+			Lib_ui:Notify(value and "[players] Enabled Nametag" or "[players] Disabled Nametag", 1)
 		end);
 
-	tracer = groupboxes.players
+	tracer = Groupboxes.players
 		:AddToggle({
-			Default = config.players.tracer;
+			Default = Config.players.tracer;
 			Text = "Tracer";
 		})
 		:OnChanged(function(value)
-			lib_ui:Notify(value and "[players] Enabled Tracer" or "[players] Disabled Tracer", 1)
+			Lib_ui:Notify(value and "[players] Enabled Tracer" or "[players] Disabled Tracer", 1)
 		end);
 
-	color = groupboxes.players:AddColorPicker({
-		Default = config.players.color;
+	color = Groupboxes.players:AddColorPicker({
+		Default = Config.players.color;
 		Text = "Color";
 	});
 
-    distance_limit = groupboxes.players:AddSlider({
-		Default = config.players.distance_limit;
+    distance_limit = Groupboxes.players:AddSlider({
+		Default = Config.players.distance_limit;
 		Text = "ESP Distance Limit";
 		Min = 0;
 		Max = 10000;
@@ -486,50 +487,50 @@ players = {
 	});
 }
 
-items = {
-	enabled = groupboxes.items
+Items = {
+	enabled = Groupboxes.items
 		:AddToggle({
-			Default = config.items.enabled;
+			Default = Config.items.enabled;
 			Text = "Enabled";
 		})
 		:OnChanged(function(value)
-			lib_ui:Notify(value and "[items] Enabled ESP" or "[items] Disabled ESP", 1)
+			Lib_ui:Notify(value and "[items] Enabled ESP" or "[items] Disabled ESP", 1)
 		end);
 
-	distance = groupboxes.items
+	distance = Groupboxes.items
 		:AddToggle({
-			Default = config.items.distance;
+			Default = Config.items.distance;
 			Text = "Distance";
 		})
 		:OnChanged(function(value)
-			lib_ui:Notify(value and "[items] Enabled Distance" or "[items] Disabled Distance", 1)
+			Lib_ui:Notify(value and "[items] Enabled Distance" or "[items] Disabled Distance", 1)
 		end);
 
-	nametag = groupboxes.items
+	nametag = Groupboxes.items
 		:AddToggle({
-			Default = config.items.nametag;
+			Default = Config.items.nametag;
 			Text = "Nametag";
 		})
 		:OnChanged(function(value)
-			lib_ui:Notify(value and "[items] Enabled Nametag" or "[items] Disabled Nametag", 1)
+			Lib_ui:Notify(value and "[items] Enabled Nametag" or "[items] Disabled Nametag", 1)
 		end);
 
-	tracer = groupboxes.items
+	tracer = Groupboxes.items
 		:AddToggle({
-			Default = config.items.tracer;
+			Default = Config.items.tracer;
 			Text = "Tracer";
 		})
 		:OnChanged(function(value)
-			lib_ui:Notify(value and "[items] Enabled Tracer" or "[items] Disabled Tracer", 1)
+			Lib_ui:Notify(value and "[items] Enabled Tracer" or "[items] Disabled Tracer", 1)
 		end);
 
-    color = groupboxes.items:AddColorPicker({
-		Default = config.items.color;
+    color = Groupboxes.items:AddColorPicker({
+		Default = Config.items.color;
 		Text = "Color";
 	});
 
-	distance_limit = groupboxes.items:AddSlider({
-		Default = config.items.distance_limit;
+	distance_limit = Groupboxes.items:AddSlider({
+		Default = Config.items.distance_limit;
 		Text = "ESP Distance Limit";
 		Min = 0;
 		Max = 10000;
@@ -537,65 +538,65 @@ items = {
 	});
 }
 
-items_config = {}
-for _, tab in pairs(config.items.entries) do
+Items_config = {}
+for _, tab in pairs(Config.items.entries) do
 	local name = tab.name
 	local Enabled = tab.Enabled
 
-	items_config[name.."_enabled"] = groupboxes.items_config
+	Items_config[name.."_enabled"] = Groupboxes.items_config
 		:AddToggle({
 			Default = Enabled;
 			Text = name.." ESP Enabled";
 		})
 		:OnChanged(function(value)
-			lib_ui:Notify(value and "[items] Enabled "..name.." ESP" or "[items] Disabled "..name.." ESP", 1)
+			Lib_ui:Notify(value and "[items] Enabled "..name.." ESP" or "[items] Disabled "..name.." ESP", 1)
 		end)
 end
 
-ammo = {
-	enabled = groupboxes.ammo
+Ammo = {
+	enabled = Groupboxes.ammo
 		:AddToggle({
-			Default = config.ammo.enabled;
+			Default = Config.ammo.enabled;
 			Text = "Enabled";
 		})
 		:OnChanged(function(value)
-			lib_ui:Notify(value and "[ammo] Enabled ESP" or "[ammo] Disabled ESP", 1)
+			Lib_ui:Notify(value and "[ammo] Enabled ESP" or "[ammo] Disabled ESP", 1)
 		end);
 
-	distance = groupboxes.ammo
+	distance = Groupboxes.ammo
 		:AddToggle({
-			Default = config.ammo.distance;
+			Default = Config.ammo.distance;
 			Text = "Distance";
 		})
 		:OnChanged(function(value)
-			lib_ui:Notify(value and "[ammo] Enabled Distance" or "[ammo] Disabled Distance", 1)
+			Lib_ui:Notify(value and "[ammo] Enabled Distance" or "[ammo] Disabled Distance", 1)
 		end);
 
-	nametag = groupboxes.ammo
+	nametag = Groupboxes.ammo
 		:AddToggle({
-			Default = config.ammo.nametag;
+			Default = Config.ammo.nametag;
 			Text = "Nametag";
 		})
 		:OnChanged(function(value)
-			lib_ui:Notify(value and "[ammo] Enabled Nametag" or "[ammo] Disabled Nametag", 1)
+			Lib_ui:Notify(value and "[ammo] Enabled Nametag" or "[ammo] Disabled Nametag", 1)
 		end);
 
-	tracer = groupboxes.ammo
+	tracer = Groupboxes.ammo
 		:AddToggle({
-			Default = config.ammo.tracer;
+			Default = Config.ammo.tracer;
 			Text = "Tracer";
 		})
 		:OnChanged(function(value)
-			lib_ui:Notify(value and "[ammo] Enabled Tracer" or "[ammo] Disabled Tracer", 1)
+			Lib_ui:Notify(value and "[ammo] Enabled Tracer" or "[ammo] Disabled Tracer", 1)
 		end);
 
-    color = groupboxes.ammo:AddColorPicker({
-		Default = config.ammo.color;
+    color = Groupboxes.ammo:AddColorPicker({
+		Default = Config.ammo.color;
 		Text = "Color";
 	});
 
-	distance_limit = groupboxes.ammo:AddSlider({
-		Default = config.ammo.distance_limit;
+	distance_limit = Groupboxes.ammo:AddSlider({
+		Default = Config.ammo.distance_limit;
 		Text = "ESP Distance Limit";
 		Min = 0;
 		Max = 10000;
@@ -603,65 +604,65 @@ ammo = {
 	});
 }
 
-ammo_config = {}
-for _, tab in pairs(config.ammo.entries) do
+Ammo_config = {}
+for _, tab in pairs(Config.ammo.entries) do
 	local name = tab.name
 	local Enabled = tab.Enabled
 
-	ammo_config[name.."_enabled"] = groupboxes.ammo_config
+	Ammo_config[name.."_enabled"] = Groupboxes.ammo_config
 		:AddToggle({
 			Default = Enabled;
 			Text = name.." ESP Enabled";
 		})
 		:OnChanged(function(value)
-			lib_ui:Notify(value and "[ammo] Enabled "..name.." ESP" or "[ammo] Disabled "..name.." ESP", 1)
+			Lib_ui:Notify(value and "[ammo] Enabled "..name.." ESP" or "[ammo] Disabled "..name.." ESP", 1)
 		end)
 end
 
-weapons = {
-	enabled = groupboxes.weapons
+Weapons = {
+	enabled = Groupboxes.weapons
 		:AddToggle({
-			Default = config.weapons.enabled;
+			Default = Config.weapons.enabled;
 			Text = "Enabled";
 		})
 		:OnChanged(function(value)
-			lib_ui:Notify(value and "[weapons] Enabled ESP" or "[weapons] Disabled ESP", 1)
+			Lib_ui:Notify(value and "[weapons] Enabled ESP" or "[weapons] Disabled ESP", 1)
 		end);
 
-	distance = groupboxes.weapons
+	distance = Groupboxes.weapons
 		:AddToggle({
-			Default = config.weapons.distance;
+			Default = Config.weapons.distance;
 			Text = "Distance";
 		})
 		:OnChanged(function(value)
-			lib_ui:Notify(value and "[weapons] Enabled Distance" or "[weapons] Disabled Distance", 1)
+			Lib_ui:Notify(value and "[weapons] Enabled Distance" or "[weapons] Disabled Distance", 1)
 		end);
 
-	nametag = groupboxes.weapons
+	nametag = Groupboxes.weapons
 		:AddToggle({
-			Default = config.weapons.nametag;
+			Default = Config.weapons.nametag;
 			Text = "Nametag";
 		})
 		:OnChanged(function(value)
-			lib_ui:Notify(value and "[weapons] Enabled Nametag" or "[weapons] Disabled Nametag", 1)
+			Lib_ui:Notify(value and "[weapons] Enabled Nametag" or "[weapons] Disabled Nametag", 1)
 		end);
 
-	tracer = groupboxes.weapons
+	tracer = Groupboxes.weapons
 		:AddToggle({
-			Default = config.weapons.tracer;
+			Default = Config.weapons.tracer;
 			Text = "Tracer";
 		})
 		:OnChanged(function(value)
-			lib_ui:Notify(value and "[weapons] Enabled Tracer" or "[weapons] Disabled Tracer", 1)
+			Lib_ui:Notify(value and "[weapons] Enabled Tracer" or "[weapons] Disabled Tracer", 1)
 		end);
 
-    color = groupboxes.weapons:AddColorPicker({
-		Default = config.weapons.color;
+    color = Groupboxes.weapons:AddColorPicker({
+		Default = Config.weapons.color;
 		Text = "Color";
 	});
 
-	distance_limit = groupboxes.weapons:AddSlider({
-		Default = config.weapons.distance_limit;
+	distance_limit = Groupboxes.weapons:AddSlider({
+		Default = Config.weapons.distance_limit;
 		Text = "ESP Distance Limit";
 		Min = 0;
 		Max = 10000;
@@ -669,18 +670,18 @@ weapons = {
 	});
 }
 
-weapons_config = {}
-for _, tab in pairs(config.weapons.entries) do
+Weapons_config = {}
+for _, tab in pairs(Config.weapons.entries) do
 	local name = tab.name
 	local Enabled = tab.Enabled
 
-	weapons_config[name.."_enabled"] = groupboxes.weapons_config
+	Weapons_config[name.."_enabled"] = Groupboxes.weapons_config
 		:AddToggle({
 			Default = Enabled;
 			Text = name.." ESP Enabled";
 		})
 		:OnChanged(function(value)
-			lib_ui:Notify(value and "[ammo] Enabled "..name.." ESP" or "[ammo] Disabled "..name.." ESP", 1)
+			Lib_ui:Notify(value and "[ammo] Enabled "..name.." ESP" or "[ammo] Disabled "..name.." ESP", 1)
 		end)
 end
 
@@ -701,8 +702,6 @@ if _G.Get_Index == nil then
 			table = { "Near-Bottom", "Bottom", "Top", "Mouse" }
 		elseif type == "box" then
 			table = { "Corners", "2D Box", "3D Box" }
-		elseif type == "aimbot_type" then
-			table = { "Closest to mouse", "Distance" }
 		elseif type == "aimbot_part" then
 			table = { "Head", "HumanoidRootPart" }
 		end
@@ -719,18 +718,18 @@ if _G.Get_Index == nil then
 	end
 end
 
-datamodel = dx9.GetDatamodel()
-workspace = dx9.FindFirstChild(datamodel, "Workspace")
-services = {
-	players = dx9.FindFirstChild(datamodel, "Players");
+Datamodel = dx9.GetDatamodel()
+Workspace = dx9.FindFirstChild(Datamodel, "Workspace")
+Services = {
+	players = dx9.FindFirstChild(Datamodel, "Players");
 }
 
-local_player = nil
-mouse = nil
+Local_player = nil
+Mouse = nil
 
 if _G.Update_Mouse == nil then
 	_G.Update_Mouse = function()
-		mouse = dx9.GetMouse()
+		Mouse = dx9.GetMouse()
 	end
 end
 
@@ -739,75 +738,75 @@ _G.Update_Mouse()
 if _G.Get_Distance_From_Mouse == nil then
 	_G.Get_Distance_From_Mouse = function(pos)
 		_G.Update_Mouse()
-		local a = (mouse.x - pos.x) * (mouse.x - pos.x)
-		local b = (mouse.y - pos.y) * (mouse.y - pos.y)
+		local a = (Mouse.x - pos.x) * (Mouse.x - pos.x)
+		local b = (Mouse.y - pos.y) * (Mouse.y - pos.y)
 		
 		return math.floor(math.sqrt(a + b) + 0.5)
 	end
 end
 
-current_aimbot_part = _G.Get_Index("aimbot_part", aimbot_settings.part.Value)
-current_tracer_type = _G.Get_Index("tracer", esp_settings.tracer_type.Value)
-current_box_type = _G.Get_Index("box", esp_settings.box_type.Value)
+Current_aimbot_part = _G.Get_Index("aimbot_part", Aimbot_settings.part.Value)
+Current_tracer_type = _G.Get_Index("tracer", Esp_settings.tracer_type.Value)
+Current_box_type = _G.Get_Index("box", Esp_settings.box_type.Value)
 
-if local_player == nil then
-	for _, player in pairs(dx9.GetChildren(services.players)) do
+if Local_player == nil then
+	for _, player in pairs(dx9.GetChildren(Services.players)) do
 		local pgui = dx9.FindFirstChild(player, "PlayerGui")
 		if pgui ~= nil and pgui ~= 0 then
-			local_player = player
+			Local_player = player
 			break
 		end
 	end
 end
 
-if local_player == nil or local_player == 0 then
-	local_player = dx9.get_localplayer()
+if Local_player == nil or Local_player == 0 then
+	Local_player = dx9.get_localplayer()
 end
 
-function get_local_player_name()
-	if dx9.GetType(local_player) == "Player" then
-		return dx9.GetName(local_player)
+function Get_local_player_name()
+	if dx9.GetType(Local_player) == "Player" then
+		return dx9.GetName(Local_player)
 	else
-		return local_player.Info.Name
+		return Local_player.Info.Name
 	end
 end
 
-local_player_name = get_local_player_name()
+Local_player_name = Get_local_player_name()
 
-my_player = dx9.FindFirstChild(services.players, local_player_name)
-my_character = nil
-my_head = nil
-my_root = nil
-my_humanoid = nil
+My_player = dx9.FindFirstChild(Services.players, Local_player_name)
+My_character = nil
+My_head = nil
+My_root = nil
+My_humanoid = nil
 
-if my_player == nil or my_player == 0 then
+if My_player == nil or My_player == 0 then
 	return
-elseif my_player ~= nil and my_player ~= 0 then
-    my_character = dx9.FindFirstChild(workspace, local_player_name)
+elseif My_player ~= nil and My_player ~= 0 then
+    My_character = dx9.FindFirstChild(Workspace, Local_player_name)
 end
 
-if my_character == nil or my_character == 0 then
+if My_character == nil or My_character == 0 then
 	return
-elseif my_character ~= nil and my_character ~= 0 then
-	my_head = dx9.FindFirstChild(my_character, "Head")
-	my_root = dx9.FindFirstChild(my_character, "HumanoidRootPart")
-	my_humanoid = dx9.FindFirstChild(my_character, "Humanoid")
+elseif My_character ~= nil and My_character ~= 0 then
+	My_head = dx9.FindFirstChild(My_character, "Head")
+	My_root = dx9.FindFirstChild(My_character, "HumanoidRootPart")
+	My_humanoid = dx9.FindFirstChild(My_character, "Humanoid")
 end
 
-if my_root == nil or my_root == 0 then
+if My_root == nil or My_root == 0 then
     return
 end
 
-if my_head == nil or my_head == 0 then
+if My_head == nil or My_head == 0 then
     return
 end
 
-screen_size = nil
+Screen_size = nil
 
 if _G.IsOnScreen == nil then
 	_G.IsOnScreen = function(screen_pos)
-		screen_size = dx9.size()
-		if screen_pos and screen_pos ~= 0 and screen_pos.x > 0 and screen_pos.y > 0 and screen_pos.x < screen_size.width and screen_pos.y < screen_size.height then
+		Screen_size = dx9.size()
+		if screen_pos and screen_pos ~= 0 and screen_pos.x > 0 and screen_pos.y > 0 and screen_pos.x < Screen_size.width and screen_pos.y < Screen_size.height then
 			return true
 		end
 		return false
@@ -816,23 +815,23 @@ end
 
 if _G.PlayerTask == nil then
 	_G.PlayerTask = function()
-		if players.enabled.Value or aimbot_settings.enabled.Value then
+		if Players.enabled.Value or Aimbot_settings.enabled.Value then
 			local closest_player_name = nil
 			local closest_player_value = nil
 			local closest_player_screen_pos = nil
-			for _, player in pairs(dx9.GetChildren(services.players)) do
+			for _, player in pairs(dx9.GetChildren(Services.players)) do
 				local playerName = dx9.GetName(player)
-				if playerName and playerName ~= local_player_name then
-					local playerColor = players.color.Value
+				if playerName and playerName ~= Local_player_name then
+					local playerColor = Players.color.Value
 					
-					local character = dx9.FindFirstChild(workspace, playerName)
+					local character = dx9.FindFirstChild(Workspace, playerName)
 					if character and character ~= 0 then
 						local root = dx9.FindFirstChild(character, "HumanoidRootPart")
 						local head = dx9.FindFirstChild(character, "Head")
 						local humanoid = dx9.FindFirstChild(character, "Humanoid")
 
 						if root and root ~= 0 and humanoid and humanoid ~= 0 and head and head ~= 0 then
-							local my_root_pos = dx9.GetPosition(my_root)
+							local my_root_pos = dx9.GetPosition(My_root)
 							local root_pos = dx9.GetPosition(root)
 							local head_pos = dx9.GetPosition(head)
 							local root_distance = _G.Get_Distance(my_root_pos, root_pos)
@@ -840,16 +839,16 @@ if _G.PlayerTask == nil then
 							local head_screen_pos = dx9.WorldToScreen({head_pos.x, head_pos.y, head_pos.z})
 
 							local screen_pos = nil
-							if current_aimbot_part == 1 then
+							if Current_aimbot_part == 1 then
 								screen_pos = head_screen_pos
-							elseif current_aimbot_part == 2 then
+							elseif Current_aimbot_part == 2 then
 								screen_pos = root_screen_pos
 							end
 
 							if _G.IsOnScreen(screen_pos) then
-								if aimbot_settings.enabled.Value then
-									if playerName == aimbot_target_name then
-										aimbot_target_screen_pos = screen_pos
+								if Aimbot_settings.enabled.Value then
+									if playerName == Aimbot_target_name then
+										Aimbot_target_screen_pos = screen_pos
 									end
 
 									local mouse_distance = _G.Get_Distance_From_Mouse(screen_pos)
@@ -873,18 +872,18 @@ if _G.PlayerTask == nil then
 									end
 								end
 								
-								if esp_settings.enabled.Value and players.enabled.Value then
-									if root_distance < players.distance_limit.Value then
-										lib_esp.draw({
+								if Esp_settings.enabled.Value and Players.enabled.Value then
+									if root_distance < Players.distance_limit.Value then
+										Lib_esp.draw({
 											target = character,
 											color = playerColor,
 											healthbar = false,
-											nametag = players.nametag.Value,
-											distance = players.distance.Value,
+											nametag = Players.nametag.Value,
+											distance = Players.distance.Value,
 											custom_distance = ""..root_distance,
-											tracer = players.tracer.Value,
-											tracer_type = current_tracer_type,
-											box_type = current_box_type,
+											tracer = Players.tracer.Value,
+											tracer_type = Current_tracer_type,
+											box_type = Current_box_type,
 										})
 									end
 								end
@@ -894,40 +893,40 @@ if _G.PlayerTask == nil then
 				end
 			end
 
-			if aimbot_settings.enabled.Value then
-				if aimbot_settings.sticky_aim.Value then
+			if Aimbot_settings.enabled.Value then
+				if Aimbot_settings.sticky_aim.Value then
 					if dx9.isRightClickHeld() then
-						aimbot_target_name = nil
-						aimbot_target_screen_pos = nil
+						Aimbot_target_name = nil
+						Aimbot_target_screen_pos = nil
 					end
-					if not aimbot_target_name or aimbot_target_name and aimbot_target_name == 0 then
-						aimbot_target_name = closest_player_name
-						aimbot_target_screen_pos = closest_player_screen_pos
+					if not Aimbot_target_name or Aimbot_target_name and Aimbot_target_name == 0 then
+						Aimbot_target_name = closest_player_name
+						Aimbot_target_screen_pos = closest_player_screen_pos
 					end
 				else
-					aimbot_target_name = closest_player_name
-					aimbot_target_screen_pos = closest_player_screen_pos
+					Aimbot_target_name = closest_player_name
+					Aimbot_target_screen_pos = closest_player_screen_pos
 				end
 
-				if aimbot_target_name and _G.IsOnScreen(aimbot_target_screen_pos) then
+				if Aimbot_target_name and _G.IsOnScreen(Aimbot_target_screen_pos) then
 					local mouse_moved = false
 					if mouse_moved == false then
 						dx9.SetAimbotValue("x", 0)
 						dx9.SetAimbotValue("y", 0)
 						dx9.SetAimbotValue("z", 0)
 						dx9.FirstPersonAim({
-							aimbot_target_screen_pos.x + screen_size.width/2,
-							aimbot_target_screen_pos.y + screen_size.height/2
-						}, aimbot_settings.smoothness.Value, 1)
+							Aimbot_target_screen_pos.x + Screen_size.width/2,
+							Aimbot_target_screen_pos.y + Screen_size.height/2
+						}, Aimbot_settings.smoothness.Value, 1)
 						mouse_moved = true
 					end
 				end
 			else
-				aimbot_target_name = nil
-				aimbot_target_screen_pos = nil
+				Aimbot_target_name = nil
+				Aimbot_target_screen_pos = nil
 			end
-			_G.aimbot_target_name = aimbot_target_name
-			_G.aimbot_target_screen_pos = aimbot_target_screen_pos
+			_G.Aimbot_target_name = Aimbot_target_name
+			_G.Aimbot_target_screen_pos = Aimbot_target_screen_pos
 		end
 	end
 end
@@ -935,7 +934,7 @@ if _G.PlayerTask then
 	_G.PlayerTask()
 end
 
-if not esp_settings.enabled.Value then
+if not Esp_settings.enabled.Value then
 	return
 end
 
@@ -959,7 +958,7 @@ if _G.ParentESPCheck == nil then
 		local skipThis = true
 		local isType = 0
 		if skipThis == true then
-			for _, tab in pairs(config.items.entries) do
+			for _, tab in pairs(Config.items.entries) do
 				local Name = tab.name
 				local PartName = tab.part
 				local ParentName = tab.parent
@@ -967,7 +966,7 @@ if _G.ParentESPCheck == nil then
 				if parentName == ParentName or parentName == PartName then
 					name = Name
 					partName = PartName
-					if items.enabled.Value and items_config[Name.."_enabled"].Value then
+					if Items.enabled.Value and Items_config[Name.."_enabled"].Value then
 						isType = 1
 						skipThis = false
 					end
@@ -976,7 +975,7 @@ if _G.ParentESPCheck == nil then
 			end
 		end
 		if skipThis == true then
-			for _, tab in pairs(config.ammo.entries) do
+			for _, tab in pairs(Config.ammo.entries) do
 				local Name = tab.name
 				local PartName = tab.part
 				local ParentName = tab.parent
@@ -984,7 +983,7 @@ if _G.ParentESPCheck == nil then
 				if parentName == ParentName or parentName == PartName then
 					name = Name
 					partName = PartName
-					if ammo.enabled.Value and ammo_config[Name.."_enabled"].Value then
+					if Ammo.enabled.Value and Ammo_config[Name.."_enabled"].Value then
 						isType = 2
 						skipThis = false
 					end
@@ -993,7 +992,7 @@ if _G.ParentESPCheck == nil then
 			end
 		end
 		if skipThis == true then
-			for _, tab in pairs(config.weapons.entries) do
+			for _, tab in pairs(Config.weapons.entries) do
 				local Name = tab.name
 				local PartName = tab.part
 				local ParentName = tab.parent
@@ -1001,7 +1000,7 @@ if _G.ParentESPCheck == nil then
 				if parentName == ParentName or parentName == PartName then
 					name = Name
 					partName = PartName
-					if weapons.enabled.Value and weapons_config[Name.."_enabled"].Value then
+					if Weapons.enabled.Value and Weapons_config[Name.."_enabled"].Value then
 						isType = 3
 						skipThis = false
 					end
@@ -1014,17 +1013,17 @@ if _G.ParentESPCheck == nil then
 		local typeConfigSettings = nil
 		local typeConfig = nil
 		if isType == 1 then
-			typeTab = items
-			typeConfigSettings = config.items
-			typeConfig = items_config
+			typeTab = Items
+			typeConfigSettings = Config.items
+			typeConfig = Items_config
 		elseif isType == 2 then
-			typeTab = ammo
-			typeConfigSettings = config.ammo
-			typeConfig = ammo_config
+			typeTab = Ammo
+			typeConfigSettings = Config.ammo
+			typeConfig = Ammo_config
 		elseif isType == 3 then
-			typeTab = weapons
-			typeConfigSettings = config.weapons
-			typeConfig = weapons_config
+			typeTab = Weapons
+			typeConfigSettings = Config.weapons
+			typeConfig = Weapons_config
 		end
 
 		if not skipThis and typeTab and typeConfigSettings and typeConfig then
@@ -1042,7 +1041,7 @@ if _G.ParentESPCheck == nil then
 					offset.y = pivot_pos.y
 					offset.z = pivot_pos.z
 				end
-				local my_root_pos = dx9.GetPosition(my_root)
+				local my_root_pos = dx9.GetPosition(My_root)
 				local root_pos = dx9.GetPosition(part)
 				local final_pos = {
 					x = root_pos.x + offset.x,
@@ -1053,7 +1052,7 @@ if _G.ParentESPCheck == nil then
 				if root_distance < typeTab.distance_limit.Value then
 					local root_screen_pos = dx9.WorldToScreen({final_pos.x, final_pos.y, final_pos.z})
 					if _G.IsOnScreen(root_screen_pos) then
-						lib_esp.draw({
+						Lib_esp.draw({
 							esp_type = "misc",
 							target = part,
 							color = typeTab.color.Value,
@@ -1063,8 +1062,8 @@ if _G.ParentESPCheck == nil then
 							distance = typeTab.distance.Value,
 							custom_distance = ""..root_distance,
 							tracer = typeTab.tracer.Value,
-							tracer_type = current_tracer_type,
-							box_type = current_box_type,
+							tracer_type = Current_tracer_type,
+							box_type = Current_box_type,
 						})
 					end
 				end
@@ -1075,8 +1074,8 @@ end
 
 if _G.WorkspaceESPTask == nil then
 	_G.WorkspaceESPTask = function()
-		if items.enabled.Value or ammo.enabled.Value or weapons.enabled.Value then
-			for _, parent in pairs(dx9.GetChildren(workspace)) do
+		if Items.enabled.Value or Ammo.enabled.Value or Weapons.enabled.Value then
+			for _, parent in pairs(dx9.GetChildren(Workspace)) do
 				_G.ParentESPCheck(parent)
 			end
 		end
