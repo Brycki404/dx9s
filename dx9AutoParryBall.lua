@@ -100,10 +100,10 @@ interface = lib_ui:CreateWindow({
 	FooterToggle = true;
 	FooterRGB = true;
 	FontColor = { 255, 255, 255 };
-	MainColor = { 32, 26, 68 };
-	BackgroundColor = { 26, 21, 55 };
-	AccentColor = { 81, 37, 112 };
-	OutlineColor = { 54, 47, 90 };
+	MainColor = { 25, 25, 25 };
+	BackgroundColor = { 20, 20, 20 };
+	AccentColor = { 255, 50, 255 };
+	OutlineColor = { 40, 40, 40 };
 })
 
 tabs = {}
