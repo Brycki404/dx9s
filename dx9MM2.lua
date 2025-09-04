@@ -118,10 +118,10 @@ Interface = Lib_ui:CreateWindow({
 	FooterToggle = true;
 	FooterRGB = true;
 	FontColor = { 255, 255, 255 };
-	MainColor = { 25, 25, 25 };
-	BackgroundColor = { 20, 20, 20 };
-	AccentColor = { 255, 50, 255 };
-	OutlineColor = { 40, 40, 40 };
+	MainColor = { 32, 26, 68 };
+	BackgroundColor = { 26, 21, 55 };
+	AccentColor = { 81, 37, 112 };
+	OutlineColor = { 54, 47, 90 };
 })
 
 Tabs = {}
@@ -169,7 +169,7 @@ Debugging.resize_keybind = Groupboxes.debug:AddKeybindButton({
 Debugging.resize_keybind = Debugging.resize_keybind:OnChanged(function(newKey)
     local oldKey = Debugging.resize_keybind.Key
     Debugging.resize_keybind:SetText("Resize Window Keybind: "..tostring(newKey))
-    lib_ui:Notify("Resize Window Keybind changed from '"..tostring(oldKey).."' to '"..tostring(newKey).."'", 1)
+    Lib_ui:Notify("Resize Window Keybind changed from '"..tostring(oldKey).."' to '"..tostring(newKey).."'", 1)
 end)
 Debugging.resize = Groupboxes.debug:AddButton("Resize Window", function()
     if Interface.Active then
@@ -247,7 +247,7 @@ Aimbot.enabled = Groupboxes.aimbot:AddToggle({
     Lib_ui:Notify(value and "[Gun Aimbot] Enabled" or "[Gun Aimbot] Disabled", 1)
     if not value then
         _G.aimbot_target_address = nil
-        _G.aimbot_target_screen_pos = nil
+        _G.Aimbot_target_screen_pos = nil
     end
 end)
 Aimbot.part = Groupboxes.aimbot:AddDropdown({
@@ -286,7 +286,7 @@ Aimbot.third_person_horizontal_smoothness = Groupboxes.aimbot:AddSlider({
     Rounding = 0;
 })
 local aimbot_target_address = _G.aimbot_target_address or nil
-local aimbot_target_screen_pos = _G.aimbot_target_screen_pos or nil
+local Aimbot_target_screen_pos = _G.Aimbot_target_screen_pos or nil
 
 Master_esp = {}
 Master_esp.enabled = Groupboxes.master_esp:AddToggle({
@@ -389,7 +389,7 @@ if _G.Get_Index == nil then
 		elseif type == "box" then
 			table = { "Corners", "2D Box", "3D Box" }
 		elseif type == "aimbot_type" then
-			table = { "Closest to Mouse", "Distance" }
+			table = { "Closest to mouse", "Distance" }
 		elseif type == "target_part" then
 			table = { "Head", "HumanoidRootPart" }
 		end

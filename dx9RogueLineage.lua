@@ -1,6 +1,7 @@
 --indent size 4
+dx9 = dx9 --in VS Code, this gets rid of a ton of problem underlines
 
-oreconfig = _G.oreconfig or {
+Oreconfig = _G.Oreconfig or {
 	{
 		name = "Mythril";
 		Enabled = true;
@@ -18,12 +19,12 @@ oreconfig = _G.oreconfig or {
 		Enabled = true;
 	};
 }
-if _G.oreconfig == nil then
-	_G.oreconfig = oreconfig
-	oreconfig = _G.oreconfig
+if _G.Oreconfig == nil then
+	_G.Oreconfig = Oreconfig
+	Oreconfig = _G.Oreconfig
 end
 
-config = _G.config or {
+Config = _G.Config or {
 	urls = {
 		DXLibUI = "https://raw.githubusercontent.com/Brycki404/DXLibUI/refs/heads/main/main.lua";
 		LibESP = "https://raw.githubusercontent.com/Brycki404/DXLibESP/refs/heads/main/main.lua";
@@ -65,7 +66,7 @@ config = _G.config or {
         tracer = false;
 		color = { 255, 255, 255 };
 		distance_limit = 10000;
-		entries = oreconfig;
+		entries = Oreconfig;
 	};
 	npcs = {
         enabled = false;
@@ -86,154 +87,154 @@ config = _G.config or {
 		distance_limit = 10000;
 	};
 };
-if _G.config == nil then
-	_G.config = config
-	config = _G.config
+if _G.Config == nil then
+	_G.Config = Config
+	Config = _G.Config
 end
 
-lib_ui = loadstring(dx9.Get(config.urls.DXLibUI))()
+Lib_ui = loadstring(dx9.Get(Config.urls.DXLibUI))()
 
-lib_esp = loadstring(dx9.Get(config.urls.LibESP))()
+Lib_esp = loadstring(dx9.Get(Config.urls.LibESP))()
 
-interface = lib_ui:CreateWindow({
+Interface = Lib_ui:CreateWindow({
 	Title = "Rogue Lineage | dx9ware | By @Brycki";
 	Size = { 500, 500 };
 	Resizable = true;
 
-	ToggleKey = config.settings.menu_toggle_keybind;
+	ToggleKey = Config.settings.menu_toggle_keybind;
 
 	FooterToggle = true;
 	FooterRGB = true;
 	FontColor = { 255, 255, 255 };
-	MainColor = { 25, 25, 25 };
-	BackgroundColor = { 20, 20, 20 };
-	AccentColor = { 255, 50, 255 };
-	OutlineColor = { 40, 40, 40 };
+	MainColor = { 32, 26, 68 };
+	BackgroundColor = { 26, 21, 55 };
+	AccentColor = { 81, 37, 112 };
+	OutlineColor = { 54, 47, 90 };
 })
 
-tabs = {
-	settings = interface:AddTab("Settings");
-	players = interface:AddTab("Players");
-	enemies = interface:AddTab("Enemies");
-	ores = interface:AddTab("Ores");
-	npcs = interface:AddTab("NPCs");
-	trinkets = interface:AddTab("Trinkets");
+Tabs = {
+	settings = Interface:AddTab("Settings");
+	players = Interface:AddTab("Players");
+	enemies = Interface:AddTab("Enemies");
+	ores = Interface:AddTab("Ores");
+	npcs = Interface:AddTab("NPCs");
+	trinkets = Interface:AddTab("Trinkets");
 }
 
-groupboxes = {
-	esp_settings = tabs.settings:AddMiddleGroupbox("ESP");
+Groupboxes = {
+	esp_settings = Tabs.settings:AddMiddleGroupbox("ESP");
 
-	players = tabs.players:AddLeftGroupbox("Player ESP");
+	players = Tabs.players:AddLeftGroupbox("Player ESP");
 
-	enemies = tabs.enemies:AddLeftGroupbox("Enemy ESP");
+	enemies = Tabs.enemies:AddLeftGroupbox("Enemy ESP");
 
-	ores = tabs.ores:AddLeftGroupbox("Ore ESP");
-	ores_config = tabs.ores:AddRightGroupbox("Ore Config");
+	ores = Tabs.ores:AddLeftGroupbox("Ore ESP");
+	ores_config = Tabs.ores:AddRightGroupbox("Ore Config");
 
-	npcs = tabs.npcs:AddLeftGroupbox("NPC ESP");
+	npcs = Tabs.npcs:AddLeftGroupbox("NPC ESP");
 
-	trinkets = tabs.trinkets:AddMiddleGroupbox("Trinket ESP");
+	trinkets = Tabs.trinkets:AddMiddleGroupbox("Trinket ESP");
 }
 
-esp_settings = {
-	enabled = groupboxes.esp_settings
+Esp_settings = {
+	enabled = Groupboxes.esp_settings
 		:AddToggle({
-			Default = config.settings.esp_enabled;
+			Default = Config.settings.esp_enabled;
 			Text = "ESP Enabled";
 		})
 		:OnChanged(function(value)
-			lib_ui:Notify(value and "[Settings] Enabled Global ESP" or "[Settings] Disabled Global ESP", 1)
+			Lib_ui:Notify(value and "[Settings] Enabled Global ESP" or "[Settings] Disabled Global ESP", 1)
 		end);
 
-	box_type = groupboxes.esp_settings
+	box_type = Groupboxes.esp_settings
 		:AddDropdown({
 			Text = "Box Type";
-			Default = config.settings.box_type;
+			Default = Config.settings.box_type;
 			Values = { "Corners", "2D Box", "3D Box" };
 		})
 		:OnChanged(function(value)
-			lib_ui:Notify("[Settings] Box Type: " .. value, 1)
+			Lib_ui:Notify("[Settings] Box Type: " .. value, 1)
 		end);
 
-	tracer_type = groupboxes.esp_settings
+	tracer_type = Groupboxes.esp_settings
 		:AddDropdown({
 			Text = "Tracer Type";
-			Default = config.settings.tracer_type;
+			Default = Config.settings.tracer_type;
 			Values = { "Near-Bottom", "Bottom", "Top", "Mouse" };
 		})
 		:OnChanged(function(value)
-			lib_ui:Notify("[Settings] Tracer Type: " .. value, 1)
+			Lib_ui:Notify("[Settings] Tracer Type: " .. value, 1)
 		end);
 }
 
-players = {
-	enabled = groupboxes.players
+Players = {
+	enabled = Groupboxes.players
 		:AddToggle({
-			Default = config.players.enabled;
+			Default = Config.players.enabled;
 			Text = "Enabled";
 		})
 		:OnChanged(function(value)
-			lib_ui:Notify(value and "[Players] Enabled ESP" or "[Players] Disabled ESP", 1)
+			Lib_ui:Notify(value and "[Players] Enabled ESP" or "[Players] Disabled ESP", 1)
 		end);
 
-	distance = groupboxes.players
+	distance = Groupboxes.players
 		:AddToggle({
-			Default = config.players.distance;
+			Default = Config.players.distance;
 			Text = "Distance";
 		})
 		:OnChanged(function(value)
-			lib_ui:Notify(value and "[Players] Enabled Distance" or "[Players] Disabled Distance", 1)
+			Lib_ui:Notify(value and "[Players] Enabled Distance" or "[Players] Disabled Distance", 1)
 		end);
 
-	healthbar = groupboxes.players:AddToggle({
-			Default = config.players.healthbar;
+	healthbar = Groupboxes.players:AddToggle({
+			Default = Config.players.healthbar;
 			Text = "HealthBar";
 		})
 		:OnChanged(function(value)
-			lib_ui:Notify(value and "[Players] Enabled HealthBar" or "[Players] Disabled HealthBar", 1)
+			Lib_ui:Notify(value and "[Players] Enabled HealthBar" or "[Players] Disabled HealthBar", 1)
 		end);
 
-	healthtag = groupboxes.players:AddToggle({
-			Default = config.players.healthtag;
+	healthtag = Groupboxes.players:AddToggle({
+			Default = Config.players.healthtag;
 			Text = "HealthTag";
 		})
 		:OnChanged(function(value)
-			lib_ui:Notify(value and "[Players] Enabled HealthTag" or "[Players] Disabled HealthTag", 1)
+			Lib_ui:Notify(value and "[Players] Enabled HealthTag" or "[Players] Disabled HealthTag", 1)
 		end);
 
-	maxhealthtag = groupboxes.players:AddToggle({
-			Default = config.players.maxhealthtag;
+	maxhealthtag = Groupboxes.players:AddToggle({
+			Default = Config.players.maxhealthtag;
 			Text = "MaxHealthTag";
 		})
 		:OnChanged(function(value)
-			lib_ui:Notify(value and "[Players] Enabled MaxHealthTag" or "[Players] Disabled MaxHealthTag", 1)
+			Lib_ui:Notify(value and "[Players] Enabled MaxHealthTag" or "[Players] Disabled MaxHealthTag", 1)
 		end);
 
-	nametag = groupboxes.players
+	nametag = Groupboxes.players
 		:AddToggle({
-			Default = config.players.nametag;
+			Default = Config.players.nametag;
 			Text = "Nametag";
 		})
 		:OnChanged(function(value)
-			lib_ui:Notify(value and "[Players] Enabled Nametag" or "[Players] Disabled Nametag", 1)
+			Lib_ui:Notify(value and "[Players] Enabled Nametag" or "[Players] Disabled Nametag", 1)
 		end);
 
-	tracer = groupboxes.players
+	tracer = Groupboxes.players
 		:AddToggle({
-			Default = config.players.tracer;
+			Default = Config.players.tracer;
 			Text = "Tracer";
 		})
 		:OnChanged(function(value)
-			lib_ui:Notify(value and "[Players] Enabled Tracer" or "[Players] Disabled Tracer", 1)
+			Lib_ui:Notify(value and "[Players] Enabled Tracer" or "[Players] Disabled Tracer", 1)
 		end);
 
-    color = groupboxes.players:AddColorPicker({
-		Default = config.players.color;
+    color = Groupboxes.players:AddColorPicker({
+		Default = Config.players.color;
 		Text = "Color";
 	});
 
-	distance_limit = groupboxes.players:AddSlider({
-		Default = config.players.distance_limit;
+	distance_limit = Groupboxes.players:AddSlider({
+		Default = Config.players.distance_limit;
 		Text = "ESP Distance Limit";
 		Min = 0;
 		Max = 10000;
@@ -241,74 +242,74 @@ players = {
 	});
 }
 
-enemies = {
-	enabled = groupboxes.enemies
+Enemies = {
+	enabled = Groupboxes.enemies
 		:AddToggle({
-			Default = config.enemies.enabled;
+			Default = Config.enemies.enabled;
 			Text = "Enabled";
 		})
 		:OnChanged(function(value)
-			lib_ui:Notify(value and "[Enemies] Enabled ESP" or "[Enemies] Disabled ESP", 1)
+			Lib_ui:Notify(value and "[Enemies] Enabled ESP" or "[Enemies] Disabled ESP", 1)
 		end);
 
-	distance = groupboxes.enemies
+	distance = Groupboxes.enemies
 		:AddToggle({
-			Default = config.enemies.distance;
+			Default = Config.enemies.distance;
 			Text = "Distance";
 		})
 		:OnChanged(function(value)
-			lib_ui:Notify(value and "[Enemies] Enabled Distance" or "[Enemies] Disabled Distance", 1)
+			Lib_ui:Notify(value and "[Enemies] Enabled Distance" or "[Enemies] Disabled Distance", 1)
 		end);
 
-	healthbar = groupboxes.enemies:AddToggle({
-			Default = config.enemies.healthbar;
+	healthbar = Groupboxes.enemies:AddToggle({
+			Default = Config.enemies.healthbar;
 			Text = "HealthBar";
 		})
 		:OnChanged(function(value)
-			lib_ui:Notify(value and "[Enemies] Enabled HealthBar" or "[Enemies] Disabled HealthBar", 1)
+			Lib_ui:Notify(value and "[Enemies] Enabled HealthBar" or "[Enemies] Disabled HealthBar", 1)
 		end);
 
-	healthtag = groupboxes.enemies:AddToggle({
-			Default = config.enemies.healthtag;
+	healthtag = Groupboxes.enemies:AddToggle({
+			Default = Config.enemies.healthtag;
 			Text = "HealthTag";
 		})
 		:OnChanged(function(value)
-			lib_ui:Notify(value and "[Enemies] Enabled HealthTag" or "[Enemies] Disabled HealthTag", 1)
+			Lib_ui:Notify(value and "[Enemies] Enabled HealthTag" or "[Enemies] Disabled HealthTag", 1)
 		end);
 
-	maxhealthtag = groupboxes.enemies:AddToggle({
-			Default = config.enemies.maxhealthtag;
+	maxhealthtag = Groupboxes.enemies:AddToggle({
+			Default = Config.enemies.maxhealthtag;
 			Text = "MaxHealthTag";
 		})
 		:OnChanged(function(value)
-			lib_ui:Notify(value and "[Enemies] Enabled MaxHealthTag" or "[Enemies] Disabled MaxHealthTag", 1)
+			Lib_ui:Notify(value and "[Enemies] Enabled MaxHealthTag" or "[Enemies] Disabled MaxHealthTag", 1)
 		end);
 
-	nametag = groupboxes.enemies
+	nametag = Groupboxes.enemies
 		:AddToggle({
-			Default = config.enemies.nametag;
+			Default = Config.enemies.nametag;
 			Text = "Nametag";
 		})
 		:OnChanged(function(value)
-			lib_ui:Notify(value and "[Enemies] Enabled Nametag" or "[Enemies] Disabled Nametag", 1)
+			Lib_ui:Notify(value and "[Enemies] Enabled Nametag" or "[Enemies] Disabled Nametag", 1)
 		end);
 
-	tracer = groupboxes.enemies
+	tracer = Groupboxes.enemies
 		:AddToggle({
-			Default = config.enemies.tracer;
+			Default = Config.enemies.tracer;
 			Text = "Tracer";
 		})
 		:OnChanged(function(value)
-			lib_ui:Notify(value and "[Enemies] Enabled Tracer" or "[Enemies] Disabled Tracer", 1)
+			Lib_ui:Notify(value and "[Enemies] Enabled Tracer" or "[Enemies] Disabled Tracer", 1)
 		end);
 
-    color = groupboxes.enemies:AddColorPicker({
-		Default = config.enemies.color;
+    color = Groupboxes.enemies:AddColorPicker({
+		Default = Config.enemies.color;
 		Text = "Color";
 	});
 
-	distance_limit = groupboxes.enemies:AddSlider({
-		Default = config.enemies.distance_limit;
+	distance_limit = Groupboxes.enemies:AddSlider({
+		Default = Config.enemies.distance_limit;
 		Text = "ESP Distance Limit";
 		Min = 0;
 		Max = 10000;
@@ -316,50 +317,50 @@ enemies = {
 	});
 }
 
-ores = {
-	enabled = groupboxes.ores
+Ores = {
+	enabled = Groupboxes.ores
 		:AddToggle({
-			Default = config.ores.enabled;
+			Default = Config.ores.enabled;
 			Text = "Enabled";
 		})
 		:OnChanged(function(value)
-			lib_ui:Notify(value and "[ores] Enabled ESP" or "[ores] Disabled ESP", 1)
+			Lib_ui:Notify(value and "[ores] Enabled ESP" or "[ores] Disabled ESP", 1)
 		end);
 
-	distance = groupboxes.ores
+	distance = Groupboxes.ores
 		:AddToggle({
-			Default = config.ores.distance;
+			Default = Config.ores.distance;
 			Text = "Distance";
 		})
 		:OnChanged(function(value)
-			lib_ui:Notify(value and "[ores] Enabled Distance" or "[ores] Disabled Distance", 1)
+			Lib_ui:Notify(value and "[ores] Enabled Distance" or "[ores] Disabled Distance", 1)
 		end);
 
-	nametag = groupboxes.ores
+	nametag = Groupboxes.ores
 		:AddToggle({
-			Default = config.ores.nametag;
+			Default = Config.ores.nametag;
 			Text = "Nametag";
 		})
 		:OnChanged(function(value)
-			lib_ui:Notify(value and "[ores] Enabled Nametag" or "[ores] Disabled Nametag", 1)
+			Lib_ui:Notify(value and "[ores] Enabled Nametag" or "[ores] Disabled Nametag", 1)
 		end);
 
-	tracer = groupboxes.ores
+	tracer = Groupboxes.ores
 		:AddToggle({
-			Default = config.ores.tracer;
+			Default = Config.ores.tracer;
 			Text = "Tracer";
 		})
 		:OnChanged(function(value)
-			lib_ui:Notify(value and "[ores] Enabled Tracer" or "[ores] Disabled Tracer", 1)
+			Lib_ui:Notify(value and "[ores] Enabled Tracer" or "[ores] Disabled Tracer", 1)
 		end);
 
-    color = groupboxes.ores:AddColorPicker({
-		Default = config.ores.color;
+    color = Groupboxes.ores:AddColorPicker({
+		Default = Config.ores.color;
 		Text = "Color";
 	});
 
-	distance_limit = groupboxes.ores:AddSlider({
-		Default = config.ores.distance_limit;
+	distance_limit = Groupboxes.ores:AddSlider({
+		Default = Config.ores.distance_limit;
 		Text = "ESP Distance Limit";
 		Min = 0;
 		Max = 10000;
@@ -367,65 +368,65 @@ ores = {
 	});
 }
 
-ores_config = {}
-for _, tab in pairs(config.ores.entries) do
+Ores_config = {}
+for _, tab in pairs(Config.ores.entries) do
 	local name = tab.name
 	local Enabled = tab.Enabled
 
-	ores_config[name.."_enabled"] = groupboxes.ores_config
+	Ores_config[name.."_enabled"] = Groupboxes.ores_config
 		:AddToggle({
 			Default = Enabled;
 			Text = name.." ESP Enabled";
 		})
 		:OnChanged(function(value)
-			lib_ui:Notify(value and "[ores] Enabled "..name.." ESP" or "[ores] Disabled "..name.." ESP", 1)
+			Lib_ui:Notify(value and "[ores] Enabled "..name.." ESP" or "[ores] Disabled "..name.." ESP", 1)
 		end)
 end
 
-npcs = {
-	enabled = groupboxes.npcs
+Npcs = {
+	enabled = Groupboxes.npcs
 		:AddToggle({
-			Default = config.npcs.enabled;
+			Default = Config.npcs.enabled;
 			Text = "Enabled";
 		})
 		:OnChanged(function(value)
-			lib_ui:Notify(value and "[npcs] Enabled ESP" or "[npcs] Disabled ESP", 1)
+			Lib_ui:Notify(value and "[npcs] Enabled ESP" or "[npcs] Disabled ESP", 1)
 		end);
 
-	distance = groupboxes.npcs
+	distance = Groupboxes.npcs
 		:AddToggle({
-			Default = config.npcs.distance;
+			Default = Config.npcs.distance;
 			Text = "Distance";
 		})
 		:OnChanged(function(value)
-			lib_ui:Notify(value and "[npcs] Enabled Distance" or "[npcs] Disabled Distance", 1)
+			Lib_ui:Notify(value and "[npcs] Enabled Distance" or "[npcs] Disabled Distance", 1)
 		end);
 
-	nametag = groupboxes.npcs
+	nametag = Groupboxes.npcs
 		:AddToggle({
-			Default = config.npcs.nametag;
+			Default = Config.npcs.nametag;
 			Text = "Nametag";
 		})
 		:OnChanged(function(value)
-			lib_ui:Notify(value and "[npcs] Enabled Nametag" or "[npcs] Disabled Nametag", 1)
+			Lib_ui:Notify(value and "[npcs] Enabled Nametag" or "[npcs] Disabled Nametag", 1)
 		end);
 
-	tracer = groupboxes.npcs
+	tracer = Groupboxes.npcs
 		:AddToggle({
-			Default = config.npcs.tracer;
+			Default = Config.npcs.tracer;
 			Text = "Tracer";
 		})
 		:OnChanged(function(value)
-			lib_ui:Notify(value and "[npcs] Enabled Tracer" or "[npcs] Disabled Tracer", 1)
+			Lib_ui:Notify(value and "[npcs] Enabled Tracer" or "[npcs] Disabled Tracer", 1)
 		end);
 
-    color = groupboxes.npcs:AddColorPicker({
-		Default = config.npcs.color;
+    color = Groupboxes.npcs:AddColorPicker({
+		Default = Config.npcs.color;
 		Text = "Color";
 	});
 
-	distance_limit = groupboxes.npcs:AddSlider({
-		Default = config.npcs.distance_limit;
+	distance_limit = Groupboxes.npcs:AddSlider({
+		Default = Config.npcs.distance_limit;
 		Text = "ESP Distance Limit";
 		Min = 0;
 		Max = 10000;
@@ -433,50 +434,50 @@ npcs = {
 	});
 }
 
-trinkets = {
-	enabled = groupboxes.trinkets
+Trinkets = {
+	enabled = Groupboxes.trinkets
 		:AddToggle({
-			Default = config.trinkets.enabled;
+			Default = Config.trinkets.enabled;
 			Text = "Enabled";
 		})
 		:OnChanged(function(value)
-			lib_ui:Notify(value and "[trinkets] Enabled ESP" or "[trinkets] Disabled ESP", 1)
+			Lib_ui:Notify(value and "[trinkets] Enabled ESP" or "[trinkets] Disabled ESP", 1)
 		end);
 
-	distance = groupboxes.trinkets
+	distance = Groupboxes.trinkets
 		:AddToggle({
-			Default = config.trinkets.distance;
+			Default = Config.trinkets.distance;
 			Text = "Distance";
 		})
 		:OnChanged(function(value)
-			lib_ui:Notify(value and "[trinkets] Enabled Distance" or "[trinkets] Disabled Distance", 1)
+			Lib_ui:Notify(value and "[trinkets] Enabled Distance" or "[trinkets] Disabled Distance", 1)
 		end);
 
-	nametag = groupboxes.trinkets
+	nametag = Groupboxes.trinkets
 		:AddToggle({
-			Default = config.trinkets.nametag;
+			Default = Config.trinkets.nametag;
 			Text = "Nametag";
 		})
 		:OnChanged(function(value)
-			lib_ui:Notify(value and "[trinkets] Enabled Nametag" or "[trinkets] Disabled Nametag", 1)
+			Lib_ui:Notify(value and "[trinkets] Enabled Nametag" or "[trinkets] Disabled Nametag", 1)
 		end);
 
-	tracer = groupboxes.trinkets
+	tracer = Groupboxes.trinkets
 		:AddToggle({
-			Default = config.trinkets.tracer;
+			Default = Config.trinkets.tracer;
 			Text = "Tracer";
 		})
 		:OnChanged(function(value)
-			lib_ui:Notify(value and "[trinkets] Enabled Tracer" or "[trinkets] Disabled Tracer", 1)
+			Lib_ui:Notify(value and "[trinkets] Enabled Tracer" or "[trinkets] Disabled Tracer", 1)
 		end);
 
-    color = groupboxes.trinkets:AddColorPicker({
-		Default = config.trinkets.color;
+    color = Groupboxes.trinkets:AddColorPicker({
+		Default = Config.trinkets.color;
 		Text = "Color";
 	});
 
-	distance_limit = groupboxes.trinkets:AddSlider({
-		Default = config.trinkets.distance_limit;
+	distance_limit = Groupboxes.trinkets:AddSlider({
+		Default = Config.trinkets.distance_limit;
 		Text = "ESP Distance Limit";
 		Min = 0;
 		Max = 10000;
@@ -528,109 +529,109 @@ if _G.Get_Index == nil then
 	end
 end
 
-datamodel = dx9.GetDatamodel()
-workspace = dx9.FindFirstChild(datamodel, "Workspace")
-services = {
-	players = dx9.FindFirstChild(datamodel, "Players");
+Datamodel = dx9.GetDatamodel()
+Workspace = dx9.FindFirstChild(Datamodel, "Workspace")
+Services = {
+	players = dx9.FindFirstChild(Datamodel, "Players");
 }
 
-local_player = nil
+Local_player = nil
 
-current_tracer_type = _G.Get_Index("tracer", esp_settings.tracer_type.Value)
-current_box_type = _G.Get_Index("box", esp_settings.box_type.Value)
+Current_tracer_type = _G.Get_Index("tracer", Esp_settings.tracer_type.Value)
+Current_box_type = _G.Get_Index("box", Esp_settings.box_type.Value)
 
-if local_player == nil then
-	for _, player in pairs(dx9.GetChildren(services.players)) do
+if Local_player == nil then
+	for _, player in pairs(dx9.GetChildren(Services.players)) do
 		local pgui = dx9.FindFirstChild(player, "PlayerGui")
 		if pgui ~= nil and pgui ~= 0 then
-			local_player = player
+			Local_player = player
 			break
 		end
 	end
 end
 
-if local_player == nil or local_player == 0 then
-	local_player = dx9.get_localplayer()
+if Local_player == nil or Local_player == 0 then
+	Local_player = dx9.get_localplayer()
 end
 
-function get_local_player_name()
-	if dx9.GetType(local_player) == "Player" then
-		return dx9.GetName(local_player)
+function Get_local_player_name()
+	if dx9.GetType(Local_player) == "Player" then
+		return dx9.GetName(Local_player)
 	else
-		return local_player.Info.Name
+		return Local_player.Info.Name
 	end
 end
 
-local_player_name = get_local_player_name()
+Local_player_name = Get_local_player_name()
 
-my_player = dx9.FindFirstChild(services.players, local_player_name)
-my_character = nil
-my_head = nil
-my_root = nil
-my_humanoid = nil
+My_player = dx9.FindFirstChild(Services.players, Local_player_name)
+My_character = nil
+My_head = nil
+My_root = nil
+My_humanoid = nil
 
-local Live_Folder = dx9.FindFirstChild(workspace, "Live")
+local Live_Folder = dx9.FindFirstChild(Workspace, "Live")
 if Live_Folder == nil or Live_Folder == 0 then
     return
 end
 
-if my_player == nil or my_player == 0 then
+if My_player == nil or My_player == 0 then
 	return
-elseif my_player ~= nil and my_player ~= 0 then
-    my_character = dx9.FindFirstChild(Live_Folder, local_player_name)
+elseif My_player ~= nil and My_player ~= 0 then
+    My_character = dx9.FindFirstChild(Live_Folder, Local_player_name)
 end
 
-if my_character == nil or my_character == 0 then
+if My_character == nil or My_character == 0 then
 	return
-elseif my_character ~= nil and my_character ~= 0 then
-	my_head = dx9.FindFirstChild(my_character, "Head")
-	my_root = dx9.FindFirstChild(my_character, "HumanoidRootPart")
-	my_humanoid = dx9.FindFirstChild(my_character, "Humanoid")
+elseif My_character ~= nil and My_character ~= 0 then
+	My_head = dx9.FindFirstChild(My_character, "Head")
+	My_root = dx9.FindFirstChild(My_character, "HumanoidRootPart")
+	My_humanoid = dx9.FindFirstChild(My_character, "Humanoid")
 end
 
-if my_root == nil or my_root == 0 then
+if My_root == nil or My_root == 0 then
     return
 end
 
-if my_head == nil or my_head == 0 then
+if My_head == nil or My_head == 0 then
     return
 end
 
-screen_size = nil
+Screen_size = nil
 
 if _G.IsOnScreen == nil then
 	_G.IsOnScreen = function(screen_pos)
-		screen_size = dx9.size()
-		if screen_pos and screen_pos ~= 0 and screen_pos.x > 0 and screen_pos.y > 0 and screen_pos.x < screen_size.width and screen_pos.y < screen_size.height then
+		Screen_size = dx9.size()
+		if screen_pos and screen_pos ~= 0 and screen_pos.x > 0 and screen_pos.y > 0 and screen_pos.x < Screen_size.width and screen_pos.y < Screen_size.height then
 			return true
 		end
 		return false
 	end
 end
 
-if not esp_settings.enabled.Value then
+if not Esp_settings.enabled.Value then
 	return
 end
 
 if _G.LiveTask == nil then
 	_G.LiveTask = function()
-        if players.enabled.Value or enemies.enabled.Value then
+        if Players.enabled.Value or Enemies.enabled.Value then
 			local Live_Folder_Children = dx9.GetChildren(Live_Folder)
 			if #Live_Folder_Children > 0 then
 				for _, entity in pairs(Live_Folder_Children) do
 					local entityName = dx9.GetName(entity)
-					local entityTab = enemies
-					local entityConfig = config.enemies
-					local playerObject = dx9.FindFirstChild(services.players, entityName)
+					local entityTab = Enemies
+					local entityConfig = Config.enemies
+					local playerObject = dx9.FindFirstChild(Services.players, entityName)
 					if playerObject ~= nil and playerObject ~= 0 then
-						entityTab = players
-						entityConfig = config.players
+						entityTab = Players
+						entityConfig = Config.players
 					else
 						local splits = _G.SplitString(entityName, "|")
 						local subName = string.sub(splits[1], 2)
 						entityName = subName
 					end
-					if entityTab == players and players.enabled.Value or entityTab == enemies and enemies.enabled.Value then
+					if entityTab == Players and Players.enabled.Value or entityTab == Enemies and Enemies.enabled.Value then
 						local humanoid = dx9.FindFirstChild(entity, "Humanoid")
 						local health = nil
 						local maxhealth = nil
@@ -646,7 +647,7 @@ if _G.LiveTask == nil then
 						end
 						local root = dx9.FindFirstChild(entity, "HumanoidRootPart")
 						if root ~= nil and root ~= 0 then
-							local my_root_pos = dx9.GetPosition(my_root)
+							local my_root_pos = dx9.GetPosition(My_root)
 							local root_pos = dx9.GetPosition(root)
 							local root_distance = _G.Get_Distance(my_root_pos, root_pos)
 							if root_distance < entityTab.distance_limit.Value then
@@ -658,7 +659,7 @@ if _G.LiveTask == nil then
 									elseif entityTab.healthtag.Value and health ~= nil then
 										customName = entityName .. " | " .. tostring(health) .. " hp"
 									end	
-									lib_esp.draw({
+									Lib_esp.draw({
 										target = entity;
 										color = entityTab.color.Value;
 										healthbar = entityTab.healthbar.Value;
@@ -667,8 +668,8 @@ if _G.LiveTask == nil then
 										distance = entityTab.distance.Value;
 										custom_distance = ""..root_distance;
 										tracer = entityTab.tracer.Value;
-										tracer_type = current_tracer_type;
-										box_type = current_box_type;
+										tracer_type = Current_tracer_type;
+										box_type = Current_box_type;
 									})
 								end
 							end
@@ -685,8 +686,8 @@ end
 
 if _G.NPCTask == nil then
 	_G.NPCTask = function()
-        if npcs.enabled.Value then
-			local NPCs_Folder = dx9.FindFirstChild(workspace, "NPCs")
+        if Npcs.enabled.Value then
+			local NPCs_Folder = dx9.FindFirstChild(Workspace, "NPCs")
 			if NPCs_Folder ~= nil and NPCs_Folder ~= 0 then
 				local NPCs_Folder_Children = dx9.GetChildren(NPCs_Folder)
 				if #NPCs_Folder_Children > 0 then
@@ -694,24 +695,24 @@ if _G.NPCTask == nil then
 						local npcName = dx9.GetName(npc)
 						local root = dx9.FindFirstChild(npc, "HumanoidRootPart")
 						if root ~= nil and root ~= 0 then
-							local my_root_pos = dx9.GetPosition(my_root)
+							local my_root_pos = dx9.GetPosition(My_root)
 							local root_pos = dx9.GetPosition(root)
 							local root_distance = _G.Get_Distance(my_root_pos, root_pos)
-							if root_distance < npcs.distance_limit.Value then
+							if root_distance < Npcs.distance_limit.Value then
 								local root_screen_pos = dx9.WorldToScreen({root_pos.x, root_pos.y, root_pos.z})
 								if _G.IsOnScreen(root_screen_pos) then
-									lib_esp.draw({
+									Lib_esp.draw({
 										esp_type = "misc";
 										target = root;
-										color = npcs.color.Value;
-										healthbar = config.npcs.healthbar;
-										nametag = npcs.nametag.Value;
+										color = Npcs.color.Value;
+										healthbar = Config.Npcs.healthbar;
+										nametag = Npcs.nametag.Value;
 										custom_nametag = npcName;
-										distance = npcs.distance.Value;
+										distance = Npcs.distance.Value;
 										custom_distance = ""..root_distance;
-										tracer = npcs.tracer.Value;
-										tracer_type = current_tracer_type;
-										box_type = current_box_type;
+										tracer = Npcs.tracer.Value;
+										tracer_type = Current_tracer_type;
+										box_type = Current_box_type;
 									})
 								end
 							end
@@ -728,8 +729,8 @@ end
 
 if _G.OreTask == nil then
 	_G.OreTask = function()
-        if ores.enabled.Value then
-			local Ores_Folder = dx9.FindFirstChild(workspace, "Ores")
+        if Ores.enabled.Value then
+			local Ores_Folder = dx9.FindFirstChild(Workspace, "Ores")
 			if Ores_Folder ~= nil and Ores_Folder ~= 0 then
 				local Ores_Folder_Children = dx9.GetChildren(Ores_Folder)
 				if #Ores_Folder_Children > 0 then
@@ -739,12 +740,12 @@ if _G.OreTask == nil then
 						local skipThis = true
 						local isType = 0
 						if skipThis == true then
-							for _, tab in pairs(config.ores.entries) do
+							for _, tab in pairs(Config.ores.entries) do
 								local Name = tab.name
 
 								if oreName == Name then
 									isType = 1
-									if ores_config[Name.."_enabled"].Value then
+									if Ores_config[Name.."_enabled"].Value then
 										skipThis = false
 									end
 									break
@@ -760,19 +761,19 @@ if _G.OreTask == nil then
 						local typeConfigSettings = nil
 						local typeConfig = nil
 						if isType == 0 or isType == 1 then
-							typeTab = ores
-							typeConfigSettings = config.ores
-							typeConfig = ores_config
+							typeTab = Ores
+							typeConfigSettings = Config.ores
+							typeConfig = Ores_config
 						end
 
 						if not skipThis and typeTab and typeConfigSettings and typeConfig then
-							local my_root_pos = dx9.GetPosition(my_root)
+							local my_root_pos = dx9.GetPosition(My_root)
 							local ore_pos = dx9.GetPosition(ore)
 							local root_distance = _G.Get_Distance(my_root_pos, ore_pos)
 							if root_distance < ores.distance_limit.Value then
 								local root_screen_pos = dx9.WorldToScreen({ore_pos.x, ore_pos.y, ore_pos.z})
 								if _G.IsOnScreen(root_screen_pos) then
-									lib_esp.draw({
+									Lib_esp.draw({
 										esp_type = "misc";
 										target = ore;
 										color = typeTab.color.Value;
@@ -782,8 +783,8 @@ if _G.OreTask == nil then
 										distance = typeTab.distance.Value;
 										custom_distance = ""..root_distance;
 										tracer = typeTab.tracer.Value;
-										tracer_type = current_tracer_type;
-										box_type = current_box_type;
+										tracer_type = Current_tracer_type;
+										box_type = Current_box_type;
 									})
 								end
 							end
@@ -800,8 +801,8 @@ end
 
 if _G.TrinketTask == nil then
 	_G.TrinketTask = function()
-		if trinkets.enabled.Value then
-			for i,v in pairs(dx9.GetChildren(workspace)) do
+		if Trinkets.enabled.Value then
+			for i,v in pairs(dx9.GetChildren(Workspace)) do
 				local vname = dx9.GetName(v)
 				local vtype = dx9.GetType(v)
 				if vname == "Folder" and vtype == "Folder" then
@@ -809,24 +810,24 @@ if _G.TrinketTask == nil then
 						local v2name = dx9.GetName(v2)
 						local v2type = dx9.GetType(v2)
 						if v2name == "UnionOperation" and v2type == "UnionOperation" then
-							local my_root_pos = dx9.GetPosition(my_root)
+							local my_root_pos = dx9.GetPosition(My_root)
 							local root_pos = dx9.GetPosition(v2)
 							local root_distance = _G.Get_Distance(my_root_pos, root_pos)
-							if root_distance < trinkets.distance_limit.Value then
+							if root_distance < Trinkets.distance_limit.Value then
 								local root_screen_pos = dx9.WorldToScreen({root_pos.x, root_pos.y, root_pos.z})
 								if _G.IsOnScreen(root_screen_pos) then
-									lib_esp.draw({
+									Lib_esp.draw({
 										esp_type = "misc";
 										target = v2;
-										color = trinkets.color.Value;
-										healthbar = config.trinkets.healthbar;
-										nametag = trinkets.nametag.Value;
+										color = Trinkets.color.Value;
+										healthbar = Config.trinkets.healthbar;
+										nametag = Trinkets.nametag.Value;
 										custom_nametag = "Trinket?";
-										distance = trinkets.distance.Value;
+										distance = Trinkets.distance.Value;
 										custom_distance = ""..root_distance;
-										tracer = trinkets.tracer.Value;
-										tracer_type = current_tracer_type;
-										box_type = current_box_type;
+										tracer = Trinkets.tracer.Value;
+										tracer_type = Current_tracer_type;
+										box_type = Current_box_type;
 									})
 								end
 							end

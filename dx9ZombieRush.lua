@@ -1,6 +1,7 @@
 --indent size 4
+dx9 = dx9 --in VS Code, this gets rid of a ton of problem underlines
 
-config = _G.config or {
+Config = _G.Config or {
 	urls = {
 		DXLibUI = "https://raw.githubusercontent.com/Brycki404/DXLibUI/refs/heads/main/main.lua";
 		LibESP = "https://raw.githubusercontent.com/Brycki404/DXLibESP/refs/heads/main/main.lua";
@@ -43,21 +44,21 @@ config = _G.config or {
 		distance_limit = 10000;
 	};
 };
-if _G.config == nil then
-	_G.config = config
-	config = _G.config
+if _G.Config == nil then
+	_G.Config = Config
+	Config = _G.Config
 end
 
-lib_ui = loadstring(dx9.Get(config.urls.DXLibUI))()
+Lib_ui = loadstring(dx9.Get(Config.urls.DXLibUI))()
 
-lib_esp = loadstring(dx9.Get(config.urls.LibESP))()
+Lib_esp = loadstring(dx9.Get(Config.urls.LibESP))()
 
-interface = lib_ui:CreateWindow({
+Interface = Lib_ui:CreateWindow({
 	Title = "Zombie Rush | dx9ware | By @Brycki";
 	Size = { 500, 500 };
 	Resizable = true;
 
-	ToggleKey = config.settings.menu_toggle_keybind;
+	ToggleKey = Config.settings.menu_toggle_keybind;
 
 	FooterToggle = true;
 	FooterRGB = true;
@@ -68,100 +69,100 @@ interface = lib_ui:CreateWindow({
 	OutlineColor = { 40, 40, 40 };
 })
 
-tabs = {
-	settings = interface:AddTab("Settings");
-	players = interface:AddTab("Players");
-    zombies = interface:AddTab("Zombies");
+Tabs = {
+	settings = Interface:AddTab("Settings");
+	players = Interface:AddTab("Players");
+    zombies = Interface:AddTab("Zombies");
 }
 
-groupboxes = {
-	esp_settings = tabs.settings:AddLeftGroupbox("ESP");
-	aimbot_settings = tabs.settings:AddRightGroupbox("Aimbot");
-	players_esp = tabs.players:AddMiddleGroupbox("ESP");
-    zombies_aimbot = tabs.zombies:AddMiddleGroupbox("Aimbot");
+Groupboxes = {
+	esp_settings = Tabs.settings:AddLeftGroupbox("ESP");
+	aimbot_settings = Tabs.settings:AddRightGroupbox("Aimbot");
+	Players_esp = Tabs.players:AddMiddleGroupbox("ESP");
+    Zombies_aimbot = Tabs.zombies:AddMiddleGroupbox("Aimbot");
 };
-    
-esp_settings = {
-	enabled = groupboxes.esp_settings
+
+Esp_settings = {
+	enabled = Groupboxes.esp_settings
 		:AddToggle({
-			Default = config.settings.esp_enabled;
+			Default = Config.settings.esp_enabled;
 			Text = "ESP Enabled";
 		})
 		:OnChanged(function(value)
-			lib_ui:Notify(value and "[settings] Enabled Global ESP" or "[settings] Disabled Global ESP", 1)
+			Lib_ui:Notify(value and "[settings] Enabled Global ESP" or "[settings] Disabled Global ESP", 1)
 		end);
 
-	box_type = groupboxes.esp_settings
+	box_type = Groupboxes.esp_settings
 		:AddDropdown({
 			Text = "Box Type";
-			Default = config.settings.box_type;
+			Default = Config.settings.box_type;
 			Values = { "Corners", "2D Box", "3D Box" };
 		})
 		:OnChanged(function(value)
-			lib_ui:Notify("[settings] Box Type: " .. value, 1)
+			Lib_ui:Notify("[settings] Box Type: " .. value, 1)
 		end);
 
-	tracer_type = groupboxes.esp_settings
+	tracer_type = Groupboxes.esp_settings
 		:AddDropdown({
 			Text = "Tracer Type";
-			Default = config.settings.tracer_type;
+			Default = Config.settings.tracer_type;
 			Values = { "Near-Bottom", "Bottom", "Top", "Mouse" };
 		})
 		:OnChanged(function(value)
-			lib_ui:Notify("[settings] Tracer Type: " .. value, 1)
+			Lib_ui:Notify("[settings] Tracer Type: " .. value, 1)
 		end);
 }
 
-aimbot_settings = {
-	enabled = groupboxes.aimbot_settings
+Aimbot_settings = {
+	enabled = Groupboxes.aimbot_settings
 		:AddToggle({
-			Default = config.settings.aimbot_enabled;
+			Default = Config.settings.aimbot_enabled;
 			Text = "Aimbot Enabled";
 		})
 		:OnChanged(function(value)
-			lib_ui:Notify(value and "[settings] Enabled Aimbot" or "[settings] Disabled Aimbot", 1)
+			Lib_ui:Notify(value and "[settings] Enabled Aimbot" or "[settings] Disabled Aimbot", 1)
 			if not value then
 				_G.aimbot_target_address = nil
-				_G.aimbot_target_screen_pos = nil
+				_G.Aimbot_target_screen_pos = nil
 			end
 		end);
 
-	part = groupboxes.aimbot_settings
+	part = Groupboxes.aimbot_settings
 		:AddDropdown({
 			Text = "Aimbot Part";
-			Default = config.settings.aimbot_part;
+			Default = Config.settings.aimbot_part;
 			Values = { "Head", "HumanoidRootPart" };
 		})
 		:OnChanged(function(value)
-			lib_ui:Notify("[settings] Aimbot Part: " .. value, 1)
+			Lib_ui:Notify("[settings] Aimbot Part: " .. value, 1)
 		end);
 
-    first_person_smoothness = groupboxes.aimbot_settings:AddSlider({
-		Default = config.settings.first_person_smoothness;
+    first_person_smoothness = Groupboxes.aimbot_settings:AddSlider({
+		Default = Config.settings.first_person_smoothness;
 		Text = "First Person Smoothness";
 		Min = 1;
 		Max = 50;
 		Rounding = 0;
 	});
 
-    first_person_sensitivity = groupboxes.aimbot_settings:AddSlider({
-		Default = config.settings.first_person_sensitivity;
+    first_person_sensitivity = Groupboxes.aimbot_settings:AddSlider({
+		Default = Config.settings.first_person_sensitivity;
 		Text = "First Person Sensitivity";
 		Min = 1;
 		Max = 50;
 		Rounding = 0;
 	});
 
-    third_person_vertical_smoothness = groupboxes.aimbot_settings:AddSlider({
-		Default = config.settings.third_person_vertical_smoothness;
+    third_person_vertical_smoothness = Groupboxes.aimbot_settings:AddSlider({
+		Default = Config.settings.third_person_vertical_smoothness;
 		Text = "Third Person Vertical Smoothness";
 		Min = 1;
 		Max = 50;
 		Rounding = 0;
 	});
 
-	third_person_horizontal_smoothness = groupboxes.aimbot_settings:AddSlider({
-		Default = config.settings.third_person_horizontal_smoothness;
+	third_person_horizontal_smoothness = Groupboxes.aimbot_settings:AddSlider({
+		Default = Config.settings.third_person_horizontal_smoothness;
 		Text = "Third Person Horizontal Smoothness";
 		Min = 1;
 		Max = 50;
@@ -170,76 +171,76 @@ aimbot_settings = {
 }
 
 local aimbot_target_address = _G.aimbot_target_address or nil
-local aimbot_target_screen_pos = _G.aimbot_target_screen_pos or nil
+local Aimbot_target_screen_pos = _G.Aimbot_target_screen_pos or nil
 
-players_esp = {
-	enabled = groupboxes.players_esp
+Players_esp = {
+	enabled = Groupboxes.Players_esp
 		:AddToggle({
-			Default = config.players.enabled;
+			Default = Config.players.enabled;
 			Text = "Enabled";
 		})
 		:OnChanged(function(value)
-			lib_ui:Notify(value and "[Players] Enabled ESP" or "[Players] Disabled ESP", 1)
+			Lib_ui:Notify(value and "[Players] Enabled ESP" or "[Players] Disabled ESP", 1)
 		end);
 
-	distance = groupboxes.players_esp
+	distance = Groupboxes.Players_esp
 		:AddToggle({
-			Default = config.players.distance;
+			Default = Config.players.distance;
 			Text = "Distance";
 		})
 		:OnChanged(function(value)
-			lib_ui:Notify(value and "[Players] Enabled Distance" or "[Players] Disabled Distance", 1)
+			Lib_ui:Notify(value and "[Players] Enabled Distance" or "[Players] Disabled Distance", 1)
 		end);
 
-    healthbar = groupboxes.players_esp:AddToggle({
-			Default = config.players.healthbar;
+    healthbar = Groupboxes.Players_esp:AddToggle({
+			Default = Config.players.healthbar;
 			Text = "HealthBar";
 		})
 		:OnChanged(function(value)
-			lib_ui:Notify(value and "[Players] Enabled HealthBar" or "[Players] Disabled HealthBar", 1)
+			Lib_ui:Notify(value and "[Players] Enabled HealthBar" or "[Players] Disabled HealthBar", 1)
 		end);
 
-	healthtag = groupboxes.players_esp:AddToggle({
-			Default = config.players.healthtag;
+	healthtag = Groupboxes.Players_esp:AddToggle({
+			Default = Config.players.healthtag;
 			Text = "HealthTag";
 		})
 		:OnChanged(function(value)
-			lib_ui:Notify(value and "[Players] Enabled HealthTag" or "[Players] Disabled HealthTag", 1)
+			Lib_ui:Notify(value and "[Players] Enabled HealthTag" or "[Players] Disabled HealthTag", 1)
 		end);
 
-	maxhealthtag = groupboxes.players_esp:AddToggle({
-			Default = config.players.maxhealthtag;
+	maxhealthtag = Groupboxes.Players_esp:AddToggle({
+			Default = Config.players.maxhealthtag;
 			Text = "MaxHealthTag";
 		})
 		:OnChanged(function(value)
-			lib_ui:Notify(value and "[Players] Enabled MaxHealthTag" or "[Players] Disabled MaxHealthTag", 1)
+			Lib_ui:Notify(value and "[Players] Enabled MaxHealthTag" or "[Players] Disabled MaxHealthTag", 1)
 		end);
     
-	nametag = groupboxes.players_esp
+	nametag = Groupboxes.Players_esp
 		:AddToggle({
-			Default = config.players.nametag;
+			Default = Config.players.nametag;
 			Text = "Nametag";
 		})
 		:OnChanged(function(value)
-			lib_ui:Notify(value and "[Players] Enabled Nametag" or "[Players] Disabled Nametag", 1)
+			Lib_ui:Notify(value and "[Players] Enabled Nametag" or "[Players] Disabled Nametag", 1)
 		end);
 
-	tracer = groupboxes.players_esp
+	tracer = Groupboxes.Players_esp
 		:AddToggle({
-			Default = config.players.tracer;
+			Default = Config.players.tracer;
 			Text = "Tracer";
 		})
 		:OnChanged(function(value)
-			lib_ui:Notify(value and "[Players] Enabled Tracer" or "[Players] Disabled Tracer", 1)
+			Lib_ui:Notify(value and "[Players] Enabled Tracer" or "[Players] Disabled Tracer", 1)
 		end);
 
-	color = groupboxes.players_esp:AddColorPicker({
-		Default = config.players.color;
+	color = Groupboxes.Players_esp:AddColorPicker({
+		Default = Config.players.color;
 		Text = "Color";
 	});
 
-    distance_limit = groupboxes.players_esp:AddSlider({
-		Default = config.players.distance_limit;
+    distance_limit = Groupboxes.Players_esp:AddSlider({
+		Default = Config.players.distance_limit;
 		Text = "ESP Distance Limit";
 		Min = 0;
 		Max = 10000;
@@ -247,14 +248,14 @@ players_esp = {
 	});
 }
 
-zombies_aimbot = {
-    enabled = groupboxes.zombies_aimbot
+Zombies_aimbot = {
+    enabled = Groupboxes.Zombies_aimbot
 		:AddToggle({
-			Default = config.zombies.aimbot;
+			Default = Config.zombies.aimbot;
 			Text = "Enabled";
 		})
 		:OnChanged(function(value)
-			lib_ui:Notify(value and "[Zombies] Enabled Aimbot" or "[Zombies] Disabled Aimbot", 1)
+			Lib_ui:Notify(value and "[Zombies] Enabled Aimbot" or "[Zombies] Disabled Aimbot", 1)
 		end);
 }
 
@@ -293,18 +294,18 @@ if _G.Get_Index == nil then
 	end
 end
 
-datamodel = dx9.GetDatamodel()
-workspace = dx9.FindFirstChild(datamodel, "Workspace")
-services = {
-	players = dx9.FindFirstChild(datamodel, "Players");
+Datamodel = dx9.GetDatamodel()
+Workspace = dx9.FindFirstChild(Datamodel, "Workspace")
+Services = {
+	players = dx9.FindFirstChild(Datamodel, "Players");
 }
 
-local_player = nil
-mouse = nil
+Local_player = nil
+Mouse = nil
 
 if _G.Update_Mouse == nil then
 	_G.Update_Mouse = function()
-		mouse = dx9.GetMouse()
+		Mouse = dx9.GetMouse()
 	end
 end
 
@@ -313,75 +314,75 @@ _G.Update_Mouse()
 if _G.Get_Distance_From_Mouse == nil then
 	_G.Get_Distance_From_Mouse = function(pos)
 		_G.Update_Mouse()
-		local a = (mouse.x - pos.x) * (mouse.x - pos.x)
-		local b = (mouse.y - pos.y) * (mouse.y - pos.y)
+		local a = (Mouse.x - pos.x) * (Mouse.x - pos.x)
+		local b = (Mouse.y - pos.y) * (Mouse.y - pos.y)
 		
 		return math.floor(math.sqrt(a + b) + 0.5)
 	end
 end
 
-current_aimbot_part = _G.Get_Index("aimbot_part", aimbot_settings.part.Value)
-current_tracer_type = _G.Get_Index("tracer", esp_settings.tracer_type.Value)
-current_box_type = _G.Get_Index("box", esp_settings.box_type.Value)
+Current_aimbot_part = _G.Get_Index("aimbot_part", Aimbot_settings.part.Value)
+Current_tracer_type = _G.Get_Index("tracer", Esp_settings.tracer_type.Value)
+Current_box_type = _G.Get_Index("box", Esp_settings.box_type.Value)
 
-if local_player == nil then
-	for _, player in pairs(dx9.GetChildren(services.players)) do
+if Local_player == nil then
+	for _, player in pairs(dx9.GetChildren(Services.players)) do
 		local pgui = dx9.FindFirstChild(player, "PlayerGui")
 		if pgui ~= nil and pgui ~= 0 then
-			local_player = player
+			Local_player = player
 			break
 		end
 	end
 end
 
-if local_player == nil or local_player == 0 then
-	local_player = dx9.get_localplayer()
+if Local_player == nil or Local_player == 0 then
+	Local_player = dx9.get_localplayer()
 end
 
-function get_local_player_name()
-	if dx9.GetType(local_player) == "Player" then
-		return dx9.GetName(local_player)
+function Get_local_player_name()
+	if dx9.GetType(Local_player) == "Player" then
+		return dx9.GetName(Local_player)
 	else
-		return local_player.Info.Name
+		return Local_player.Info.Name
 	end
 end
 
-local_player_name = get_local_player_name()
+Local_player_name = Get_local_player_name()
 
-my_player = dx9.FindFirstChild(services.players, local_player_name)
-my_character = nil
-my_head = nil
-my_root = nil
-my_humanoid = nil
+My_player = dx9.FindFirstChild(Services.players, Local_player_name)
+My_character = nil
+My_head = nil
+My_root = nil
+My_humanoid = nil
 
-if my_player == nil or my_player == 0 then
+if My_player == nil or My_player == 0 then
 	return
-elseif my_player ~= nil and my_player ~= 0 then
-    my_character = dx9.FindFirstChild(workspace, local_player_name)
+elseif My_player ~= nil and My_player ~= 0 then
+    My_character = dx9.FindFirstChild(Workspace, Local_player_name)
 end
 
-if my_character == nil or my_character == 0 then
+if My_character == nil or My_character == 0 then
 	return
-elseif my_character ~= nil and my_character ~= 0 then
-	my_head = dx9.FindFirstChild(my_character, "Head")
-	my_root = dx9.FindFirstChild(my_character, "HumanoidRootPart")
-	my_humanoid = dx9.FindFirstChild(my_character, "Humanoid")
+elseif My_character ~= nil and My_character ~= 0 then
+	My_head = dx9.FindFirstChild(My_character, "Head")
+	My_root = dx9.FindFirstChild(My_character, "HumanoidRootPart")
+	My_humanoid = dx9.FindFirstChild(My_character, "Humanoid")
 end
 
-if my_root == nil or my_root == 0 then
+if My_root == nil or My_root == 0 then
     return
 end
 
-if my_head == nil or my_head == 0 then
+if My_head == nil or My_head == 0 then
     return
 end
 
-screen_size = nil
+Screen_size = nil
 
 if _G.IsOnScreen == nil then
 	_G.IsOnScreen = function(screen_pos)
-		screen_size = dx9.size()
-		if screen_pos and screen_pos ~= 0 and screen_pos.x > 0 and screen_pos.y > 0 and screen_pos.x < screen_size.width and screen_pos.y < screen_size.height then
+		Screen_size = dx9.size()
+		if screen_pos and screen_pos ~= 0 and screen_pos.x > 0 and screen_pos.y > 0 and screen_pos.x < Screen_size.width and screen_pos.y < Screen_size.height then
 			return true
 		end
 		return false
@@ -390,8 +391,8 @@ end
 
 if _G.ZombiesTask == nil then
 	_G.ZombiesTask = function()
-		if aimbot_settings.enabled.Value and zombies_aimbot.enabled.Value then
-			local ZombieStorage = dx9.FindFirstChild(workspace, "Zombie Storage")
+		if Aimbot_settings.enabled.Value and Zombies_aimbot.enabled.Value then
+			local ZombieStorage = dx9.FindFirstChild(Workspace, "Zombie Storage")
             if ZombieStorage ~= nil and ZombieStorage ~= 0 then
                 local closest_zombie_address = nil
                 local closest_zombie_value = nil
@@ -408,7 +409,7 @@ if _G.ZombiesTask == nil then
                                 health = math.floor(health)
                             end
                             if health ~= nil and health > 0 then
-                                local my_root_pos = dx9.GetPosition(my_root)
+                                local my_root_pos = dx9.GetPosition(My_root)
                                 local root_pos = dx9.GetPosition(root)
                                 local head_pos = dx9.GetPosition(head)
                                 local root_distance = _G.Get_Distance(my_root_pos, root_pos)
@@ -416,16 +417,16 @@ if _G.ZombiesTask == nil then
                                 local head_screen_pos = dx9.WorldToScreen({head_pos.x, head_pos.y, head_pos.z})
 
                                 local screen_pos = nil
-                                if current_aimbot_part == 1 then
+                                if Current_aimbot_part == 1 then
                                     screen_pos = head_screen_pos
-                                elseif current_aimbot_part == 2 then
+                                elseif Current_aimbot_part == 2 then
                                     screen_pos = root_screen_pos
                                 end
 
                                 if _G.IsOnScreen(head_screen_pos) or _G.IsOnScreen(root_screen_pos) then
-                                    if aimbot_settings.enabled.Value and zombies_aimbot.enabled.Value then
+                                    if Aimbot_settings.enabled.Value and Zombies_aimbot.enabled.Value then
                                         if zombie == aimbot_target_address then
-                                            aimbot_target_screen_pos = screen_pos
+                                            Aimbot_target_screen_pos = screen_pos
                                         end
 
                                         local mouse_distance = _G.Get_Distance_From_Mouse(screen_pos)
@@ -454,36 +455,36 @@ if _G.ZombiesTask == nil then
                     end
                 end
 
-                if aimbot_settings.enabled.Value and zombies_aimbot.enabled.Value then
+                if Aimbot_settings.enabled.Value and Zombies_aimbot.enabled.Value then
                     aimbot_target_address = closest_zombie_address
-                    aimbot_target_screen_pos = closest_zombie_screen_pos
+                    Aimbot_target_screen_pos = closest_zombie_screen_pos
                     
-                    if aimbot_target_address and _G.IsOnScreen(aimbot_target_screen_pos) then
+                    if aimbot_target_address and _G.IsOnScreen(Aimbot_target_screen_pos) then
                         local mouse_moved = false
                         if mouse_moved == false then
-                            dx9.DrawCircle({aimbot_target_screen_pos.x, aimbot_target_screen_pos.y}, {255, 255, 255}, 15)
+                            dx9.DrawCircle({Aimbot_target_screen_pos.x, Aimbot_target_screen_pos.y}, {255, 255, 255}, 15)
                             dx9.SetAimbotValue("x", 0)
                             dx9.SetAimbotValue("y", 0)
                             dx9.SetAimbotValue("z", 0)
                             dx9.FirstPersonAim({
-                                aimbot_target_screen_pos.x + screen_size.width/2,
-                                aimbot_target_screen_pos.y + screen_size.height/2
-                            }, aimbot_settings.first_person_smoothness.Value, aimbot_settings.first_person_sensitivity.Value)
+                                Aimbot_target_screen_pos.x + Screen_size.width/2,
+                                Aimbot_target_screen_pos.y + Screen_size.height/2
+                            }, Aimbot_settings.first_person_smoothness.Value, Aimbot_settings.first_person_sensitivity.Value)
                             if not dx9.isRightClickHeld() then
 								dx9.ThirdPersonAim({
-									aimbot_target_screen_pos.x,
-									aimbot_target_screen_pos.y
-								}, aimbot_settings.third_person_horizontal_smoothness.Value, aimbot_settings.third_person_vertical_smoothness.Value)
+									Aimbot_target_screen_pos.x,
+									Aimbot_target_screen_pos.y
+								}, Aimbot_settings.third_person_horizontal_smoothness.Value, Aimbot_settings.third_person_vertical_smoothness.Value)
 							end
 							mouse_moved = true
                         end
                     end
                 else
                     aimbot_target_address = nil
-                    aimbot_target_screen_pos = nil
+                    Aimbot_target_screen_pos = nil
                 end
                 _G.aimbot_target_address = aimbot_target_address
-                _G.aimbot_target_screen_pos = aimbot_target_screen_pos
+                _G.Aimbot_target_screen_pos = Aimbot_target_screen_pos
             end
 		end
 	end
@@ -494,11 +495,11 @@ end
 
 if _G.PlayerTask == nil then
 	_G.PlayerTask = function()
-		if esp_settings.enabled.Value and players_esp.enabled.Value then
-			for _, player in pairs(dx9.GetChildren(services.players)) do
+		if Esp_settings.enabled.Value and Players_esp.enabled.Value then
+			for _, player in pairs(dx9.GetChildren(Services.players)) do
 				local playerName = dx9.GetName(player)
-				if playerName and playerName ~= local_player_name then
-					local character = dx9.FindFirstChild(workspace, playerName)
+				if playerName and playerName ~= Local_player_name then
+					local character = dx9.FindFirstChild(Workspace, playerName)
 					if character and character ~= 0 then
 						local root = dx9.FindFirstChild(character, "HumanoidRootPart")
 						local head = dx9.FindFirstChild(character, "Head")
@@ -515,7 +516,7 @@ if _G.PlayerTask == nil then
                                     maxhealth = math.floor(maxhealth)
                                 end
 
-                                local my_root_pos = dx9.GetPosition(my_root)
+                                local my_root_pos = dx9.GetPosition(My_root)
                                 local root_pos = dx9.GetPosition(root)
                                 local head_pos = dx9.GetPosition(head)
                                 local root_distance = _G.Get_Distance(my_root_pos, root_pos)
@@ -523,25 +524,25 @@ if _G.PlayerTask == nil then
                                 local head_screen_pos = dx9.WorldToScreen({head_pos.x, head_pos.y, head_pos.z})
 
                                 local customName = playerName
-                                if players_esp.healthtag.Value and players_esp.maxhealthtag.Value and health ~= nil and maxhealth ~= nil then
+                                if Players_esp.healthtag.Value and Players_esp.maxhealthtag.Value and health ~= nil and maxhealth ~= nil then
                                     customName = playerName .. " | " .. tostring(health) .. "/" .. tostring(maxhealth) .. " hp"
-                                elseif players_esp.healthtag.Value and health ~= nil then
+                                elseif Players_esp.healthtag.Value and health ~= nil then
                                     customName = playerName .. " | " .. tostring(health) .. " hp"
                                 end
 
                                 if _G.IsOnScreen(head_screen_pos) or _G.IsOnScreen(root_screen_pos) then
-                                    if root_distance < players_esp.distance_limit.Value then
-                                        lib_esp.draw({
+                                    if root_distance < Players_esp.distance_limit.Value then
+                                        Lib_esp.draw({
                                             target = character;
-                                            color = players_esp.color.Value;
-                                            healthbar = players_esp.healthbar.Value;
-                                            nametag = players_esp.nametag.Value;
-                                            distance = players_esp.distance.Value;
+                                            color = Players_esp.color.Value;
+                                            healthbar = Players_esp.healthbar.Value;
+                                            nametag = Players_esp.nametag.Value;
+                                            distance = Players_esp.distance.Value;
                                             custom_nametag = customName;
                                             custom_distance = tostring(root_distance);
-                                            tracer = players_esp.tracer.Value;
-                                            tracer_type = current_tracer_type;
-                                            box_type = current_box_type;
+                                            tracer = Players_esp.tracer.Value;
+                                            tracer_type = Current_tracer_type;
+                                            box_type = Current_box_type;
                                         })
                                     end
                                 end
