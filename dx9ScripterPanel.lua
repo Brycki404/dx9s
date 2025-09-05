@@ -306,7 +306,6 @@ Services = {
 
 Local_player = nil
 Local_player_table = dx9.get_localplayer()
-Current_fps = game_settings.fps and game_settings.fps.Value and tonumber(game_settings.fps.Value) or 60
 
 if Local_player == nil then
 	for _, player in pairs(dx9.GetChildren(Services.players)) do

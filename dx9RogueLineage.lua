@@ -770,7 +770,7 @@ if _G.OreTask == nil then
 							local my_root_pos = dx9.GetPosition(My_root)
 							local ore_pos = dx9.GetPosition(ore)
 							local root_distance = _G.Get_Distance(my_root_pos, ore_pos)
-							if root_distance < ores.distance_limit.Value then
+							if root_distance < Ores.distance_limit.Value then
 								local root_screen_pos = dx9.WorldToScreen({ore_pos.x, ore_pos.y, ore_pos.z})
 								if _G.IsOnScreen(root_screen_pos) then
 									Lib_esp.draw({
