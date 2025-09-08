@@ -335,11 +335,18 @@ else
 end
 
 Groupboxes.waypoints:AddTitle("Waypoint Settings")
+Groupboxes.waypoints:AddLabel("Text Boxes do not yet have a cursor, so when typing, follow the instructions below:")
+Groupboxes.waypoints:AddLabel("[LEFT SHIFT] and [RIGHT SHIFT] to toggle capslock")
+Groupboxes.waypoints:AddLabel("[SUBTRACT] on your NumPad to type dashes and underscores")
+Groupboxes.waypoints:AddLabel("[ENTER/RETURN] to stop typing")
+Groupboxes.waypoints:AddLabel("[SPACEBAR] to type a space")
+Groupboxes.waypoints:AddLabel("[BACKSPACE] to delete the last character")
 Waypoints.nametextbox = Groupboxes.waypoints:AddTextBox({
 	Index = "WaypointNameTextBox";
 	Placeholder = "Name";
 	Default = "New Waypoint";
 })
+Groupboxes.waypoints:AddLabel(Waypoints.nametextbox.Capslock and "Capslock: ENABLED" or "Capslock: DISABLED", Waypoints.nametextbox.Capslock and {0, 255, 0} or {255, 0, 0})
 Waypoints.visible = Groupboxes.waypoints:AddToggle({
 	Index = "WaypointVisibleToggle";
 	Default = true;
