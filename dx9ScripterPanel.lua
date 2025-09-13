@@ -283,7 +283,7 @@ Deepsearch.searchbutton = Groupboxes.deepsearch:AddButton("Search", function()
 			for i, instance in pairs(_G.deepSearchCache.Hits) do
 				local path = FindPath(_G.deepSearchCache.Tree, instance)
 				if path then
-					print("\nPath to value:", FormatPath(path), ", "..tostring(dx9.GetType(instance)))  --> Output: Path to value: ["user"]["settings"]["theme"], TYPE
+					print("\nPath to value:", FormatPath(path), "("..tostring(dx9.GetType(tonumber(instance)))..")")  --> Output: Path to value: ["user"]["settings"]["theme"] (TYPE)
 				else
 					print("\nValue not found.")
 				end
