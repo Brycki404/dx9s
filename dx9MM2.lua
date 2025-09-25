@@ -635,23 +635,27 @@ if _G.AimbotTask == nil then
                                     local aimbot_range = 9999 --dx9.GetAimbotValue("range")
                                     local aimbot_fov = dx9.GetAimbotValue("fov")
                                     if Mouse_distance and Mouse_distance <= aimbot_fov and root_distance <= aimbot_range then
-                                        local Mouse_moved = false
-                                        if Mouse_moved == false then
-                                            dx9.DrawCircle({screen_pos.x, screen_pos.y}, {255, 255, 255}, 15)
-                                            dx9.SetAimbotValue("x", 0)
-                                            dx9.SetAimbotValue("y", 0)
-                                            dx9.SetAimbotValue("z", 0)
-                                            dx9.FirstPersonAim({
-                                                screen_pos.x + Screen_size.width/2,
-                                                screen_pos.y + Screen_size.height/2
-                                            }, Aimbot.first_person_smoothness.Value, Aimbot.first_person_sensitivity.Value)
-                                            if not dx9.isRightClickHeld() then
-                                                dx9.ThirdPersonAim({
-                                                    screen_pos.x,
-                                                    screen_pos.y
-                                                }, Aimbot.third_person_horizontal_smoothness.Value, Aimbot.third_person_vertical_smoothness.Value)
+                                        if not _G.lastAimbotFrame or _G.lastAimbotFrame and (os.clock() - _G.lastAimbotFrame) > (1/60) then
+                                            local Mouse_moved = false
+                                            if Mouse_moved == false then
+                                                dx9.DrawCircle({screen_pos.x, screen_pos.y}, {255, 255, 255}, 15)
+                                                dx9.SetAimbotValue("x", 0)
+                                                dx9.SetAimbotValue("y", 0)
+                                                dx9.SetAimbotValue("z", 0)
+                                                
+                                                dx9.FirstPersonAim({
+                                                    screen_pos.x + Screen_size.width/2,
+                                                    screen_pos.y + Screen_size.height/2
+                                                }, Aimbot.first_person_smoothness.Value, Aimbot.first_person_sensitivity.Value)
+                                                if not dx9.isRightClickHeld() then
+                                                    dx9.ThirdPersonAim({
+                                                        screen_pos.x,
+                                                        screen_pos.y
+                                                    }, Aimbot.third_person_horizontal_smoothness.Value, Aimbot.third_person_vertical_smoothness.Value)
+                                                end
+                                                Mouse_moved = true
                                             end
-                                            Mouse_moved = true
+                                            _G.lastAimbotFrame = os.clock()
                                         end
                                     end
                                 end

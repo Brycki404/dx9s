@@ -460,24 +460,27 @@ if _G.ZombiesTask == nil then
                     Aimbot_target_screen_pos = closest_zombie_screen_pos
                     
                     if aimbot_target_address and _G.IsOnScreen(Aimbot_target_screen_pos) then
-                        local mouse_moved = false
-                        if mouse_moved == false then
-                            dx9.DrawCircle({Aimbot_target_screen_pos.x, Aimbot_target_screen_pos.y}, {255, 255, 255}, 15)
-                            dx9.SetAimbotValue("x", 0)
-                            dx9.SetAimbotValue("y", 0)
-                            dx9.SetAimbotValue("z", 0)
-                            dx9.FirstPersonAim({
-                                Aimbot_target_screen_pos.x + Screen_size.width/2,
-                                Aimbot_target_screen_pos.y + Screen_size.height/2
-                            }, Aimbot_settings.first_person_smoothness.Value, Aimbot_settings.first_person_sensitivity.Value)
-                            if not dx9.isRightClickHeld() then
-								dx9.ThirdPersonAim({
-									Aimbot_target_screen_pos.x,
-									Aimbot_target_screen_pos.y
-								}, Aimbot_settings.third_person_horizontal_smoothness.Value, Aimbot_settings.third_person_vertical_smoothness.Value)
+						if not _G.lastAimbotFrame or _G.lastAimbotFrame and (os.clock() - _G.lastAimbotFrame) > (1/60) then
+							local mouse_moved = false
+							if mouse_moved == false then
+								dx9.DrawCircle({Aimbot_target_screen_pos.x, Aimbot_target_screen_pos.y}, {255, 255, 255}, 15)
+								dx9.SetAimbotValue("x", 0)
+								dx9.SetAimbotValue("y", 0)
+								dx9.SetAimbotValue("z", 0)
+								dx9.FirstPersonAim({
+									Aimbot_target_screen_pos.x + Screen_size.width/2,
+									Aimbot_target_screen_pos.y + Screen_size.height/2
+								}, Aimbot_settings.first_person_smoothness.Value, Aimbot_settings.first_person_sensitivity.Value)
+								if not dx9.isRightClickHeld() then
+									dx9.ThirdPersonAim({
+										Aimbot_target_screen_pos.x,
+										Aimbot_target_screen_pos.y
+									}, Aimbot_settings.third_person_horizontal_smoothness.Value, Aimbot_settings.third_person_vertical_smoothness.Value)
+								end
+								mouse_moved = true
 							end
-							mouse_moved = true
-                        end
+							_G.lastAimbotFrame = os.clock()
+						end
                     end
                 else
                     aimbot_target_address = nil
