@@ -18,13 +18,12 @@ Config = _G.Config or {
 		maximum_Hz_Cache = 15;
 		Sec_precision = 4;
 		Hz_precision = 0;
-		cache_cleanup_timer = 3;
 
 		master_esp_enabled = true;
     	box_type = 1; -- 1 = "Corners", 2 = "2D Box", 3 = "3D Box"
     	tracer_type = 1; -- 1= "Near-Bottom", 2 = "Bottom", 3 = "Top", 4 = "Mouse"
     };
-	enemies = {
+	players = {
 		enabled = true;
         distance = true;
         nametag = true;
@@ -35,17 +34,6 @@ Config = _G.Config or {
         color = { 255, 0, 0 };
 		distance_limit = 10000;
 	};
-	allies = {
-        enabled = false;
-        distance = true;
-        nametag = true;
-		healthbar = true;
-		healthtag = true;
-		maxhealthtag = true;
-        tracer = false;
-        color = { 0, 255, 0 };
-		distance_limit = 10000;
-    };
 }
 if _G.Config == nil then
 	_G.Config = Config
@@ -101,7 +89,7 @@ Lib_ui = loadstring(dx9.Get(Config.urls.DXLibUI))()
 Lib_esp = loadstring(dx9.Get(Config.urls.LibESP))()
 
 Interface = Lib_ui:CreateWindow({
-	Title = "Operation One | dx9ware | By @Brycki";
+	Title = "Project Smash | dx9ware | By @Brycki";
 	Size = { 500, 500 };
 	Resizable = true;
 
@@ -119,15 +107,13 @@ Interface = Lib_ui:CreateWindow({
 Tabs = {}
 Tabs.debug = Interface:AddTab("Debug")
 Tabs.settings = Interface:AddTab("Settings")
-Tabs.enemies = Interface:AddTab("Enemies")
-Tabs.allies = Interface:AddTab("Allies")
+Tabs.players = Interface:AddTab("Players")
 
 Groupboxes = {}
 Groupboxes.debug = Tabs.debug:AddMiddleGroupbox("Debugging")
 Groupboxes.master_esp_settings = Tabs.settings:AddMiddleGroupbox("Master ESP")
 Groupboxes.aimbot_settings = Tabs.settings:AddMiddleGroupbox("Aimbot")
-Groupboxes.enemies = Tabs.enemies:AddMiddleGroupbox("Enemies ESP")
-Groupboxes.allies = Tabs.allies:AddMiddleGroupbox("Allies ESP")
+Groupboxes.players = Tabs.players:AddMiddleGroupbox("Players ESP")
 
 Debugging = {}
 Debugging.console = Groupboxes.debug:AddToggle({
@@ -242,69 +228,69 @@ Aimbot_settings = {
 local Aimbot_target_name = _G.Aimbot_target_name or nil
 local Aimbot_target_screen_pos = _G.Aimbot_target_screen_pos or nil
 
-Enemies = {
-	enabled = Groupboxes.enemies
+Players = {
+	enabled = Groupboxes.players
 		:AddToggle({
-			Default = Config.enemies.enabled;
+			Default = Config.players.enabled;
 			Text = "Enabled";
 		})
 		:OnChanged(function(value)
-			Lib_ui:Notify(value and "[enemies] Enabled ESP" or "[enemies] Disabled ESP", 1)
+			Lib_ui:Notify(value and "[players] Enabled ESP" or "[players] Disabled ESP", 1)
 		end);
 
-	distance = Groupboxes.enemies
+	distance = Groupboxes.players
 		:AddToggle({
-			Default = Config.enemies.distance;
+			Default = Config.players.distance;
 			Text = "Distance";
 		})
 		:OnChanged(function(value)
-			Lib_ui:Notify(value and "[enemies] Enabled Distance" or "[enemies] Disabled Distance", 1)
+			Lib_ui:Notify(value and "[players] Enabled Distance" or "[players] Disabled Distance", 1)
 		end);
 	
-	healthbar = Groupboxes.enemies:AddToggle({
-			Default = Config.enemies.healthbar;
+	healthbar = Groupboxes.players:AddToggle({
+			Default = Config.players.healthbar;
 			Text = "HealthBar";
 		})
 		:OnChanged(function(value)
-			Lib_ui:Notify(value and "[enemies] Enabled HealthBar" or "[enemies] Disabled HealthBar", 1)
+			Lib_ui:Notify(value and "[players] Enabled HealthBar" or "[players] Disabled HealthBar", 1)
 		end);
 
-	healthtag = Groupboxes.enemies:AddToggle({
-			Default = Config.enemies.healthtag;
+	healthtag = Groupboxes.players:AddToggle({
+			Default = Config.players.healthtag;
 			Text = "HealthTag";
 		})
 		:OnChanged(function(value)
-			Lib_ui:Notify(value and "[enemies] Enabled HealthTag" or "[enemies] Disabled HealthTag", 1)
+			Lib_ui:Notify(value and "[players] Enabled HealthTag" or "[players] Disabled HealthTag", 1)
 		end);
 
-	maxhealthtag = Groupboxes.enemies:AddToggle({
-			Default = Config.enemies.maxhealthtag;
+	maxhealthtag = Groupboxes.players:AddToggle({
+			Default = Config.players.maxhealthtag;
 			Text = "MaxHealthTag";
 		})
 		:OnChanged(function(value)
-			Lib_ui:Notify(value and "[enemies] Enabled MaxHealthTag" or "[enemies] Disabled MaxHealthTag", 1)
+			Lib_ui:Notify(value and "[players] Enabled MaxHealthTag" or "[players] Disabled MaxHealthTag", 1)
 		end);
 
-	nametag = Groupboxes.enemies
+	nametag = Groupboxes.players
 		:AddToggle({
-			Default = Config.enemies.nametag;
+			Default = Config.players.nametag;
 			Text = "Nametag";
 		})
 		:OnChanged(function(value)
-			Lib_ui:Notify(value and "[enemies] Enabled Nametag" or "[enemies] Disabled Nametag", 1)
+			Lib_ui:Notify(value and "[players] Enabled Nametag" or "[players] Disabled Nametag", 1)
 		end);
 
-	tracer = Groupboxes.enemies
+	tracer = Groupboxes.players
 		:AddToggle({
-			Default = Config.enemies.tracer;
+			Default = Config.players.tracer;
 			Text = "Tracer";
 		})
 		:OnChanged(function(value)
-			Lib_ui:Notify(value and "[enemies] Enabled Tracer" or "[enemies] Disabled Tracer", 1)
+			Lib_ui:Notify(value and "[players] Enabled Tracer" or "[players] Disabled Tracer", 1)
 		end);
 
-    distance_limit = Groupboxes.enemies:AddSlider({
-		Default = Config.enemies.distance_limit;
+    distance_limit = Groupboxes.players:AddSlider({
+		Default = Config.players.distance_limit;
 		Text = "ESP Distance Limit";
 		Min = 0;
 		Max = 5000;
@@ -518,7 +504,7 @@ end
 
 if _G.PlayerTask == nil then
 	_G.PlayerTask = function()
-		if Enemies.enabled.Value or Allies.enabled.Value or Aimbot_settings.enabled.Value then
+		if Players.enabled.Value or Aimbot_settings.enabled.Value then
 			local closest_player_name = nil
 			local closest_player_value = nil
 			local closest_player_screen_pos = nil
@@ -537,19 +523,6 @@ if _G.PlayerTask == nil then
 				if cached_tab then
 					local teamName = dx9.GetTeam(player)
 					local playerColor = {255, 255, 255}
-					local teamGroupbox = nil
-					local teamConfig = nil
-					if My_team_name ~= teamName then
-						--Enemies
-						playerColor = {255, 0, 0}
-						teamGroupbox = Enemies
-						teamConfig = Config.enemies
-					else
-						--Allies
-						playerColor = {0, 255, 0}
-						teamGroupbox = Allies
-						teamConfig = Config.allies
-					end
 					
 					local character = dx9.FindFirstChild(Worskpace, cached_tab.playerName)
 					if character and character ~= 0 then
@@ -595,20 +568,20 @@ if _G.PlayerTask == nil then
 									--end
 								end
 								
-								local this_custom_name = teamGroupbox.healthtag.Value and cached_tab.playerName.." | "..health..(teamGroupbox.maxhealthtag.Value and "/"..maxhealth.." hp" or " hp") or cached_tab.playerName;
+								local this_custom_name = Players.healthtag.Value and cached_tab.playerName.." | "..health..(Players.maxhealthtag.Value and "/"..maxhealth.." hp" or " hp") or cached_tab.playerName;
 
 								
-								if Master_esp_settings.enabled.Value and teamGroupbox.enabled.Value then
-									if root_distance < teamGroupbox.distance_limit.Value then
+								if Master_esp_settings.enabled.Value and Players.enabled.Value then
+									if root_distance < Players.distance_limit.Value then
 										Lib_esp.draw({
 											target = character,
 											color = playerColor,
-											healthbar = teamGroupbox.healthbar.Value,
-											nametag = teamGroupbox.nametag.Value,
+											healthbar = Players.healthbar.Value,
+											nametag = Players.nametag.Value,
 											custom_nametag = this_custom_name,
-											distance = My_root ~= nil and My_root ~= 0 and teamGroupbox.distance.Value or false,
+											distance = My_root ~= nil and My_root ~= 0 and Players.distance.Value or false,
 											custom_distance = ""..root_distance,
-											tracer = teamGroupbox.tracer.Value,
+											tracer = Players.tracer.Value,
 											tracer_type = Current_tracer_type,
 											box_type = Current_box_type,
 										})
