@@ -645,8 +645,8 @@ if _G.PlayerTask == nil then
 						dx9.SetAimbotValue("y", 0)
 						dx9.SetAimbotValue("z", 0)
 						dx9.FirstPersonAim({
-							math.floor((Aimbot_target_screen_pos and Aimbot_target_screen_pos.x or 0) + Screen_size.width/2),
-							math.floor((Aimbot_target_screen_pos and Aimbot_target_screen_pos.y or 0) + Screen_size.height/2)
+							math.floor((Aimbot_target_screen_pos and Aimbot_target_screen_pos.x or 0) + Screen_size.width/2 + 0.5),
+							math.floor((Aimbot_target_screen_pos and Aimbot_target_screen_pos.y or 0) + Screen_size.height/2 + 0.5)
 						}, Aimbot_settings.smoothness.Value, 1)
 						mouse_moved = true
 					end
