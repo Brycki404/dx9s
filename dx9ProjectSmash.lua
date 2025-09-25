@@ -594,7 +594,7 @@ if _G.PlayerTask == nil then
 				end
 			end
 
-			if not _G.lastAimbotFrame or _G.lastAimbotFrame and (os.clock() - _G.lastAimbotFrame) > (1/60) then
+			if not _G.lastAimbotFrame or _G.lastAimbotFrame and (os.clock() - _G.lastAimbotFrame) > (1/30) then
 				if Aimbot_settings.enabled.Value then
 					--swapping targets
 					if Aimbot_settings.sticky_aim.Value then
