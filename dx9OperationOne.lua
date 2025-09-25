@@ -621,42 +621,45 @@ if _G.PlayerTask == nil then
 				end
 			end
 
-			if Aimbot_settings.enabled.Value then
-				--swapping targets
-				if Aimbot_settings.sticky_aim.Value then
-					if dx9.isRightClickHeld() then
-						Aimbot_target_name = nil
-						Aimbot_target_screen_pos = nil
-					end
-					if not Aimbot_target_name or Aimbot_target_name and Aimbot_target_name == 0 then
+			if not _G.lastAimbotFrame or _G.lastAimbotFrame and (os.clock() - _G.lastAimbotFrame) > (1/60) then
+				if Aimbot_settings.enabled.Value then
+					--swapping targets
+					if Aimbot_settings.sticky_aim.Value then
+						if dx9.isRightClickHeld() then
+							Aimbot_target_name = nil
+							Aimbot_target_screen_pos = nil
+						end
+						if not Aimbot_target_name or Aimbot_target_name and Aimbot_target_name == 0 then
+							Aimbot_target_name = closest_player_name
+							Aimbot_target_screen_pos = closest_player_screen_pos
+						end
+					else
 						Aimbot_target_name = closest_player_name
 						Aimbot_target_screen_pos = closest_player_screen_pos
 					end
-				else
-					Aimbot_target_name = closest_player_name
-					Aimbot_target_screen_pos = closest_player_screen_pos
-				end
 
-				if Aimbot_target_name and _G.IsOnScreen(Aimbot_target_screen_pos) then
-					--print(Aimbot_target_name.." | x: "..Aimbot_target_screen_pos.x.." | y: "..Aimbot_target_screen_pos.y)
-					local mouse_moved = false
-					if mouse_moved == false then
-						dx9.SetAimbotValue("x", 0)
-						dx9.SetAimbotValue("y", 0)
-						dx9.SetAimbotValue("z", 0)
-						dx9.FirstPersonAim({
-							(Aimbot_target_screen_pos and Aimbot_target_screen_pos.x or 0) + Screen_size.width/2,
-							(Aimbot_target_screen_pos and Aimbot_target_screen_pos.y or 0) + Screen_size.height/2
-						}, Aimbot_settings.smoothness.Value, 1)
-						mouse_moved = true
+					if Aimbot_target_name and _G.IsOnScreen(Aimbot_target_screen_pos) then
+						--print(Aimbot_target_name.." | x: "..Aimbot_target_screen_pos.x.." | y: "..Aimbot_target_screen_pos.y)
+						local mouse_moved = false
+						if mouse_moved == false then
+							dx9.SetAimbotValue("x", 0)
+							dx9.SetAimbotValue("y", 0)
+							dx9.SetAimbotValue("z", 0)
+							dx9.FirstPersonAim({
+								(Aimbot_target_screen_pos and Aimbot_target_screen_pos.x or 0) + Screen_size.width/2,
+								(Aimbot_target_screen_pos and Aimbot_target_screen_pos.y or 0) + Screen_size.height/2
+							}, Aimbot_settings.smoothness.Value, 1)
+							mouse_moved = true
+						end
 					end
+				else
+					Aimbot_target_name = nil
+					Aimbot_target_screen_pos = nil
 				end
-			else
-				Aimbot_target_name = nil
-				Aimbot_target_screen_pos = nil
+				_G.Aimbot_target_name = Aimbot_target_name
+				_G.Aimbot_target_screen_pos = Aimbot_target_screen_pos
+				_G.lastAimbotFrame = os.clock()
 			end
-			_G.Aimbot_target_name = Aimbot_target_name
-			_G.Aimbot_target_screen_pos = Aimbot_target_screen_pos
 		end
 	end
 end
