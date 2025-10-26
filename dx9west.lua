@@ -744,50 +744,48 @@ if _G.PlayerTask == nil then
 									screen_pos = root_screen_pos
 								end
 
-								if _G.IsOnScreen(screen_pos) then
-									if Aimbot_settings.enabled.Value then
-										if cached_tab.playerName == Aimbot_target_name then
-											Aimbot_target_screen_pos = screen_pos
-										end
+								if Aimbot_settings.enabled.Value then
+									if cached_tab.playerName == Aimbot_target_name then
+										Aimbot_target_screen_pos = screen_pos
+									end
 
-										--if not Aimbot_settings.sticky_aim.Value or Aimbot_settings.sticky_aim.Value and not Aimbot_target_name then
-											local mouse_distance = _G.Get_Distance_From_Mouse(screen_pos)
-											local aimbot_range = 9999 --dx9.GetAimbotValue("range")
-											local aimbot_fov = dx9.GetAimbotValue("fov")
-											if mouse_distance and mouse_distance <= aimbot_fov and root_distance <= aimbot_range then
-												local current_aimbot_type = dx9.GetAimbotValue("type")
-												if current_aimbot_type == 1 then
-													if closest_player_value == nil or mouse_distance < closest_player_value then
-														closest_player_name = cached_tab.playerName
-														closest_player_value = mouse_distance
-														closest_player_screen_pos = screen_pos
-													end
-												elseif current_aimbot_type == 0 then
-													if closest_player_value == nil or root_distance < closest_player_value then
-														closest_player_name = cached_tab.playerName
-														closest_player_value = root_distance
-														closest_player_screen_pos = screen_pos
-													end
+									if not Aimbot_settings.sticky_aim.Value or Aimbot_settings.sticky_aim.Value and Aimbot_target_name == nil then
+										local mouse_distance = _G.Get_Distance_From_Mouse(screen_pos)
+										local aimbot_range = 9999 --dx9.GetAimbotValue("range")
+										local aimbot_fov = dx9.GetAimbotValue("fov")
+										if mouse_distance and mouse_distance <= aimbot_fov and root_distance <= aimbot_range then
+											local current_aimbot_type = dx9.GetAimbotValue("type")
+											if current_aimbot_type == 1 then
+												if closest_player_value == nil or mouse_distance < closest_player_value then
+													closest_player_name = cached_tab.playerName
+													closest_player_value = mouse_distance
+													closest_player_screen_pos = screen_pos
+												end
+											elseif current_aimbot_type == 0 then
+												if closest_player_value == nil or root_distance < closest_player_value then
+													closest_player_name = cached_tab.playerName
+													closest_player_value = root_distance
+													closest_player_screen_pos = screen_pos
 												end
 											end
-										--end
-									end
-									
-									if Esp_settings.enabled.Value and Players.enabled.Value then
-										if root_distance < Players.distance_limit.Value then
-											Lib_esp.draw({
-												target = character,
-												color = playerColor,
-												healthbar = Config.players.healthbar,
-												nametag = Players.nametag.Value,
-												distance = Players.distance.Value,
-												custom_distance = ""..root_distance,
-												tracer = Players.tracer.Value,
-												tracer_type = Current_tracer_type,
-												box_type = Current_box_type,
-											})
-											_G.PlayerCache[tostring(player)].last_update = os.clock()
 										end
+									end
+								end
+								
+								if Esp_settings.enabled.Value and Players.enabled.Value then
+									if _G.IsOnScreen(screen_pos) and root_distance < Players.distance_limit.Value then
+										Lib_esp.draw({
+											target = character,
+											color = playerColor,
+											healthbar = Config.players.healthbar,
+											nametag = Players.nametag.Value,
+											distance = Players.distance.Value,
+											custom_distance = ""..root_distance,
+											tracer = Players.tracer.Value,
+											tracer_type = Current_tracer_type,
+											box_type = Current_box_type,
+										})
+										_G.PlayerCache[tostring(player)].last_update = os.clock()
 									end
 								end
 							end
@@ -814,15 +812,14 @@ if _G.PlayerTask == nil then
 					end
 
 					if Aimbot_target_name and _G.IsOnScreen(Aimbot_target_screen_pos) then
-						--print(Aimbot_target_name.." | x: "..Aimbot_target_screen_pos.x.." | y: "..Aimbot_target_screen_pos.y)
 						local mouse_moved = false
 						if mouse_moved == false then
 							dx9.SetAimbotValue("x", 0)
 							dx9.SetAimbotValue("y", 0)
 							dx9.SetAimbotValue("z", 0)
 							dx9.FirstPersonAim({
-								Aimbot_target_screen_pos.x + Screen_size.width/2,
-								Aimbot_target_screen_pos.y + Screen_size.height/2
+								(Aimbot_target_screen_pos and Aimbot_target_screen_pos.x or 0) + Screen_size.width/2,
+								(Aimbot_target_screen_pos and Aimbot_target_screen_pos.y or 0) + Screen_size.height/2
 							}, Aimbot_settings.smoothness.Value, 1)
 							mouse_moved = true
 						end
