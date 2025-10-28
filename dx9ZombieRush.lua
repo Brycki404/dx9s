@@ -460,7 +460,7 @@ if _G.ZombiesTask == nil then
                     Aimbot_target_screen_pos = closest_zombie_screen_pos
                     
                     if aimbot_target_address and _G.IsOnScreen(Aimbot_target_screen_pos) then
-						if not _G.lastAimbotFrame or _G.lastAimbotFrame and (os.clock() - _G.lastAimbotFrame) > (1/60) then
+						if not _G.lastAimbotFrame or _G.lastAimbotFrame and (os.clock() - _G.lastAimbotFrame) > (1/30) then
 							local mouse_moved = false
 							if mouse_moved == false then
 								dx9.DrawCircle({Aimbot_target_screen_pos.x, Aimbot_target_screen_pos.y}, {255, 255, 255}, 15)

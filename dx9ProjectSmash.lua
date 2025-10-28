@@ -9,9 +9,9 @@ Config = _G.Config or {
 	};
     settings = {
 		aimbot_enabled = true;
-		sticky_aim = false;
+		sticky_aim = true;
 		aimbot_part = 1; -- 1 = "Head", 2 = "HumanoidRootPart"
-		aimbot_smoothness = 5;
+		aimbot_smoothness = 1;
 
 		menu_toggle_keybind = "[F2]";
 		
@@ -27,9 +27,6 @@ Config = _G.Config or {
 		enabled = true;
         distance = true;
         nametag = true;
-		healthbar = true;
-		healthtag = true;
-		maxhealthtag = true;
         tracer = false;
         color = { 255, 0, 0 };
 		distance_limit = 10000;
@@ -246,31 +243,7 @@ Players = {
 		:OnChanged(function(value)
 			Lib_ui:Notify(value and "[players] Enabled Distance" or "[players] Disabled Distance", 1)
 		end);
-	
-	healthbar = Groupboxes.players:AddToggle({
-			Default = Config.players.healthbar;
-			Text = "HealthBar";
-		})
-		:OnChanged(function(value)
-			Lib_ui:Notify(value and "[players] Enabled HealthBar" or "[players] Disabled HealthBar", 1)
-		end);
-
-	healthtag = Groupboxes.players:AddToggle({
-			Default = Config.players.healthtag;
-			Text = "HealthTag";
-		})
-		:OnChanged(function(value)
-			Lib_ui:Notify(value and "[players] Enabled HealthTag" or "[players] Disabled HealthTag", 1)
-		end);
-
-	maxhealthtag = Groupboxes.players:AddToggle({
-			Default = Config.players.maxhealthtag;
-			Text = "MaxHealthTag";
-		})
-		:OnChanged(function(value)
-			Lib_ui:Notify(value and "[players] Enabled MaxHealthTag" or "[players] Disabled MaxHealthTag", 1)
-		end);
-
+		
 	nametag = Groupboxes.players
 		:AddToggle({
 			Default = Config.players.nametag;
@@ -291,77 +264,6 @@ Players = {
 
     distance_limit = Groupboxes.players:AddSlider({
 		Default = Config.players.distance_limit;
-		Text = "ESP Distance Limit";
-		Min = 0;
-		Max = 5000;
-		Rounding = 0;
-	});
-}
-
-Allies = {
-	enabled = Groupboxes.allies
-		:AddToggle({
-			Default = Config.allies.enabled;
-			Text = "Enabled";
-		})
-		:OnChanged(function(value)
-			Lib_ui:Notify(value and "[allies] Enabled ESP" or "[allies] Disabled ESP", 1)
-		end);
-
-	distance = Groupboxes.allies
-		:AddToggle({
-			Default = Config.allies.distance;
-			Text = "Distance";
-		})
-		:OnChanged(function(value)
-			Lib_ui:Notify(value and "[allies] Enabled Distance" or "[allies] Disabled Distance", 1)
-		end);
-    
-	healthbar = Groupboxes.allies:AddToggle({
-			Default = Config.allies.healthbar;
-			Text = "HealthBar";
-		})
-		:OnChanged(function(value)
-			Lib_ui:Notify(value and "[allies] Enabled HealthBar" or "[allies] Disabled HealthBar", 1)
-		end);
-
-	healthtag = Groupboxes.allies:AddToggle({
-			Default = Config.allies.healthtag;
-			Text = "HealthTag";
-		})
-		:OnChanged(function(value)
-			Lib_ui:Notify(value and "[allies] Enabled HealthTag" or "[allies] Disabled HealthTag", 1)
-		end);
-
-	maxhealthtag = Groupboxes.allies:AddToggle({
-			Default = Config.allies.maxhealthtag;
-			Text = "MaxHealthTag";
-		})
-		:OnChanged(function(value)
-			Lib_ui:Notify(value and "[allies] Enabled MaxHealthTag" or "[allies] Disabled MaxHealthTag", 1)
-		end);
-
-
-	nametag = Groupboxes.allies
-		:AddToggle({
-			Default = Config.allies.nametag;
-			Text = "Nametag";
-		})
-		:OnChanged(function(value)
-			Lib_ui:Notify(value and "[allies] Enabled Nametag" or "[allies] Disabled Nametag", 1)
-		end);
-
-	tracer = Groupboxes.allies
-		:AddToggle({
-			Default = Config.allies.tracer;
-			Text = "Tracer";
-		})
-		:OnChanged(function(value)
-			Lib_ui:Notify(value and "[allies] Enabled Tracer" or "[allies] Disabled Tracer", 1)
-		end);
-
-    distance_limit = Groupboxes.allies:AddSlider({
-		Default = Config.allies.distance_limit;
 		Text = "ESP Distance Limit";
 		Min = 0;
 		Max = 5000;
@@ -404,10 +306,11 @@ end
 
 Datamodel = dx9.GetDatamodel()
 
-Worskpace = dx9.FindFirstChildOfClass(Datamodel, "Workspace")
+Worskpace = dx9.FindFirstChild(Datamodel, "Workspace")
+Living = dx9.FindFirstChild(Worskpace, "Living")
 
 Services = {
-	players = dx9.FindFirstChildOfClass(Datamodel, "Players");
+	players = dx9.FindFirstChild(Datamodel, "Players");
 }
 
 Local_player = nil
@@ -468,7 +371,7 @@ My_character = nil
 My_root = nil
 
 if My_player and My_player ~= 0 then
-    My_character = dx9.FindFirstChild(Worskpace, Local_player_name)
+    My_character = dx9.FindFirstChild(Living, Local_player_name)
 	My_team_name = dx9.GetTeam(My_player)
 end
 
@@ -521,37 +424,32 @@ if _G.PlayerTask == nil then
 					end
 				end
 				if cached_tab then
-					local teamName = dx9.GetTeam(player)
 					local playerColor = {255, 255, 255}
-					
-					local character = dx9.FindFirstChild(Worskpace, cached_tab.playerName)
+					local character = dx9.FindFirstChild(Living, cached_tab.playerName)
 					if character and character ~= 0 then
 						local root = dx9.FindFirstChild(character, "HumanoidRootPart")
 						local humanoid = dx9.FindFirstChild(character, "Humanoid")
-
 						if root and root ~= 0 and humanoid and humanoid ~= 0 then
 							local my_root_pos = My_root ~= nil and My_root ~= 0 and dx9.GetPosition(My_root) or {x=0, y=0, z=0}
 							local root_pos = dx9.GetPosition(root)
 							local root_distance = _G.Get_Distance(my_root_pos, root_pos)
 							local root_screen_pos = dx9.WorldToScreen({root_pos.x, root_pos.y, root_pos.z})
-							local health = math.ceil(dx9.GetHealth(humanoid))
-							local maxhealth = math.ceil(dx9.GetMaxHealth(humanoid))
+							local health = math.ceil(dx9.GetHealth(humanoid) or 0)
 
 							local screen_pos = root_screen_pos
-
-							if _G.IsOnScreen(screen_pos) then
+							if health > 0 then
 								if Aimbot_settings.enabled.Value then
 									if cached_tab.playerName == Aimbot_target_name then
 										Aimbot_target_screen_pos = screen_pos
 									end
 
-									--if not Aimbot_settings.sticky_aim.Value or Aimbot_settings.sticky_aim.Value and not Aimbot_target_name then
+									if not Aimbot_settings.sticky_aim.Value or Aimbot_settings.sticky_aim.Value and Aimbot_target_name == nil then
 										local mouse_distance = _G.Get_Distance_From_Mouse(screen_pos)
 										local aimbot_range = 9999 --dx9.GetAimbotValue("range")
 										local aimbot_fov = dx9.GetAimbotValue("fov")
 										if mouse_distance and mouse_distance <= aimbot_fov and root_distance <= aimbot_range then
 											local current_aimbot_type = dx9.GetAimbotValue("type")
-											if current_aimbot_type == 1 then
+											if current_aimbot_type == 1 and _G.IsOnScreen(screen_pos) then
 												if closest_player_value == nil or mouse_distance < closest_player_value then
 													closest_player_name = cached_tab.playerName
 													closest_player_value = mouse_distance
@@ -565,20 +463,17 @@ if _G.PlayerTask == nil then
 												end
 											end
 										end
-									--end
+									end
 								end
-								
-								local this_custom_name = Players.healthtag.Value and cached_tab.playerName.." | "..health..(Players.maxhealthtag.Value and "/"..maxhealth.." hp" or " hp") or cached_tab.playerName;
 
-								
 								if Master_esp_settings.enabled.Value and Players.enabled.Value then
-									if root_distance < Players.distance_limit.Value then
+									if _G.IsOnScreen(screen_pos) and root_distance < Players.distance_limit.Value then
 										Lib_esp.draw({
 											target = character,
 											color = playerColor,
-											healthbar = Players.healthbar.Value,
+											healthbar = false,
 											nametag = Players.nametag.Value,
-											custom_nametag = this_custom_name,
+											custom_nametag = cached_tab.playerName,
 											distance = My_root ~= nil and My_root ~= 0 and Players.distance.Value or false,
 											custom_distance = ""..root_distance,
 											tracer = Players.tracer.Value,
@@ -594,7 +489,7 @@ if _G.PlayerTask == nil then
 				end
 			end
 
-			if not _G.lastAimbotFrame or _G.lastAimbotFrame and (os.clock() - _G.lastAimbotFrame) > (1/60) then
+			if not _G.lastAimbotFrame or _G.lastAimbotFrame and (os.clock() - _G.lastAimbotFrame) > (1/30) then
 				if Aimbot_settings.enabled.Value then
 					--swapping targets
 					if Aimbot_settings.sticky_aim.Value then
@@ -612,7 +507,6 @@ if _G.PlayerTask == nil then
 					end
 
 					if Aimbot_target_name and _G.IsOnScreen(Aimbot_target_screen_pos) then
-						--print(Aimbot_target_name.." | x: "..Aimbot_target_screen_pos.x.." | y: "..Aimbot_target_screen_pos.y)
 						local mouse_moved = false
 						if mouse_moved == false then
 							dx9.SetAimbotValue("x", 0)

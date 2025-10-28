@@ -635,7 +635,7 @@ if _G.AimbotTask == nil then
                                     local aimbot_range = 9999 --dx9.GetAimbotValue("range")
                                     local aimbot_fov = dx9.GetAimbotValue("fov")
                                     if Mouse_distance and Mouse_distance <= aimbot_fov and root_distance <= aimbot_range then
-                                        if not _G.lastAimbotFrame or _G.lastAimbotFrame and (os.clock() - _G.lastAimbotFrame) > (1/60) then
+                                        if not _G.lastAimbotFrame or _G.lastAimbotFrame and (os.clock() - _G.lastAimbotFrame) > (1/30) then
                                             local Mouse_moved = false
                                             if Mouse_moved == false then
                                                 dx9.DrawCircle({screen_pos.x, screen_pos.y}, {255, 255, 255}, 15)
