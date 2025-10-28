@@ -2,6 +2,8 @@
 dx9 = dx9 --in VS Code, this gets rid of a ton of problem underlines
 local startTime = os.clock()
 
+dx9.ShowConsole(true)
+
 Config = _G.Config or {
 	urls = {
 		DXLibUI = "https://raw.githubusercontent.com/Brycki404/DXLibUI/refs/heads/main/main.lua";
@@ -349,14 +351,12 @@ if Master_esp_settings.enabled.Value then
     if Apples.enabled.Value then
         if _G.AppleTask == nil then
             _G.AppleTask = function()
-				-- if not _G.AppleFolder or _G.AppleFolder == 0 then
-				-- 	_G.AppleFolder = dx9.FindFirstChild(Workspace, _G.AppleFolderName)
-				-- end
-				-- if _G.AppleFolder then
-				local appleFolder = dx9.FindFirstChild(Workspace, _G.AppleFolderName)
-					local AppleFolderChildren = dx9.GetChildren(appleFolder) --_G.AppleFolder)
+				if not _G.AppleFolder or _G.AppleFolder == 0 then
+				 _G.AppleFolder = dx9.FindFirstChild(Workspace, _G.AppleFolderName)
+				end
+			 if _G.AppleFolder then
+					local AppleFolderChildren = dx9.GetChildren(_G.AppleFolder)
 					if AppleFolderChildren and #AppleFolderChildren > 0 then
-						print("multiple apple children")
 						for _, apple in ipairs(AppleFolderChildren) do
 							local my_root_pos = dx9.GetPosition(My_root)
 							local apple_pos = dx9.GetPosition(apple)
@@ -365,7 +365,6 @@ if Master_esp_settings.enabled.Value then
 
 							if quick_root_distance < math.pow(Apples.distance_limit.Value, 2) then
 								if _G.IsOnScreen(screen_pos) then
-									print("draw")
 									local root_distance = _G.Get_Distance(quick_root_distance)
 									Lib_esp.draw({
 										esp_type = "misc",
@@ -383,7 +382,7 @@ if Master_esp_settings.enabled.Value then
 							end
 						end
 					end
-				--end
+				end
             end
         end
         if _G.AppleTask then
