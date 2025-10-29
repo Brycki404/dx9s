@@ -9,7 +9,7 @@ Config = _G.Config or {
 		repr = "https://raw.githubusercontent.com/Ozzypig/repr/refs/heads/master/repr.lua";
 	};
     settings = {
-		menu_toggle_keybind = "[M]";
+		menu_toggle_keybind = "[F2]";
 		
 		master_esp_enabled = true;
     	box_type = 1; -- 1 = "Corners", 2 = "2D Box", 3 = "3D Box"
@@ -19,8 +19,9 @@ Config = _G.Config or {
 		Sec_precision = 4;
 		Hz_precision = 0;
     };
-	apples = {
+	fruits = {
         enabled = true;
+		nametag = true;
         distance = true;
         tracer = false;
 		color = { 255, 0, 0 };
@@ -95,7 +96,7 @@ Lib_ui = loadstring(dx9.Get(Config.urls.DXLibUI))()
 Lib_esp = loadstring(dx9.Get(Config.urls.LibESP))()
 
 Interface = Lib_ui:CreateWindow({
-	Title = "Brazilian Army Apple ESP | dx9ware | By @Brycki";
+	Title = "Blox Fruits | dx9ware | By @Brycki";
 	Size = { 500, 500 };
 	Resizable = true;
 
@@ -121,7 +122,7 @@ end
 Groupboxes = {}
 Groupboxes.debug = Tabs.settings:AddMiddleGroupbox("Debugging");
 Groupboxes.master_esp_settings = Tabs.settings:AddMiddleGroupbox("Master ESP");
-Groupboxes.apple_esp = Tabs.esp:AddMiddleGroupbox("Apple ESP")
+Groupboxes.fruit_esp = Tabs.esp:AddMiddleGroupbox("Fruit ESP")
 
 Debugging = {}
 Debugging.console = Groupboxes.debug:AddToggle({
@@ -182,31 +183,31 @@ Master_esp_settings.tracer_type = Groupboxes.master_esp_settings:AddDropdown({
 	Lib_ui:Notify("[settings] Tracer Type: " .. value, 1)
 end)
 
-Apples = {}
-Apples.enabled = Groupboxes.apple_esp:AddToggle({
-	Default = Config.apples.enabled;
+Fruits = {}
+Fruits.enabled = Groupboxes.fruit_esp:AddToggle({
+	Default = Config.fruits.enabled;
 	Text = "Enabled";
 }):OnChanged(function(value)
-	Lib_ui:Notify(value and "[apples] Enabled ESP" or "[apples] Disabled ESP", 1)
+	Lib_ui:Notify(value and "[fruits] Enabled ESP" or "[fruits] Disabled ESP", 1)
 end)
-Apples.distance = Groupboxes.apple_esp:AddToggle({
-	Default = Config.apples.distance;
+Fruits.distance = Groupboxes.fruit_esp:AddToggle({
+	Default = Config.fruits.distance;
 	Text = "Distance";
 }):OnChanged(function(value)
-	Lib_ui:Notify(value and "[apples] Enabled Distance" or "[apples] Disabled Distance", 1)
+	Lib_ui:Notify(value and "[fruits] Enabled Distance" or "[fruits] Disabled Distance", 1)
 end)
-Apples.tracer = Groupboxes.apple_esp:AddToggle({
-	Default = Config.apples.tracer;
+Fruits.tracer = Groupboxes.fruit_esp:AddToggle({
+	Default = Config.fruits.tracer;
 	Text = "Tracer";
 }):OnChanged(function(value)
-	Lib_ui:Notify(value and "[apples] Enabled Tracer" or "[apples] Disabled Tracer", 1)
+	Lib_ui:Notify(value and "[fruits] Enabled Tracer" or "[fruits] Disabled Tracer", 1)
 end)
-Apples.color = Groupboxes.apple_esp:AddColorPicker({
-	Default = Config.apples.color;
+Fruits.color = Groupboxes.fruit_esp:AddColorPicker({
+	Default = Config.fruits.color;
 	Text = "Color";
 })
-Apples.distance_limit = Groupboxes.apple_esp:AddSlider({
-	Default = Config.apples.distance_limit;
+Fruits.distance_limit = Groupboxes.fruit_esp:AddSlider({
+	Default = Config.fruits.distance_limit;
 	Text = "ESP Distance Limit";
 	Min = 0;
 	Max = 10000;
@@ -341,41 +342,40 @@ if _G.IsOnScreen == nil then
 	end
 end
 
-if not _G.AppleFolderName then
-	_G.AppleFolderName = "Maças"
-end
-
 if Master_esp_settings.enabled.Value then
-    if Apples.enabled.Value then
-        if _G.AppleTask == nil then
-            _G.AppleTask = function()
-				if not _G.AppleFolder or _G.AppleFolder == 0 then
-					_G.AppleFolder = dx9.FindFirstChild(Workspace, _G.AppleFolderName)
-				end
-				if _G.AppleFolder then
-					local AppleFolderChildren = dx9.GetChildren(_G.AppleFolder)
-					if AppleFolderChildren and #AppleFolderChildren > 0 then
-						for _, apple in ipairs(AppleFolderChildren) do
-							local my_root_pos = dx9.GetPosition(My_root)
-							local apple_pos = dx9.GetPosition(apple)
-							local quick_root_distance = _G.Get_Quick_Distance(my_root_pos, apple_pos)
-							local screen_pos = dx9.WorldToScreen({apple_pos.x, apple_pos.y, apple_pos.z})
+    if Fruits.enabled.Value then
+        if _G.FruitTask == nil then
+            _G.FruitTask = function()
+				local WorkspaceChildren = dx9.GetChildren(Worskpace)
+				if WorkspaceChildren and #WorkspaceChildren > 0 then
+					for _, fruit in ipairs(WorkspaceChildren) do
+						if dx9.GetType(fruit) == "Tool" then
+							local model = dx9.FindFirstChild(fruit, "Fruit")
+							if model and model ~= 0 and dx9.GetType(model) == "Model" then
+								local rootPart = dx9.FindFirstChild(model, "RootPart")
+								if rootPart and rootPart ~= 0 then
+									local my_root_pos = dx9.GetPosition(My_root)
+									local fruit_pos = dx9.GetPosition(rootPart)
+									local quick_root_distance = _G.Get_Quick_Distance(my_root_pos, fruit_pos)
+									local screen_pos = dx9.WorldToScreen({fruit_pos.x, fruit_pos.y, fruit_pos.z})
 
-							if quick_root_distance < math.pow(Apples.distance_limit.Value, 2) then
-								if _G.IsOnScreen(screen_pos) then
-									local root_distance = _G.Get_Distance(quick_root_distance)
-									Lib_esp.draw({
-										esp_type = "misc",
-										target = apple,
-										color = Apples.color.Value,
-										healthbar = false,
-										nametag = false,
-										distance = Apples.distance.Value,
-										custom_distance = root_distance and ""..root_distance or "?",
-										tracer = Apples.tracer.Value,
-										tracer_type = Current_tracer_type,
-										box_type = Current_box_type
-									})
+									if quick_root_distance < math.pow(Fruits.distance_limit.Value, 2) then
+										if _G.IsOnScreen(screen_pos) then
+											local root_distance = _G.Get_Distance(quick_root_distance)
+											Lib_esp.draw({
+												esp_type = "misc",
+												target = rootPart,
+												color = Fruits.color.Value,
+												healthbar = false,
+												nametag = Fruits.nametag.Value,
+												distance = Fruits.distance.Value,
+												custom_distance = root_distance and ""..root_distance or "?",
+												tracer = Fruits.tracer.Value,
+												tracer_type = Current_tracer_type,
+												box_type = Current_box_type
+											})
+										end
+									end
 								end
 							end
 						end
@@ -383,8 +383,8 @@ if Master_esp_settings.enabled.Value then
 				end
             end
         end
-        if _G.AppleTask then
-            _G.AppleTask()
+        if _G.FruitTask then
+            _G.FruitTask()
         end
     end
 end
