@@ -13,7 +13,7 @@ Config = _G.Config or {
 		DXLibUI = "https://raw.githubusercontent.com/Brycki404/DXLibUI/refs/heads/main/main.lua";
 	};
 	settings = {
-		menu_toggle_keybind = "[F3]";
+		menu_toggle_keybind = "[F2]";
 
 		game = 1; -- 1 = "Blade Ball", 2 = "Death Ball"
 		fps = 1; -- 1 = 60, 2 = 120, 3 = 144, 4 = 240
