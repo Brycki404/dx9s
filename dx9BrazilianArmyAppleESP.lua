@@ -2,8 +2,6 @@
 dx9 = dx9 --in VS Code, this gets rid of a ton of problem underlines
 local startTime = os.clock()
 
-dx9.ShowConsole(true)
-
 Config = _G.Config or {
 	urls = {
 		DXLibUI = "https://raw.githubusercontent.com/Brycki404/DXLibUI/refs/heads/main/main.lua";
@@ -11,7 +9,7 @@ Config = _G.Config or {
 		repr = "https://raw.githubusercontent.com/Ozzypig/repr/refs/heads/master/repr.lua";
 	};
     settings = {
-		menu_toggle_keybind = "[F2]";
+		menu_toggle_keybind = "[M]";
 		
 		master_esp_enabled = true;
     	box_type = 1; -- 1 = "Corners", 2 = "2D Box", 3 = "3D Box"
