@@ -424,9 +424,6 @@ Services = {
 	players = dx9.FindFirstChildOfClass(Datamodel, "Players");
 }
 
-Local_player = nil
-Mouse = nil
-
 if _G.Update_Mouse == nil then
 	_G.Update_Mouse = function()
 		Mouse = dx9.GetMouse()
@@ -449,23 +446,18 @@ Current_target_part = _G.Get_Index("target_part", Aimbot_settings.part.Value)
 Current_tracer_type = _G.Get_Index("tracer", Master_esp_settings.tracer_type.Value)
 Current_box_type = _G.Get_Index("box", Master_esp_settings.box_type.Value)
 
-if Local_player == nil then
-	for _, player in pairs(dx9.GetChildren(Services.players)) do
-		local pgui = dx9.FindFirstChildOfClass(player, "PlayerGui")
-		if pgui ~= nil and pgui ~= 0 then
-			Local_player = player
-			break
-		end
+Local_player_table = dx9.get_localplayer()
+for _, player in pairs(dx9.GetChildren(Services.players)) do
+	local pgui = dx9.FindFirstChildOfClass(player, "PlayerGui")
+	if pgui ~= nil and pgui ~= 0 then
+		Local_player = player
+		break
 	end
 end
 
-if Local_player == nil or Local_player == 0 then
-	Local_player = dx9.get_localplayer()
-end
-
 function Get_local_player_name()
-	if type(Local_player) == "table" then
-		return Local_player.Info.Name
+	if type(Local_player_table) == "table" then
+		return Local_player_table.Info.Name
 	elseif type(Local_player) == "number" and dx9.GetType(Local_player) == "Player" then
 		return dx9.GetName(Local_player)
 	else
@@ -474,12 +466,9 @@ function Get_local_player_name()
 	end
 end
 
-Local_player_name = Get_local_player_name()
+Local_player_name = Local_player_name ~= nil and Local_player_name or Local_player_name == nil and Get_local_player_name()
 
-My_player = dx9.FindFirstChild(Services.players, Local_player_name)
-My_team_name = nil
-My_character = nil
-My_root = nil
+My_player = Local_player or dx9.FindFirstChild(Services.players, Local_player_name)
 
 if My_player and My_player ~= 0 then
     My_character = dx9.FindFirstChild(Worskpace, Local_player_name)
