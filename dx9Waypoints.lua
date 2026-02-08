@@ -326,11 +326,11 @@ _G.selectedWaypointIndex = Waypoints.selector.ValueIndex - 1
 
 if _G.selectedWaypointIndex >= 1 and _G.selectedWaypointIndex <= #_G.waypointlist then
 	local waypointdata = _G.waypointlist[_G.selectedWaypointIndex]
-	Groupboxes.waypoints:AddLabel("Position: { x: "..tostring(math.floor(waypointdata.position.x)).." , y: "..tostring(math.floor(waypointdata.position.y).." , z: "..tostring(math.floor(waypointdata.position.z)).." }"))
+	Groupboxes.waypoints:AddLabel("Position: { x: "..tostring(math.floor(waypointdata.position.x)).." , y: "..tostring(math.floor(waypointdata.position.y)).." , z: "..tostring(math.floor(waypointdata.position.z)).." }")
 else
 	local my_root_pos = Get_local_player_position()
 	if my_root_pos ~= nil and type(my_root_pos) == "table" and my_root_pos.x and my_root_pos.y and my_root_pos.z then
-		Groupboxes.waypoints:AddLabel("Position: { x: "..tostring(math.floor(my_root_pos.x)).." , y: "..tostring(math.floor(my_root_pos.y).." , z: "..tostring(math.floor(my_root_pos.z)).." }"))
+		Groupboxes.waypoints:AddLabel("Position: { x: "..tostring(math.floor(my_root_pos.x)).." , y: "..tostring(math.floor(my_root_pos.y)).." , z: "..tostring(math.floor(my_root_pos.z)).." }")
 	end
 end
 
