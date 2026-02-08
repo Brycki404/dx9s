@@ -49,10 +49,6 @@ Config.urls = {
 _G.Config = Config
 Config = _G.Config
 
-if _G.selectedWaypointIndex == nil then
-	_G.selectedWaypointIndex = 0
-end
-
 if _G.averageHz == nil then
 	_G.averageHz = 0
 end
@@ -146,7 +142,6 @@ Tabs = {
     players = Interface:AddTab("Players");
     pylons = Interface:AddTab("Pylons");
     objects = Interface:AddTab("Objects");
-    waypoints = Interface:AddTab("Waypoints");
 }
 
 if _G.FirstScriptLoopRan == nil then
@@ -160,7 +155,6 @@ Groupboxes = {
     players = Tabs.players:AddMiddleGroupbox("Players");
 	pylons = Tabs.pylons:AddMiddleGroupbox("Pylons");
 	objects = Tabs.objects:AddMiddleGroupbox("Objects");
-    waypoints = Tabs.waypoints:AddMiddleGroupbox("Waypoints");
 }
 
 ---------------------------------------
