@@ -53,61 +53,6 @@ if _G.selectedWaypointIndex == nil then
 	_G.selectedWaypointIndex = 0
 end
 
-if _G.waypointlist == nil then
-    _G.waypointlist = {
-        {
-		    position = {x = 350000, y = 4, z = 350000};
-            name = "DILLY";
-            visible = true;
-            color = { 255, 255, 0 };
-            tracer = false;
-            distance_limit = math.huge;
-            nametag = true;
-            distance = true;
-        };
-		{
-		    position = {x = -7390, y = 1112135.5, z = 2422.5};
-            name = "Flashlight";
-            visible = true;
-            color = { 255, 255, 0 };
-            tracer = false;
-            distance_limit = math.huge;
-            nametag = true;
-            distance = true;
-        };
-		{
-		    position = {x = -11357.5, y = 1117349.5, z = -57.3};
-            name = "(null)";
-            visible = true;
-            color = { 255, 255, 0 };
-            tracer = false;
-            distance_limit = math.huge;
-            nametag = true;
-            distance = true;
-        };
-		{
-		    position = {x = 1856, y = 1.5, z = 45810};
-            name = "Ominous Part";
-            visible = true;
-            color = { 255, 255, 0 };
-            tracer = false;
-            distance_limit = math.huge;
-            nametag = true;
-            distance = true;
-        };
-		{
-		    position = {x = 387.5, y = 602.5, z = 350000};
-            name = "Fire";
-            visible = true;
-            color = { 255, 255, 0 };
-            tracer = false;
-            distance_limit = math.huge;
-            nametag = true;
-            distance = true;
-        };
-    }
-end
-
 if _G.averageHz == nil then
 	_G.averageHz = 0
 end
@@ -161,36 +106,6 @@ if _G.CountTableEntries == nil then
 			end
 		end
 		return count
-	end
-end
-
-if _G.GetWaypointSelectionOptions == nil then
-	_G.GetWaypointSelectionOptions = function()
-		local list = {}
-
-		if _G.waypointlist ~= nil and type(_G.waypointlist) == "table" and #_G.waypointlist > 0 then
-			for index, data in ipairs(_G.waypointlist) do
-				list[index] = tostring(index) .. " - '" .. data.name .. "'"
-			end
-		end
-
-		return list
-	end
-end
-
-if _G.GetWaypointDropdownSelectionOptions == nil then
-	_G.GetWaypointDropdownSelectionOptions = function(waypointSelectionOptions)
-		local list = {
-			"0 - [Create a New Waypoint]";
-		}
-
-		if waypointSelectionOptions ~= nil and type(waypointSelectionOptions) == "table" and #waypointSelectionOptions >= 1 then
-			for index, text in ipairs(waypointSelectionOptions) do
-				list[index + 1] = text
-			end
-		end
-
-		return list
 	end
 end
 
@@ -531,154 +446,6 @@ if not Get_local_player_position then
     end
 end
 
---------------------------------------
--- WAYPOINTS
---------------------------------------
-Waypoints = {}
-Waypoints.selector = Groupboxes.waypoints:AddDropdown({
-	Index = "WaypointSelectorDropdown";
-	Default = 1;
-	Text = "Waypoint";
-	Values = {"0 - [Create New Waypoint]"};
-})
-Waypoints.selector = Waypoints.selector:OnChanged(function(value)
-	_G.selectedWaypointIndex = Waypoints.selector.ValueIndex - 1
-	if _G.selectedWaypointIndex >= 1 and _G.selectedWaypointIndex <= #_G.waypointlist then
-		local waypointdata = _G.waypointlist[selectedWaypointIndex]
-		print(waypointdata or tostring(waypointdata))
-		if waypointdata ~= nil and type(waypointdata) == "table" then
-			local quickTools = Lib_ui.Windows["Universal Waypoints | dx9ware | By @Brycki"].Tabs["Waypoints"].Groupboxes["Waypoints"].Tools
-			quickTools["WaypointNameTextBox"]:SetValue(waypointdata.name)
-			quickTools["WaypointVisibleToggle"]:SetValue(waypointdata.visible)
-			quickTools["WaypointColorPicker"]:SetValue(waypointdata.color)
-			quickTools["WaypointTracerToggle"]:SetValue(waypointdata.tracer)
-			quickTools["WaypointDistanceLimitSlider"]:SetValue(waypointdata.distance_limit)
-			quickTools["WaypointNametagToggle"]:SetValue(waypointdata.nametag)
-			quickTools["WaypointDistanceToggle"]:SetValue(waypointdata.distance)
-			Lib_ui:Notify("[Waypoints] Selected Waypoint: "..tostring(value).." - '"..waypointdata.name.."'", 1)
-		end
-	end
-end)
-_G.selectedWaypointIndex = Waypoints.selector.ValueIndex - 1
-if _G.selectedWaypointIndex >= 1 and _G.selectedWaypointIndex <= #_G.waypointlist then
-	local waypointdata = _G.waypointlist[_G.selectedWaypointIndex]
-	Groupboxes.waypoints:AddLabel("Position: { x: "..tostring(math.floor(waypointdata.position.x)).." , y: "..tostring(math.floor(waypointdata.position.y)).." , z: "..tostring(math.floor(waypointdata.position.z)).." }")
-else
-	local my_root_pos = Get_local_player_position()
-	if my_root_pos ~= nil and type(my_root_pos) == "table" and my_root_pos.x and my_root_pos.y and my_root_pos.z then
-		Groupboxes.waypoints:AddLabel("Position: { x: "..tostring(math.floor(my_root_pos.x)).." , y: "..tostring(math.floor(my_root_pos.y)).." , z: "..tostring(math.floor(my_root_pos.z)).." }")
-	end
-end
-Groupboxes.waypoints:AddTitle("Waypoint Settings")
-Groupboxes.waypoints:AddLabel("Text Boxes do not yet have a cursor, so when typing, follow the instructions below:")
-Groupboxes.waypoints:AddLabel("[LEFT SHIFT] and [RIGHT SHIFT] to toggle capslock")
-Groupboxes.waypoints:AddLabel("[SUBTRACT] on your NumPad to type dashes and underscores")
-Groupboxes.waypoints:AddLabel("[ENTER/RETURN] to stop typing")
-Groupboxes.waypoints:AddLabel("[SPACEBAR] to type a space")
-Groupboxes.waypoints:AddLabel("[BACKSPACE] to delete the last character")
-Waypoints.nametextbox = Groupboxes.waypoints:AddTextBox({
-	Index = "WaypointNameTextBox";
-	Placeholder = "Name";
-	Default = "New Waypoint";
-})
-Groupboxes.waypoints:AddLabel(Waypoints.nametextbox.Capslock and "Capslock: ENABLED" or "Capslock: DISABLED", Waypoints.nametextbox.Capslock and {0, 255, 0} or {255, 0, 0})
-Waypoints.visible = Groupboxes.waypoints:AddToggle({
-	Index = "WaypointVisibleToggle";
-	Default = true;
-	Text = "ESP Visible";
-})
-Waypoints.color = Groupboxes.waypoints:AddColorPicker({
-	Index = "WaypointColorPicker";
-	Default = {255, 255, 255};
-	Text = "ESP Color";
-})
-Waypoints.tracer = Groupboxes.waypoints:AddToggle({
-	Index = "WaypointTracerToggle";
-	Default = false;
-	Text = "Tracer";
-})
-Waypoints.distance_limit = Groupboxes.waypoints:AddSlider({
-	Index = "WaypointDistanceLimitSlider";
-	Default = 9999;
-	Text = "ESP Distance Limit";
-	Min = 1;
-	Max = 9999;
-	Rounding = 0;
-})
-Waypoints.nametag = Groupboxes.waypoints:AddToggle({
-	Index = "WaypointNametagToggle";
-	Default = true;
-	Text = "ESP Nametag Visible";
-})
-Waypoints.distance = Groupboxes.waypoints:AddToggle({
-	Index = "WaypointDistanceToggle";
-	Default = true;
-	Text = "ESP Distance Visible";
-})
-Groupboxes.waypoints:AddTitle("Functions")
-
---any initial waypoints
-local waypointSelectionOptions = _G.GetWaypointSelectionOptions()
-local waypointDropdownSelectionOptions = _G.GetWaypointDropdownSelectionOptions(waypointSelectionOptions)
-
-Waypoints.selector:SetValues(waypointDropdownSelectionOptions)
-
-Waypoints.savewaypoint = Groupboxes.waypoints:AddButton("Save Waypoint Settings", function()
-	if _G.selectedWaypointIndex >= 1 and _G.selectedWaypointIndex <= #_G.waypointlist then
-		local waypointdata = _G.waypointlist[_G.selectedWaypointIndex]
-
-		waypointdata.name = Waypoints.nametextbox:GetValue()
-		waypointdata.visible = Waypoints.visible.Value
-		waypointdata.color = Waypoints.color ~= nil and Waypoints.color.Value or nil
-		waypointdata.tracer = Waypoints.tracer ~= nil and Waypoints.tracer.Value or nil
-		waypointdata.distance_limit = Waypoints.distance_limit ~= nil and Waypoints.distance_limit.Value or nil
-		waypointdata.nametag = Waypoints.nametag ~= nil and Waypoints.nametag.Value or nil
-		waypointdata.distance = Waypoints.distance ~= nil and Waypoints.distance.Value or nil
-
-		_G.waypointlist[_G.selectedWaypointIndex] = waypointdata
-	else
-		local newwaypointdata = {}
-
-		local my_root_pos = Get_local_player_position()
-		newwaypointdata.position = my_root_pos
-		newwaypointdata.name = Waypoints.nametextbox:GetValue()
-		newwaypointdata.visible = Waypoints.visible.Value
-		newwaypointdata.color = Waypoints.color ~= nil and Waypoints.color.Value or nil
-		newwaypointdata.tracer = Waypoints.tracer ~= nil and Waypoints.tracer.Value or nil
-		newwaypointdata.distance_limit = Waypoints.distance_limit ~= nil and Waypoints.distance_limit.Value or nil
-		newwaypointdata.nametag = Waypoints.nametag ~= nil and Waypoints.nametag.Value or nil
-		newwaypointdata.distance = Waypoints.distance ~= nil and Waypoints.distance.Value or nil
-
-		table.insert(_G.waypointlist, newwaypointdata)
-	end
-
-	local waypointSelectionOptions = _G.GetWaypointSelectionOptions()
-	local waypointDropdownSelectionOptions = _G.GetWaypointDropdownSelectionOptions(waypointSelectionOptions)
-
-	Waypoints.selector:SetValues(waypointDropdownSelectionOptions)
-end)
-Waypoints.teleporttowaypoint = Groupboxes.waypoints:AddButton("Teleport to Waypoint", function()
-	if _G.selectedWaypointIndex >= 1 and _G.selectedWaypointIndex <= #_G.waypointlist then
-		local waypointdata = _G.waypointlist[_G.selectedWaypointIndex]
-		local positiondata = waypointdata.position
-		dx9.Teleport(My_character, {positiondata.x, positiondata.y, positiondata.z})
-	end
-end)
-Waypoints.deletewaypoint = Groupboxes.waypoints:AddButton("Delete Waypoint", function()
-	if _G.selectedWaypointIndex >= 1 and _G.selectedWaypointIndex <= #_G.waypointlist then
-		table.remove(_G.waypointlist, _G.selectedWaypointIndex)
-
-		_G.selectedWaypointIndex = 1
-		Waypoints.selector:SetValue(1)
-		_G.selectedWaypointIndex = 1
-
-		local waypointSelectionOptions = _G.GetWaypointSelectionOptions()
-		local waypointDropdownSelectionOptions = _G.GetWaypointDropdownSelectionOptions(waypointSelectionOptions)
-
-		Waypoints.selector:SetValues(waypointDropdownSelectionOptions)
-	end
-end)
-
 if _G.IsOnScreen == nil then
 	_G.IsOnScreen = function(screen_pos)
 		Screen_size = dx9.size()
@@ -813,7 +580,7 @@ if _G.PylonTask == nil then
                                     color = Config.pylons.color,
                                     healthbar = false,
                                     nametag = Pylons.nametag.Value,
-                                    custom_nametag = name,
+                                    custom_nametag = "PYLON | Position:"..root_pos.x..", "..root_pos.y..", "..root_pos.z,
                                     distance = My_root ~= nil and My_root ~= 0 and Pylons.distance.Value or false,
                                     custom_distance = ""..root_distance,
                                     tracer = Pylons.tracer.Value,
@@ -891,7 +658,7 @@ if _G.ObjectTask == nil then
                                     color = Config.objects.color,
                                     healthbar = false,
                                     nametag = Objects.nametag.Value,
-                                    custom_nametag = name,
+                                    custom_nametag = name.." | Position:"..root_pos.x..", "..root_pos.y..", "..root_pos.z,
                                     distance = My_root ~= nil and My_root ~= 0 and Objects.distance.Value or false,
                                     custom_distance = ""..root_distance,
                                     tracer = Objects.tracer.Value,
@@ -908,39 +675,6 @@ if _G.ObjectTask == nil then
 end
 if _G.ObjectTask then
 	_G.ObjectTask()
-end
-
-if _G.WaypointTask == nil then
-	_G.WaypointTask = function()
-		for index, data in ipairs(_G.waypointlist) do
-			if data.visible then
-				local my_root_pos = Get_local_player_position()
-				local pos = data.position
-				local distance = _G.Get_Distance(my_root_pos, pos) or 0
-				local screen_pos = dx9.WorldToScreen({pos.x, pos.y, pos.z})
-				
-				local isOnScreen = _G.IsOnScreen(screen_pos) and true or false
-				local isInRange = distance < data.distance_limit and true or false
-				if isOnScreen then
-					if isInRange then
-						Lib_esp.ground_circle({
-							position = pos,
-							color = data.color,
-							nametag = data.nametag,
-							custom_nametag = data.name,
-							distance = data.distance,
-							custom_distance = distance,
-							tracer = data.tracer,
-							tracer_type = Master_esp_settings.tracer_type.ValueIndex
-						})
-					end
-				end
-			end
-		end
-	end
-end
-if _G.WaypointTask then
-	_G.WaypointTask()
 end
 
 local endTime = os.clock()
