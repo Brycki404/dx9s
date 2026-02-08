@@ -391,10 +391,109 @@ Objects.distance_limit = Groupboxes.objects:AddSlider({
     Rounding = 50;
 });
 
+if _G.Get_Index == nil then
+	_G.Get_Index = function(type, value)
+		local table = nil
+		if type == "tracer" then
+			table = { "Near-Bottom", "Bottom", "Top", "Mouse" }
+		elseif type == "box" then
+			table = { "Corners", "2D Box", "3D Box" }
+		end
+
+		if table then
+			for index, item in pairs(table) do
+				if item == value then
+					return index
+				end
+			end
+		end
+
+		return nil
+	end
+end
+
+Current_tracer_type = _G.Get_Index("tracer", Master_esp_settings.tracer_type.Value)
+Current_box_type = _G.Get_Index("box", Master_esp_settings.box_type.Value)
+
+Datamodel = dx9.GetDatamodel()
+Workspace = dx9.FindFirstChild(Datamodel, "Workspace")
+PapersFolder = dx9.FindFirstChild(Workspace, "Papers")
+PylonsFolder = dx9.FindFirstChild(Workspace, "Pylons")
+ObjectsFolder = dx9.FindFirstChild(Workspace, "Objects")
+Services = {
+	players = dx9.FindFirstChild(Datamodel, "Players");
+}
+
+Local_player_table = dx9.get_localplayer()
+for _, player in ipairs(dx9.GetChildren(Services.players)) do
+	local pgui = dx9.FindFirstChildOfClass(player, "PlayerGui")
+	if pgui ~= nil and pgui ~= 0 then
+		Local_player = player
+		break
+	end
+end
+
+function Get_local_player_name()
+	if type(Local_player_table) == "table" then
+		return Local_player_table.Info.Name
+	elseif type(Local_player) == "number" and dx9.GetType(Local_player) == "Player" then
+		return dx9.GetName(Local_player)
+	else
+		print("WARNING | Get_local_player_name returned nil")
+		return nil
+	end
+end
+
+Local_player_name = Local_player_name ~= nil and Local_player_name or Local_player_name == nil and Get_local_player_name()
+
+My_player = Local_player or dx9.FindFirstChild(Services.players, Local_player_name)
+
+if _G.Update_Mouse == nil then
+	_G.Update_Mouse = function()
+		Mouse = dx9.GetMouse()
+	end
+end
+
+_G.Update_Mouse()
+
+if _G.Get_Distance_From_Mouse == nil then
+	_G.Get_Distance_From_Mouse = function(pos)
+		_G.Update_Mouse()
+		local a = (Mouse.x - pos.x) * (Mouse.x - pos.x)
+		local b = (Mouse.y - pos.y) * (Mouse.y - pos.y)
+		
+		return math.floor(math.sqrt(a + b) + 0.5)
+	end
+end
+
+if My_player ~= nil and My_player ~= 0 then
+    My_character = dx9.FindFirstChild(Workspace, Local_player_name)
+end
+
+if My_character ~= nil and My_character ~= 0 then
+	My_head = dx9.FindFirstChild(My_character, "Head")
+	My_root = dx9.FindFirstChild(My_character, "HumanoidRootPart")
+	My_humanoid = dx9.FindFirstChild(My_character, "Humanoid")
+end
+
+if not Get_local_player_position then
+    Get_local_player_position = function()
+        if dx9.GetType(Local_player) == "Player" then
+            if My_root then
+                local my_root_pos = dx9.GetPosition(My_root)
+                return my_root_pos
+            elseif Local_player_table then
+                return Local_player_table.Position
+            end
+        else
+            return Local_player.Position or Local_player_table.Position
+        end
+    end
+end
+
 --------------------------------------
 -- WAYPOINTS
 --------------------------------------
-dx9.ShowConsole(true)
 Waypoints = {}
 Waypoints.selector = Groupboxes.waypoints:AddDropdown({
 	Index = "WaypointSelectorDropdown";
@@ -402,7 +501,6 @@ Waypoints.selector = Groupboxes.waypoints:AddDropdown({
 	Text = "Waypoint";
 	Values = {"0 - [Create New Waypoint]"};
 })
-print("Here 1")
 Waypoints.selector = Waypoints.selector:OnChanged(function(value)
 	_G.selectedWaypointIndex = Waypoints.selector.ValueIndex - 1
 	if _G.selectedWaypointIndex >= 1 and _G.selectedWaypointIndex <= #_G.waypointlist then
@@ -421,21 +519,16 @@ Waypoints.selector = Waypoints.selector:OnChanged(function(value)
 		end
 	end
 end)
-print("Here 2")
 _G.selectedWaypointIndex = Waypoints.selector.ValueIndex - 1
-print("Here 3")
 if _G.selectedWaypointIndex >= 1 and _G.selectedWaypointIndex <= #_G.waypointlist then
-    print("Waypoint Data: "..repr(_G.waypointlist[_G.selectedWaypointIndex], ReprSettings))
 	local waypointdata = _G.waypointlist[_G.selectedWaypointIndex]
 	Groupboxes.waypoints:AddLabel("Position: { x: "..tostring(math.floor(waypointdata.position.x)).." , y: "..tostring(math.floor(waypointdata.position.y)).." , z: "..tostring(math.floor(waypointdata.position.z)).." }")
 else
-    print("No Waypoint Selected, showing local player position instead")
 	local my_root_pos = Get_local_player_position()
 	if my_root_pos ~= nil and type(my_root_pos) == "table" and my_root_pos.x and my_root_pos.y and my_root_pos.z then
 		Groupboxes.waypoints:AddLabel("Position: { x: "..tostring(math.floor(my_root_pos.x)).." , y: "..tostring(math.floor(my_root_pos.y)).." , z: "..tostring(math.floor(my_root_pos.z)).." }")
 	end
 end
-print("Here 4")
 Groupboxes.waypoints:AddTitle("Waypoint Settings")
 Groupboxes.waypoints:AddLabel("Text Boxes do not yet have a cursor, so when typing, follow the instructions below:")
 Groupboxes.waypoints:AddLabel("[LEFT SHIFT] and [RIGHT SHIFT] to toggle capslock")
@@ -538,106 +631,6 @@ Waypoints.deletewaypoint = Groupboxes.waypoints:AddButton("Delete Waypoint", fun
 		Waypoints.selector:SetValues(waypointDropdownSelectionOptions)
 	end
 end)
-
-if _G.Get_Index == nil then
-	_G.Get_Index = function(type, value)
-		local table = nil
-		if type == "tracer" then
-			table = { "Near-Bottom", "Bottom", "Top", "Mouse" }
-		elseif type == "box" then
-			table = { "Corners", "2D Box", "3D Box" }
-		end
-
-		if table then
-			for index, item in pairs(table) do
-				if item == value then
-					return index
-				end
-			end
-		end
-
-		return nil
-	end
-end
-
-Current_tracer_type = _G.Get_Index("tracer", Master_esp_settings.tracer_type.Value)
-Current_box_type = _G.Get_Index("box", Master_esp_settings.box_type.Value)
-
-Datamodel = dx9.GetDatamodel()
-Workspace = dx9.FindFirstChild(Datamodel, "Workspace")
-PapersFolder = dx9.FindFirstChild(Workspace, "Papers")
-PylonsFolder = dx9.FindFirstChild(Workspace, "Pylons")
-ObjectsFolder = dx9.FindFirstChild(Workspace, "Objects")
-Services = {
-	players = dx9.FindFirstChild(Datamodel, "Players");
-}
-
-Local_player_table = dx9.get_localplayer()
-for _, player in ipairs(dx9.GetChildren(Services.players)) do
-	local pgui = dx9.FindFirstChildOfClass(player, "PlayerGui")
-	if pgui ~= nil and pgui ~= 0 then
-		Local_player = player
-		break
-	end
-end
-
-function Get_local_player_name()
-	if type(Local_player_table) == "table" then
-		return Local_player_table.Info.Name
-	elseif type(Local_player) == "number" and dx9.GetType(Local_player) == "Player" then
-		return dx9.GetName(Local_player)
-	else
-		print("WARNING | Get_local_player_name returned nil")
-		return nil
-	end
-end
-
-Local_player_name = Local_player_name ~= nil and Local_player_name or Local_player_name == nil and Get_local_player_name()
-
-My_player = Local_player or dx9.FindFirstChild(Services.players, Local_player_name)
-
-if _G.Update_Mouse == nil then
-	_G.Update_Mouse = function()
-		Mouse = dx9.GetMouse()
-	end
-end
-
-_G.Update_Mouse()
-
-if _G.Get_Distance_From_Mouse == nil then
-	_G.Get_Distance_From_Mouse = function(pos)
-		_G.Update_Mouse()
-		local a = (Mouse.x - pos.x) * (Mouse.x - pos.x)
-		local b = (Mouse.y - pos.y) * (Mouse.y - pos.y)
-		
-		return math.floor(math.sqrt(a + b) + 0.5)
-	end
-end
-
-if My_player ~= nil and My_player ~= 0 then
-    My_character = dx9.FindFirstChild(Workspace, Local_player_name)
-end
-
-if My_character ~= nil and My_character ~= 0 then
-	My_head = dx9.FindFirstChild(My_character, "Head")
-	My_root = dx9.FindFirstChild(My_character, "HumanoidRootPart")
-	My_humanoid = dx9.FindFirstChild(My_character, "Humanoid")
-end
-
-if not _G.Get_local_player_position then
-    _G.Get_local_player_position = function()
-        if dx9.GetType(Local_player) == "Player" then
-            if My_root then
-                local my_root_pos = dx9.GetPosition(My_root)
-                return my_root_pos
-            elseif Local_player_table then
-                return Local_player_table.Position
-            end
-        else
-            return Local_player.Position or Local_player_table.Position
-        end
-    end
-end
 
 if _G.IsOnScreen == nil then
 	_G.IsOnScreen = function(screen_pos)
