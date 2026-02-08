@@ -580,7 +580,7 @@ if _G.PylonTask == nil then
                                     color = Config.pylons.color,
                                     healthbar = false,
                                     nametag = Pylons.nametag.Value,
-                                    custom_nametag = "PYLON | Position:"..root_pos.x..", "..root_pos.y..", "..root_pos.z,
+                                    custom_nametag = "PYLON | Position: "..math.floor(root_pos.x)..", "..math.floor(root_pos.y)..", "..math.floor(root_pos.z),
                                     distance = My_root ~= nil and My_root ~= 0 and Pylons.distance.Value or false,
                                     custom_distance = ""..root_distance,
                                     tracer = Pylons.tracer.Value,
@@ -648,8 +648,6 @@ if _G.ObjectTask == nil then
 
                         local espType = cached_tab.hrp ~= nil and nil or "misc"
 
-                        print("Object: "..name.." | Position: "..root_pos.x..", "..root_pos.y..", "..root_pos.z)
-
                         if _G.IsOnScreen(screen_pos) then								
                             if root_distance < Objects.distance_limit.Value then
                                 Lib_esp.draw({
@@ -658,7 +656,7 @@ if _G.ObjectTask == nil then
                                     color = Config.objects.color,
                                     healthbar = false,
                                     nametag = Objects.nametag.Value,
-                                    custom_nametag = name.." | Position:"..root_pos.x..", "..root_pos.y..", "..root_pos.z,
+                                    custom_nametag = name.." | Position: "..math.floor(root_pos.x)..", "..math.floor(root_pos.y)..", "..math.floor(root_pos.z),
                                     distance = My_root ~= nil and My_root ~= 0 and Objects.distance.Value or false,
                                     custom_distance = ""..root_distance,
                                     tracer = Objects.tracer.Value,
