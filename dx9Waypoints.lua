@@ -381,6 +381,13 @@ Waypoints.distance = Groupboxes.waypoints:AddToggle({
 	Text = "ESP Distance Visible";
 })
 Groupboxes.waypoints:AddTitle("Functions")
+
+--any initial waypoints
+local waypointSelectionOptions = _G.GetWaypointSelectionOptions()
+local waypointDropdownSelectionOptions = _G.GetWaypointDropdownSelectionOptions(waypointSelectionOptions)
+
+Waypoints.selector:SetValues(waypointDropdownSelectionOptions)
+
 Waypoints.savewaypoint = Groupboxes.waypoints:AddButton("Save Waypoint Settings", function()
 	if _G.selectedWaypointIndex >= 1 and _G.selectedWaypointIndex <= #_G.waypointlist then
 		local waypointdata = _G.waypointlist[_G.selectedWaypointIndex]

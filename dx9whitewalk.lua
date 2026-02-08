@@ -55,16 +55,56 @@ end
 
 if _G.waypointlist == nil then
     _G.waypointlist = {
-        -- {
-		--     position = my_root_pos;
-        --     name = "";
-        --     visible = Waypoints.visible.Value;
-        --     color = Waypoints.color ~= nil and Waypoints.color.Value or nil;
-        --     tracer = Waypoints.tracer ~= nil and Waypoints.tracer.Value or nil;
-        --     distance_limit = Waypoints.distance_limit ~= nil and Waypoints.distance_limit.Value or nil;
-        --     nametag = Waypoints.nametag ~= nil and Waypoints.nametag.Value or nil;
-        --     newwaypointdata.distance = Waypoints.distance ~= nil and Waypoints.distance.Value or nil;
-        -- };
+        {
+		    position = {x = 350000, y = 4, z = 350000};
+            name = "DILLY";
+            visible = true;
+            color = { 255, 255, 0 };
+            tracer = false;
+            distance_limit = math.huge;
+            nametag = true;
+            distance = true;
+        };
+		{
+		    position = {x = -7390, y = 1112135.5, z = 2422.5};
+            name = "Flashlight";
+            visible = true;
+            color = { 255, 255, 0 };
+            tracer = false;
+            distance_limit = math.huge;
+            nametag = true;
+            distance = true;
+        };
+		{
+		    position = {x = -11357.5, y = 1117349.5, z = -57.3};
+            name = "(null)";
+            visible = true;
+            color = { 255, 255, 0 };
+            tracer = false;
+            distance_limit = math.huge;
+            nametag = true;
+            distance = true;
+        };
+		{
+		    position = {x = 1856, y = 1.5, z = 45810};
+            name = "Ominous Part";
+            visible = true;
+            color = { 255, 255, 0 };
+            tracer = false;
+            distance_limit = math.huge;
+            nametag = true;
+            distance = true;
+        };
+		{
+		    position = {x = 387.5, y = 602.5, z = 350000};
+            name = "Fire";
+            visible = true;
+            color = { 255, 255, 0 };
+            tracer = false;
+            distance_limit = math.huge;
+            nametag = true;
+            distance = true;
+        };
     }
 end
 
@@ -576,6 +616,13 @@ Waypoints.distance = Groupboxes.waypoints:AddToggle({
 	Text = "ESP Distance Visible";
 })
 Groupboxes.waypoints:AddTitle("Functions")
+
+--any initial waypoints
+local waypointSelectionOptions = _G.GetWaypointSelectionOptions()
+local waypointDropdownSelectionOptions = _G.GetWaypointDropdownSelectionOptions(waypointSelectionOptions)
+
+Waypoints.selector:SetValues(waypointDropdownSelectionOptions)
+
 Waypoints.savewaypoint = Groupboxes.waypoints:AddButton("Save Waypoint Settings", function()
 	if _G.selectedWaypointIndex >= 1 and _G.selectedWaypointIndex <= #_G.waypointlist then
 		local waypointdata = _G.waypointlist[_G.selectedWaypointIndex]
@@ -863,38 +910,38 @@ if _G.ObjectTask then
 	_G.ObjectTask()
 end
 
--- if _G.WaypointTask == nil then
--- 	_G.WaypointTask = function()
--- 		for index, data in ipairs(_G.waypointlist) do
--- 			if data.visible then
--- 				local my_root_pos = Get_local_player_position()
--- 				local pos = data.position
--- 				local distance = _G.Get_Distance(my_root_pos, pos) or 0
--- 				local screen_pos = dx9.WorldToScreen({pos.x, pos.y, pos.z})
+if _G.WaypointTask == nil then
+	_G.WaypointTask = function()
+		for index, data in ipairs(_G.waypointlist) do
+			if data.visible then
+				local my_root_pos = Get_local_player_position()
+				local pos = data.position
+				local distance = _G.Get_Distance(my_root_pos, pos) or 0
+				local screen_pos = dx9.WorldToScreen({pos.x, pos.y, pos.z})
 				
--- 				local isOnScreen = _G.IsOnScreen(screen_pos) and true or false
--- 				local isInRange = distance < data.distance_limit and true or false
--- 				if isOnScreen then
--- 					if isInRange then
--- 						Lib_esp.ground_circle({
--- 							position = pos,
--- 							color = data.color,
--- 							nametag = data.nametag,
--- 							custom_nametag = data.name,
--- 							distance = data.distance,
--- 							custom_distance = distance,
--- 							tracer = data.tracer,
--- 							tracer_type = Master_esp_settings.tracer_type.ValueIndex
--- 						})
--- 					end
--- 				end
--- 			end
--- 		end
--- 	end
--- end
--- if _G.WaypointTask then
--- 	_G.WaypointTask()
--- end
+				local isOnScreen = _G.IsOnScreen(screen_pos) and true or false
+				local isInRange = distance < data.distance_limit and true or false
+				if isOnScreen then
+					if isInRange then
+						Lib_esp.ground_circle({
+							position = pos,
+							color = data.color,
+							nametag = data.nametag,
+							custom_nametag = data.name,
+							distance = data.distance,
+							custom_distance = distance,
+							tracer = data.tracer,
+							tracer_type = Master_esp_settings.tracer_type.ValueIndex
+						})
+					end
+				end
+			end
+		end
+	end
+end
+if _G.WaypointTask then
+	_G.WaypointTask()
+end
 
 local endTime = os.clock()
 local elapsedTime = endTime - startTime
